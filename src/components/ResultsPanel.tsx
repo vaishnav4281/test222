@@ -55,10 +55,10 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
 
     const headers = [
       // Domain Information
-      "Domain", 
-      "Domain Age", 
-      "Created Date", 
-      "Expires Date", 
+      "Domain",
+      "Domain Age",
+      "Created Date",
+      "Expires Date",
       "Registrar",
       // Network Information
       "IP Address",
@@ -80,7 +80,7 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
       // Metadata
       "Scan Timestamp"
     ];
-    
+
     const escapeCsv = (val: any) => {
       const s = val === null || val === undefined ? '' : String(val);
       // Quote fields that contain commas, semicolons, quotes, newlines, or start with special characters
@@ -97,7 +97,7 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
         const vt_rep = vt?.reputation ?? "-";
         const vt_mal = vt?.malicious ?? "-";
         const vt_risk = vt?.risk_level ?? "-";
-        
+
         return [
           // Domain Information
           escapeCsv(result.domain),
@@ -159,8 +159,8 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
   };
 
   return (
-  <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-  <CardHeader className="bg-gradient-to-r from-red-600/10 to-blue-600/10 border-b border-red-200/50 dark:border-blue-800/50 p-2 sm:p-3">
+    <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+      <CardHeader className="bg-gradient-to-r from-red-600/10 to-blue-600/10 border-b border-red-200/50 dark:border-blue-800/50 p-2 sm:p-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
           <CardTitle className="flex items-center space-x-2">
             <div className="p-2 bg-gradient-to-r from-red-600 to-blue-600 rounded-lg">
@@ -172,9 +172,9 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
             </Badge>
           </CardTitle>
           {results.length > 0 && (
-            <Button 
-              onClick={exportToCsv} 
-              size="sm" 
+            <Button
+              onClick={exportToCsv}
+              size="sm"
               variant="outline"
               className="border-red-200 dark:border-blue-800 hover:bg-gradient-to-r hover:from-red-50 hover:to-blue-50 dark:hover:from-red-950/50 dark:hover:to-blue-950/50 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
             >
@@ -184,7 +184,7 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
           )}
         </div>
       </CardHeader>
-  <CardContent className="p-2 sm:p-3">
+      <CardContent className="p-2 sm:p-3">
         {results.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
             <div className="bg-gradient-to-r from-red-100 to-blue-100 dark:from-red-950/50 dark:to-blue-950/50 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
@@ -196,8 +196,8 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
         ) : (
           <div className="space-y-4">
             {results.map((result, index) => (
-              <div 
-                key={result.id} 
+              <div
+                key={result.id}
                 className="border border-red-200/50 dark:border-blue-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in min-h-[240px]"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -247,13 +247,13 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
                     <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-950/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors duration-300">
                       <span className="font-medium text-slate-700 dark:text-slate-300">Country:</span>
                       <span className={`font-medium text-right ${result.country === '-' ? 'text-slate-400 dark:text-slate-500 italic' : 'text-red-600 dark:text-red-400'}`}>
-                        {result.country === '-' ? 'Checking...' : result.country}
+                        {result.country === '-' ? 'N/A' : result.country}
                       </span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors duration-300">
                       <span className="font-medium text-slate-700 dark:text-slate-300">ISP:</span>
                       <span className={`font-medium text-right break-all ${result.isp === '-' ? 'text-slate-400 dark:text-slate-500 italic' : 'text-blue-600 dark:text-blue-400'}`}>
-                        {result.isp === '-' ? 'Checking...' : result.isp}
+                        {result.isp === '-' ? 'N/A' : result.isp}
                       </span>
                     </div>
                   </div>

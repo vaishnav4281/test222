@@ -52,7 +52,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       .replace(/\.+$/, '');
 
     setIsScanning(true);
-    
+
     try {
       // OPTIMIZED: Fetch VirusTotal AND WHOIS in parallel for speed
       const [vtResult, whoisResult] = await Promise.allSettled([
@@ -85,7 +85,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           return null;
         })()
       ]);
-      
+
       const vtData: any = vtResult.status === 'fulfilled' ? vtResult.value : null;
       const whoisData: any = whoisResult.status === 'fulfilled' ? whoisResult.value : null;
       const attrs: any = vtData?.data?.attributes || {};
@@ -115,7 +115,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       let whoisCreated = creationDateStr;
       let whoisExpires = attrs.last_modification_date ? new Date(attrs.last_modification_date * 1000).toLocaleString() : "-";
       let whoisRegistrar = attrs.registrar || "-";
-      
+
       if (whoisData) {
         const wd = whoisData || {};
         whoisCreated = wd.created || wd.creation_date || whoisCreated;
@@ -143,10 +143,10 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           fetchWithTimeout(`/api/ipqs/check?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
           fetchWithTimeout(`/api/abuseipdb/check?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
         ]);
-        
+
         const ipqs = ipqsResult.status === 'fulfilled' ? ipqsResult.value : null;
         const abuse = abuseResult.status === 'fulfilled' ? abuseResult.value : null;
-        
+
         if (ipqs) {
           const fraud = typeof ipqs.fraud_score === 'number' ? ipqs.fraud_score : 0;
           abuseScore = Math.max(abuseScore, fraud);
@@ -158,14 +158,36 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           locLongitude = (ipqs.longitude !== undefined && ipqs.longitude !== null) ? String(ipqs.longitude) : locLongitude;
           locIsp = (ipqs.ISP || ipqs.isp || ipqs.organization || locIsp) as string;
         }
-        
+
+        // Fallback to IP-API if Country/ISP is still missing
+        if (locCountry === '-' || locIsp === '-') {
+          try {
+            console.log('⚠️ IPQS missing data, trying fallback to IP-API...');
+            const fallbackRes = await fetchWithTimeout(`/api/ip-api/json/${ip}`, 3000);
+            if (fallbackRes.ok) {
+              const fb = await fallbackRes.json();
+              if (fb.status === 'success') {
+                locCountry = fb.country || locCountry;
+                locRegion = fb.regionName || locRegion;
+                locCity = fb.city || locCity;
+                locIsp = fb.isp || locIsp;
+                locLatitude = fb.lat ? String(fb.lat) : locLatitude;
+                locLongitude = fb.lon ? String(fb.lon) : locLongitude;
+                console.log('✅ IP-API fallback success:', { country: locCountry, isp: locIsp });
+              }
+            }
+          } catch (e) {
+            console.warn('❌ Fallback IP fetch failed:', e);
+          }
+        }
+
         if (abuse?.data?.abuseConfidenceScore) {
           abuseScore = Math.max(abuseScore, abuse.data.abuseConfidenceScore);
         }
       }
 
       // Format DNS records for CSV export
-      const dnsRecordsString = lastDns.length > 0 
+      const dnsRecordsString = lastDns.length > 0
         ? lastDns.map((r: any) => `${r.type}: ${r.value}`).join('; ')
         : '-';
 
@@ -230,7 +252,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         })()
       };
       onVirusTotalResults(virusTotalResult);
-      
+
       // Kick off Metascraper in background (non-blocking) with parallel CORS proxy
       void (async () => {
         try {
@@ -349,7 +371,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           onMetascraperResults({ id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString(), error: errorMessage });
         }
       })();
-      
+
       // Removed background VT fetch (we already fetched it above)
       setIsScanning(false);
       setDomain("");
@@ -495,7 +517,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Domain Analysis</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-6 p-4 sm:p-6">
         <div className="space-y-3">
           <Label htmlFor="domain" className="text-sm font-medium text-slate-700 dark:text-slate-300">Domain Name</Label>
           <Input
@@ -509,8 +531,8 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           />
         </div>
 
-        <Button 
-          onClick={handleScan} 
+        <Button
+          onClick={handleScan}
           disabled={isScanning}
           className="w-full bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
         >
@@ -527,7 +549,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           )}
         </Button>
 
-        
+
       </CardContent>
     </Card>
   );

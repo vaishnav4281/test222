@@ -3,10 +3,22 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import fs from "fs";
+import dotenv from "dotenv";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const cwd = process.cwd();
+
+  // Load env_config manually to ensure keys are available
+  const envConfigPath = path.join(cwd, 'env_config');
+  if (fs.existsSync(envConfigPath)) {
+    const envConfig = dotenv.parse(fs.readFileSync(envConfigPath));
+    for (const k in envConfig) {
+      process.env[k] = envConfig[k];
+    }
+    console.log("[vite] Loaded env_config");
+  }
+
   const env = loadEnv(mode, cwd, "");
   const vtKey = env.VITE_VIRUSTOTAL_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY;
   const ipqsKeys = [
@@ -64,16 +76,16 @@ export default defineConfig(({ mode }) => {
             } else {
               console.log(`[vite] IPQS proxy configured with ${ipqsKeys.length} key(s)`);
             }
-            
+
             // Track key status: null = untested, true = working, false = exhausted
             const keyStatus: (boolean | null)[] = ipqsKeys.map(() => null);
             let currentKeyIndex = 0;
-            
+
             // INSTANT STARTUP: Test keys lazily on-demand instead of blocking at startup
             if (ipqsKeys.length > 0) {
               console.log(`[vite] ⚡ IPQS proxy ready with ${ipqsKeys.length} key(s) - instant startup mode`);
             }
-            
+
             // Helper to find next working key instantly
             const findNextWorkingKey = () => {
               for (let i = currentKeyIndex + 1; i < ipqsKeys.length; i++) {
@@ -81,7 +93,7 @@ export default defineConfig(({ mode }) => {
               }
               return currentKeyIndex; // No better key found
             };
-            
+
             proxy.on('proxyReq', (proxyReq, req, res) => {
               const ip = new URL(`http://localhost${req.url}`).searchParams.get('ip');
               if (!ip) {
@@ -89,28 +101,28 @@ export default defineConfig(({ mode }) => {
                 proxyReq.path = '/api/json/ip/invalid/invalid';
                 return;
               }
-              
+
               const currentKey = ipqsKeys[currentKeyIndex];
               if (!currentKey) {
                 console.error('[vite] IPQS proxy: no API key available');
                 proxyReq.path = '/api/json/ip/invalid/invalid';
                 return;
               }
-              
+
               proxyReq.path = `/api/json/ip/${currentKey}/${ip}?strictness=1&allow_public_access_points=true&lighter_penalties=true`;
               console.log(`[vite] ⚡ IPQS: Using key #${currentKeyIndex + 1} for IP ${ip}`);
             });
-            
+
             proxy.on('proxyRes', (proxyRes, req, res) => {
               const chunks: Buffer[] = [];
               proxyRes.on('data', (chunk) => chunks.push(chunk));
               proxyRes.on('end', () => {
                 const body = Buffer.concat(chunks).toString('utf8');
-                
+
                 // Check if quota exceeded
                 if (body.includes('exceeded your request quota')) {
                   keyStatus[currentKeyIndex] = false; // Mark as exhausted
-                  
+
                   // OPTIMIZED: Immediately find next working key
                   const nextKey = findNextWorkingKey();
                   if (nextKey !== currentKeyIndex) {

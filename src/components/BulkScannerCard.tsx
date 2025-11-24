@@ -37,7 +37,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
       throw err;
     }
   };
-  
+
   const [domains, setDomains] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
@@ -82,7 +82,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
       const vtData = vtDataResult.status === 'fulfilled' ? vtDataResult.value : null;
       const whoisData = whoisResult.status === 'fulfilled' ? whoisResult.value : null;
       const attrs = vtData?.data?.attributes || {};
-      
+
       const creationDateStr = attrs.creation_date ? new Date(attrs.creation_date * 1000).toLocaleString() : "-";
       const lastDns: any[] = Array.isArray(attrs.last_dns_records) ? attrs.last_dns_records : [];
       const nsRecords = lastDns.filter(r => r?.type === 'NS').map(r => r?.value).filter(Boolean);
@@ -119,16 +119,16 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
       let locLatitude = "-", locLongitude = "-", locIsp = "-";
       const ip = aRecord;
       const isIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(ip) || /^[a-fA-F0-9:]+$/.test(ip);
-      
+
       if (isIp) {
         const [ipqsResult, abuseResult] = await Promise.allSettled([
           fetchWithTimeout(`/api/ipqs/check?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
           fetchWithTimeout(`/api/abuseipdb/check?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
         ]);
-        
+
         const ipqs = ipqsResult.status === 'fulfilled' ? ipqsResult.value : null;
         const abuse = abuseResult.status === 'fulfilled' ? abuseResult.value : null;
-        
+
         if (ipqs) {
           const fraud = typeof ipqs.fraud_score === 'number' ? ipqs.fraud_score : 0;
           abuseScore = Math.max(abuseScore, fraud);
@@ -176,18 +176,18 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
             const metascraperResponse = await fetchThroughCorsProxy(targetUrl, { timeout: 4000, parallelAttempts: 3 });
             const html = await metascraperResponse.text();
             const metaData: any = { id: Date.now() + index + 1, domain, timestamp: new Date().toLocaleString() };
-            
+
             // Extract basic metadata
             const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
             const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i);
             const twitterTitleMatch = html.match(/<meta[^>]*name=["']twitter:title["'][^>]*content=["']([^"']+)["']/i);
             metaData.title = (ogTitleMatch?.[1] || twitterTitleMatch?.[1] || titleMatch?.[1] || '').trim();
-            
+
             const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
             const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i);
             const twitterDescMatch = html.match(/<meta[^>]*name=["']twitter:description["'][^>]*content=["']([^"']+)["']/i);
             metaData.description = (ogDescMatch?.[1] || twitterDescMatch?.[1] || descMatch?.[1] || '').trim();
-            
+
             const totalFields = 30;
             const filledFields = Object.keys(metaData).filter(key => key !== 'id' && key !== 'domain' && key !== 'timestamp' && key !== 'jsonLd' && metaData[key]).length;
             metaData.completenessScore = Math.round((filledFields / totalFields) * 100);
@@ -260,7 +260,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
 
   const handleBulkScan = async () => {
     const domainList = domains.trim().split('\n').filter(d => d.trim());
-    
+
     if (domainList.length === 0) {
       toast({
         title: "No Domains Found",
@@ -272,7 +272,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
 
     setIsScanning(true);
     setScanProgress(0);
-    
+
     let completed = 0;
     // Process domains in parallel batches
     for (let i = 0; i < domainList.length; i += BATCH_SIZE) {
@@ -301,7 +301,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
           <span className="bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">Bulk Domain Scanner</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-6 p-4 sm:p-6">
         <div className="space-y-3">
           <Label htmlFor="file-upload" className="text-sm font-medium text-slate-700 dark:text-slate-300">Upload Domain List (.txt)</Label>
           <div className="flex items-center space-x-2">
@@ -352,7 +352,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
               <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">{Math.round(scanProgress)}%</span>
             </div>
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
-              <div 
+              <div
                 className="bg-gradient-to-r from-blue-600 to-red-600 h-3 rounded-full transition-all duration-500 shadow-lg"
                 style={{ width: `${scanProgress}%` }}
               />
@@ -360,8 +360,8 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
           </div>
         )}
 
-        <Button 
-          onClick={handleBulkScan} 
+        <Button
+          onClick={handleBulkScan}
           disabled={isScanning}
           className="w-full bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
         >

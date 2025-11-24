@@ -26,9 +26,12 @@ dist-ssr
 .env.production
 .env*.local
 *.env
+env_config
 
 # Other files
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+
+/generated/prisma

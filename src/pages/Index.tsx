@@ -3,16 +3,30 @@ import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Search, Database, FileText, Globe, Activity, Moon, Sun } from "lucide-react";
+import { Shield, Search, Database, FileText, Globe, Activity, Moon, Sun, LogOut, History as HistoryIcon, Download, Trash2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import DomainAnalysisCard from "@/components/DomainAnalysisCard";
 import BulkScannerCard from "@/components/BulkScannerCard";
 import ResultsPanel from "@/components/ResultsPanel";
 import MetascraperResults from "@/components/MetascraperResults";
 import VirusTotalResults from "@/components/VirusTotalResults";
 import SecurityIntelPanel from "@/components/SecurityIntelPanel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<'single' | 'bulk'>('single');
+  const { token, logout, user } = useAuth();
+  const [activeTab, setActiveTab] = useState<'single' | 'bulk' | 'history'>('single');
+  const [history, setHistory] = useState<any[]>([]);
   const [results, setResults] = useState([]);
   const [metascraperResults, setMetascraperResults] = useState([]);
   const [virusTotalResults, setVirusTotalResults] = useState([]);
@@ -52,7 +66,7 @@ const Index = () => {
     // Check for saved theme preference or default to light mode
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       setIsDarkMode(true);
       document.documentElement.classList.add('dark');
@@ -70,9 +84,82 @@ const Index = () => {
     }
   };
 
+  const saveHistory = async (target: string, result: any) => {
+    if (!token) return;
+    try {
+      await fetch('http://localhost:3001/api/history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ target, result })
+      });
+    } catch (e) {
+      console.error('Failed to save history', e);
+    }
+  };
+
+  const fetchHistory = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:3001/api/history', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch history', e);
+    }
+  };
+
+  const downloadHistory = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('http://localhost:3001/api/history/download', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'scan_history.csv';
+        a.click();
+      }
+    } catch (e) {
+      console.error('Failed to download history', e);
+    }
+  };
+
+  const clearHistory = async () => {
+    if (!token) return;
+    // Confirmation handled by AlertDialog
+    try {
+      const res = await fetch('http://localhost:3001/api/history', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setHistory([]);
+      }
+    } catch (e) {
+      console.error('Failed to clear history', e);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      fetchHistory();
+    }
+  }, [activeTab]);
+
   // Create callback functions that properly handle state updates
   const handleSingleResults = (newResult: any) => {
     setResults(prev => [newResult, ...prev]);
+    saveHistory(newResult.domain || newResult.ip, newResult);
   };
 
   const handleMetascraperResults = (newResult: any) => {
@@ -85,196 +172,337 @@ const Index = () => {
 
   const handleBulkResults = (newResult: any) => {
     setResults(prev => [newResult, ...prev]);
+    saveHistory(newResult.domain || newResult.ip, newResult);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-red-50 dark:from-slate-900 dark:via-blue-950 dark:to-red-950 transition-all duration-700">
-      {/* Header */}
-      <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-b border-blue-200 dark:border-red-800 sticky top-0 z-50 transition-all duration-300 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo and Title Section */}
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="bg-gradient-to-br from-red-600 to-blue-600 p-2.5 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 flex-shrink-0">
-                <Shield className="h-5 w-5 text-white" />
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-base sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent leading-tight truncate">
-                  Domain Scope
-                </h1>
-                <p className="text-[10px] sm:text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-tight">
-                  OSINT • DNS • WHOIS • Security
-                </p>
-              </div>
-            </div>
+  const vtSummaryByDomain = useMemo(() => {
+    const map: Record<string, { reputation?: number; malicious?: number; suspicious?: number; harmless?: number; risk_level?: string; }> = {};
+    (virusTotalResults || []).forEach((r: any) => {
+      if (!r || !r.domain) return;
+      const stats = r.last_analysis_stats || {};
+      map[r.domain] = {
+        reputation: typeof r.reputation === 'number' ? r.reputation : undefined,
+        malicious: typeof stats.malicious === 'number' ? stats.malicious : undefined,
+        suspicious: typeof stats.suspicious === 'number' ? stats.suspicious : undefined,
+        harmless: typeof stats.harmless === 'number' ? stats.harmless : undefined,
+        risk_level: r.risk_level,
+      };
+    });
+    return map;
+  }, [virusTotalResults]);
 
-            {/* Actions Section */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <Button
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-blue-500/[0.02] pointer-events-none dark:opacity-100 opacity-50" />
+
+      {/* Header - Optimized spacing */}
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="bg-gradient-to-br from-red-600 to-blue-600 p-1.5 sm:p-2 rounded-lg sm:rounded-xl shadow-lg shadow-red-500/20 dark:shadow-red-500/30">
+                <Shield className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
+              </div>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                DomainScope
+              </h1>
+            </div>
+            <div className="flex items-center space-x-1.5 sm:space-x-3">
+              <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{user?.email}</span>
+              </div>
+              <button
                 onClick={toggleDarkMode}
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-lg hover:scale-105 transition-all duration-300 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-red-400 hover:shadow-md"
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 shadow-sm"
               >
-                {isDarkMode ? (
-                  <Sun className="h-4 w-4 text-yellow-500" />
-                ) : (
-                  <Moon className="h-4 w-4 text-blue-600" />
-                )}
-              </Button>
+                {isDarkMode ? <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-slate-700" />}
+              </button>
+              <button
+                onClick={logout}
+                className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all duration-300 font-medium shadow-lg shadow-red-500/30 text-sm"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Features Overview (hidden on small screens) */}
-        <div className="hidden md:grid grid-cols-3 lg:grid-cols-6 gap-3 lg:gap-4 mb-6">
-          {[
-            { icon: Search, label: "WHOIS & Ownership", color: "text-red-600", bg: "bg-red-100 dark:bg-red-950" },
-            { icon: Globe, label: "DNS & Infra Map", color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-950" },
-            { icon: Database, label: "IP • Geo • ISP", color: "text-red-500", bg: "bg-red-100 dark:bg-red-950" },
-            { icon: Shield, label: "Abuse Score (IPDB)", color: "text-blue-500", bg: "bg-blue-100 dark:bg-blue-950" },
-            { icon: Activity, label: "VirusTotal Security", color: "text-red-600", bg: "bg-red-100 dark:bg-red-950" },
-            { icon: FileText, label: "Metadata", color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-950" },
-          ].map((feature, index) => (
-            <Card key={index} className="text-center hover:shadow-xl transition-all duration-500 hover:scale-105 border-transparent hover:border-gradient-to-r hover:from-red-200 hover:to-blue-200 group animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-              <CardContent className="p-2 sm:p-4">
-                <div className={`h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 sm:mb-3 rounded-xl ${feature.bg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.icon className={`h-4 w-4 sm:h-6 sm:w-6 ${feature.color}`} />
-                </div>
-                <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  {feature.label}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10 md:py-12 space-y-8 sm:space-y-12 relative">
+        {/* Premium Hero Section - Balanced spacing */}
+        <div className="relative text-center space-y-5 sm:space-y-7 animate-fade-in">
+          {/* Elegant gradient background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+            <div className="absolute top-0 left-1/3 w-96 h-96 bg-gradient-to-br from-red-500/10 via-rose-400/5 to-transparent rounded-full blur-3xl" />
+            <div className="absolute top-20 right-1/3 w-96 h-96 bg-gradient-to-br from-blue-600/10 via-blue-400/5 to-transparent rounded-full blur-3xl" />
+          </div>
+
+          <div className="relative space-y-3 sm:space-y-5">
+            {/* Premium Typography */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif" }}>
+              <span className="block mb-1 sm:mb-2">Domain Intelligence</span>
+              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                Redefined
+              </span>
+            </h1>
+
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+              Enterprise-grade threat analysis and security intelligence platform
+            </p>
+          </div>
+
+          {/* Premium feature badges */}
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 pt-2 sm:pt-3">
+            <div className="group px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40 hover:scale-105 transition-all duration-300">
+              Real-time Scanning
+            </div>
+            <div className="group px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300">
+              Multi-Source Intelligence
+            </div>
+            <div className="group px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+              Instant Reports
+            </div>
+          </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-4 sm:mb-6 bg-gradient-to-r from-red-100 to-blue-100 dark:from-red-950 dark:to-blue-950 p-1 rounded-xl w-fit mx-auto animate-fade-in">
-          <Button
-            variant={activeTab === 'single' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('single')}
-            className={`rounded-lg transition-all duration-300 text-xs sm:text-sm ${activeTab === 'single' 
-              ? 'bg-gradient-to-r from-red-600 to-blue-600 text-white shadow-lg hover:scale-105' 
-              : 'hover:bg-white/50 dark:hover:bg-slate-800/50'
-            }`}
-          >
-            <Search className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            Single Domain
-          </Button>
-          <Button
-            variant={activeTab === 'bulk' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('bulk')}
-            className={`rounded-lg transition-all duration-300 text-xs sm:text-sm ${activeTab === 'bulk' 
-              ? 'bg-gradient-to-r from-red-600 to-blue-600 text-white shadow-lg hover:scale-105' 
-              : 'hover:bg-white/50 dark:hover:bg-slate-800/50'
-            }`}
-          >
-            <Database className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            Bulk Scanner
-          </Button>
-        </div>
+        {/* Main Content Area */}
+        <div className="space-y-8 sm:space-y-10">
+          {/* Tabs - Clean and professional */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              {[
+                { id: 'single', label: 'Single Scan', icon: Search },
+                { id: 'bulk', label: 'Bulk Scanner', icon: Database },
+                { id: 'history', label: 'Scan History', icon: HistoryIcon },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`
+                    relative flex items-center px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap
+                    ${activeTab === tab.id
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }
+                  `}
+                >
+                  <tab.icon className="h-4 w-4 mr-2" />
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* Main Content Area (centered) */}
-        <div className="space-y-6">
           {/* Scanner Panel - centered */}
           <div className="max-w-6xl mx-auto w-full animate-slide-in-right">
             {activeTab === 'single' ? (
-              <DomainAnalysisCard 
-                onResults={handleSingleResults} 
+              <DomainAnalysisCard
+                onResults={handleSingleResults}
                 onMetascraperResults={handleMetascraperResults}
                 onVirusTotalResults={handleVirusTotalResults}
               />
-            ) : (
-              <BulkScannerCard 
+            ) : activeTab === 'bulk' ? (
+              <BulkScannerCard
                 onResults={handleBulkResults}
                 onMetascraperResults={handleMetascraperResults}
                 onVirusTotalResults={handleVirusTotalResults}
               />
+            ) : (
+              <Card className="border-none shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Scan History</h2>
+                    <div className="flex space-x-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" className="hover:shadow-lg transition-all duration-300 hover:scale-105">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Clear History
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white dark:bg-slate-900 border-red-200 dark:border-red-900">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-red-600 dark:text-red-500">Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
+                              This action cannot be undone. This will permanently delete your entire scan history from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="border-slate-200 dark:border-slate-700">Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={clearHistory} className="bg-red-600 hover:bg-red-700 text-white border-0">
+                              Delete History
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {history.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300 group hover:border-blue-300 dark:hover:border-blue-700">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-50 to-slate-50 dark:from-blue-900/20 dark:to-slate-800 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                            {item.type === 'bulk' ? <Database className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{item.target}</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center mt-1">
+                              <HistoryIcon className="h-3 w-3 mr-1" />
+                              {new Date(item.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1">
+                          Completed
+                        </Badge>
+                      </div>
+                    ))}
+                    {history.length === 0 && (
+                      <div className="text-center text-slate-500 py-8">No scan history found.</div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
 
           {/* Results - centered wide */}
-          <div className="max-w-6xl mx-auto w-full space-y-6 animate-slide-in-right" style={{ animationDelay: '200ms' }}>
-            {/* Backend Results */}
-            <ResultsPanel 
-              results={results} 
-              vtSummaryByDomain={useMemo(() => {
-                const map: Record<string, { reputation?: number; malicious?: number; suspicious?: number; harmless?: number; risk_level?: string; }> = {};
-                (virusTotalResults || []).forEach((r: any) => {
-                  if (!r || !r.domain) return;
-                  const stats = r.last_analysis_stats || {};
-                  map[r.domain] = {
-                    reputation: typeof r.reputation === 'number' ? r.reputation : undefined,
-                    malicious: typeof stats.malicious === 'number' ? stats.malicious : undefined,
-                    suspicious: typeof stats.suspicious === 'number' ? stats.suspicious : undefined,
-                    harmless: typeof stats.harmless === 'number' ? stats.harmless : undefined,
-                    risk_level: r.risk_level,
-                  };
-                });
-                return map;
-              }, [virusTotalResults])}
-            />
+          {activeTab !== 'history' && (
+            <div className="max-w-6xl mx-auto w-full space-y-6 animate-slide-in-right" style={{ animationDelay: '200ms' }}>
+              {/* Backend Results */}
+              <ResultsPanel
+                results={results}
+                vtSummaryByDomain={vtSummaryByDomain}
+              />
 
-            {/* VirusTotal Results - Moved to second position */}
-            <VirusTotalResults results={virusTotalResults} />
+              {/* VirusTotal Results - Moved to second position */}
+              <VirusTotalResults results={virusTotalResults} />
 
-            {/* Security Intelligence: IPQS + AbuseIPDB + DNSBL */}
-            <SecurityIntelPanel results={results as any} />
+              {/* Security Intelligence: IPQS + AbuseIPDB + DNSBL */}
+              <SecurityIntelPanel results={results as any} />
 
-            {/* Metascraper Results - Moved to last position */}
-            <MetascraperResults results={metascraperResults} />
-          </div>
+              {/* Metascraper Results - Moved to last position */}
+              <MetascraperResults results={metascraperResults} />
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-blue-200 dark:border-red-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
-            <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-red-50 to-blue-50 dark:from-red-950/40 dark:to-blue-950/40 border border-red-200/50 dark:border-blue-800/50 hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-              <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent mb-4">Analysis includes</h3>
-              <ul className="space-y-2 text-sm sm:text-base text-slate-700 dark:text-slate-300">
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• WHOIS registration data</li>
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• DNS record information</li>
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• IP geolocation & ASN</li>
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• Security reputation check</li>
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• VPN/Proxy detection</li>
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• VirusTotal security analysis</li>
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• Webpage metadata extraction</li>
-              </ul>
+      {/* Footer - Balanced spacing */}
+      <footer className="relative border-t border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+        {/* Subtle gradient accents */}
+        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-r from-red-500/5 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-blue-600/5 to-transparent rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-10 sm:py-14 relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+            {/* Analysis features card */}
+            <div className="group relative rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 shadow-xl hover:shadow-2xl hover:border-red-500/50 dark:hover:border-red-500/50 transition-all duration-500 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl sm:rounded-2xl" />
+              <div className="relative">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-red-600 to-red-700 shadow-lg">
+                    <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">Analysis Includes</h3>
+                </div>
+                <ul className="space-y-3 text-sm sm:text-base text-slate-700 dark:text-slate-300">
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> WHOIS registration data
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> DNS record information
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> IP geolocation & ASN
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> Security reputation check
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> VPN/Proxy detection
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> VirusTotal security analysis
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> Webpage metadata extraction
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div className="rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-blue-50 to-red-50 dark:from-blue-950/40 dark:to-red-950/40 border border-blue-200/50 dark:border-red-800/50 hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-              <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent mb-4">Bulk scan features</h3>
-              <ul className="space-y-2 text-sm sm:text-base text-slate-700 dark:text-slate-300">
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• Bulk Scanning via Text Imports</li>
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• Real-time progress tracking</li>
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• Failed lookup logging</li>
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• CSV export with domain age</li>
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• Comprehensive reporting</li>
-                <li className="transition-colors duration-300 hover:text-red-600 dark:hover:text-blue-400">• Parallel batching for speed</li>
-                <li className="transition-colors duration-300 hover:text-blue-600 dark:hover:text-red-400">• Per-domain status & timing</li>
-              </ul>
+
+            {/* Bulk scan features card */}
+            <div className="group relative rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 shadow-xl hover:shadow-2xl hover:border-blue-600/50 dark:hover:border-blue-600/50 transition-all duration-500 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl sm:rounded-2xl" />
+              <div className="relative">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg">
+                    <Database className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">Bulk Scan Features</h3>
+                </div>
+                <ul className="space-y-3 text-sm sm:text-base text-slate-700 dark:text-slate-300">
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> Bulk scanning via text imports
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> Real-time progress tracking
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> Failed lookup logging
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> CSV export with domain age
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> Comprehensive reporting
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
+                    <span className="text-red-500">✦</span> Parallel batching for speed
+                  </li>
+                  <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span className="text-blue-500">✦</span> Per-domain status & timing
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-          <div className="text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-8 space-y-1">
-            <div>© {new Date().getFullYear()} Domain Scope</div>
-            <div>
-              Built by <span className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Vaishnav K</span> •
-              {' '}
+
+          {/* Credits */}
+          <div className="text-center text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-10 sm:mt-12 space-y-2">
+            <div className="font-medium">© {new Date().getFullYear()} DomainScope — Advanced Threat Intelligence Platform</div>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span>Developed by</span>
+              <span className="font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Vaishnav K</span>
+              <span>•</span>
               <a
                 href="https://github.com/vaishnav4281"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline hover:scale-105 transition-all duration-300"
               >
-                github.com/vaishnav4281
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                GitHub
+              </a>
+              <span>•</span>
+              <a
+                href="https://www.linkedin.com/in/va1shnav"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline hover:scale-105 transition-all duration-300"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+                LinkedIn
               </a>
             </div>
           </div>

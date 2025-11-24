@@ -68,8 +68,8 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
   };
 
   return (
-  <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
-  <CardHeader className="bg-gradient-to-r from-green-600/10 to-emerald-600/10 border-b border-green-200/50 dark:border-emerald-800/50 p-2 sm:p-3">
+    <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
+      <CardHeader className="bg-gradient-to-r from-green-600/10 to-emerald-600/10 border-b border-green-200/50 dark:border-emerald-800/50 p-2 sm:p-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
           <CardTitle className="flex items-center space-x-2">
             <div className="p-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg">
@@ -84,7 +84,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
           </CardTitle>
         </div>
       </CardHeader>
-  <CardContent className="p-2 sm:p-3">
+      <CardContent className="p-2 sm:p-3">
         {results.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
             <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-950/50 dark:to-emerald-950/50 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
@@ -96,8 +96,8 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
         ) : (
           <div className="space-y-4">
             {results.map((result, index) => (
-              <div 
-                key={result.id} 
+              <div
+                key={result.id}
                 className="border border-green-200/50 dark:border-emerald-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -150,13 +150,13 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
 
                 {!result.error && (
                   <Tabs defaultValue="security" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 bg-green-100 dark:bg-green-950">
-                      <TabsTrigger value="security" className="text-xs">Security</TabsTrigger>
-                      <TabsTrigger value="detection" className="text-xs">Detection</TabsTrigger>
-                      <TabsTrigger value="reputation" className="text-xs">Reputation</TabsTrigger>
-                      <TabsTrigger value="categories" className="text-xs">Categories</TabsTrigger>
-                      <TabsTrigger value="dns" className="text-xs">DNS/SSL</TabsTrigger>
-                      <TabsTrigger value="info" className="text-xs">Info</TabsTrigger>
+                    <TabsList className="grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-start bg-slate-100 dark:bg-slate-800 h-auto gap-1 p-1">
+                      <TabsTrigger value="security" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Security</TabsTrigger>
+                      <TabsTrigger value="detection" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Detection</TabsTrigger>
+                      <TabsTrigger value="reputation" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Reputation</TabsTrigger>
+                      <TabsTrigger value="categories" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Categories</TabsTrigger>
+                      <TabsTrigger value="dns" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">DNS/SSL</TabsTrigger>
+                      <TabsTrigger value="info" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Info</TabsTrigger>
                     </TabsList>
 
                     {/* SECURITY TAB */}
@@ -168,19 +168,19 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Malicious</p>
                             <p className="text-2xl font-bold text-red-600 dark:text-red-400">{result.last_analysis_stats.malicious || 0}</p>
                           </div>
-                          
+
                           <div className="p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
                             <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Suspicious</p>
                             <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{result.last_analysis_stats.suspicious || 0}</p>
                           </div>
-                          
+
                           <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
                             <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Harmless</p>
                             <p className="text-2xl font-bold text-green-600 dark:text-green-400">{result.last_analysis_stats.harmless || 0}</p>
                           </div>
-                          
+
                           <div className="p-3 bg-gray-50 dark:bg-gray-950/30 rounded-lg border border-gray-200 dark:border-gray-800">
                             <Activity className="h-5 w-5 text-gray-600 dark:text-gray-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Undetected</p>
@@ -212,12 +212,11 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                             <div key={vendor} className="p-2 bg-slate-50 dark:bg-slate-950/50 rounded border border-slate-200 dark:border-slate-700">
                               <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium">{vendor}</span>
-                                <Badge className={`text-xs ${
-                                  data.category === 'malicious' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' :
+                                <Badge className={`text-xs ${data.category === 'malicious' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' :
                                   data.category === 'suspicious' ? 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' :
-                                  data.category === 'harmless' ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' :
-                                  'bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300'
-                                }`}>
+                                    data.category === 'harmless' ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' :
+                                      'bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300'
+                                  }`}>
                                   {data.category}
                                 </Badge>
                               </div>
@@ -286,24 +285,24 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       )}
                     </TabsContent>
 
-                    {/* DNS/SSL TAB */}
+                    {/* DNS/SSL TAB - Mobile Optimized */}
                     <TabsContent value="dns" className="space-y-3 mt-4">
                       {result.last_dns_records && result.last_dns_records.length > 0 && (
                         <div>
                           <p className="text-xs font-semibold text-green-600 dark:text-green-400 mb-2 flex items-center space-x-2">
-                            <Server className="h-4 w-4" />
+                            <Server className="h-4 w-4 flex-shrink-0" />
                             <span>DNS Records ({result.last_dns_records.length})</span>
                           </p>
                           <div className="space-y-2">
                             {result.last_dns_records.slice(0, 10).map((record, idx) => (
-                              <div key={idx} className="p-2 bg-slate-50 dark:bg-slate-950/50 rounded text-xs">
-                                <div className="flex items-center justify-between">
-                                  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-xs">
+                              <div key={idx} className="p-2 sm:p-3 bg-slate-50 dark:bg-slate-950/50 rounded text-xs">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-xs w-fit">
                                     {record.type}
                                   </Badge>
-                                  <span className="text-slate-600 dark:text-slate-400 font-mono">{record.value}</span>
+                                  <span className="text-slate-600 dark:text-slate-400 font-mono break-all text-xs">{record.value}</span>
                                 </div>
-                                {record.ttl && <p className="text-slate-500 mt-1">TTL: {record.ttl}</p>}
+                                {record.ttl && <p className="text-slate-500 mt-1 text-xs">TTL: {record.ttl}</p>}
                               </div>
                             ))}
                           </div>
@@ -313,18 +312,18 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       {result.last_https_certificate && (
                         <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
                           <div className="flex items-center space-x-2 mb-2">
-                            <Lock className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <Lock className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
                             <p className="text-xs font-semibold text-green-600 dark:text-green-400">SSL Certificate</p>
                           </div>
                           <div className="space-y-1 text-xs">
                             {result.last_https_certificate.subject && (
-                              <div><span className="font-medium">Subject:</span> {result.last_https_certificate.subject.CN}</div>
+                              <div className="break-words"><span className="font-medium">Subject:</span> {result.last_https_certificate.subject.CN}</div>
                             )}
                             {result.last_https_certificate.issuer && (
-                              <div><span className="font-medium">Issuer:</span> {result.last_https_certificate.issuer.O}</div>
+                              <div className="break-words"><span className="font-medium">Issuer:</span> {result.last_https_certificate.issuer.O}</div>
                             )}
                             {result.last_https_certificate_date && (
-                              <div><span className="font-medium">Last Seen:</span> {result.last_https_certificate_date}</div>
+                              <div className="break-words"><span className="font-medium">Last Seen:</span> {result.last_https_certificate_date}</div>
                             )}
                           </div>
                         </div>
@@ -333,7 +332,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       {result.jarm && (
                         <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg">
                           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">JARM Fingerprint</p>
-                          <p className="text-xs text-slate-700 dark:text-slate-300 font-mono break-all">{result.jarm}</p>
+                          <p className="text-xs text-slate-700 dark:text-slate-300 font-mono break-all mt-1">{result.jarm}</p>
                         </div>
                       )}
                     </TabsContent>
