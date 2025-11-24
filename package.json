@@ -2,7 +2,11 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
+  "packageManager": "npm@9.8.1",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node dev-server.js",
     "build": "vite build && npx prisma generate",
