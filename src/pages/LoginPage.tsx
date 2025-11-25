@@ -118,9 +118,9 @@ export default function LoginPage() {
                             <Share2 className="h-7 w-7" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Graph Intelligence</h3>
+                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Security Scoring</h3>
                             <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Advanced algorithms for threat pivoting, relationship mapping, and infrastructure analysis.
+                                Multi-source threat intelligence with IPQS fraud detection, AbuseIPDB reports, and DNS blacklist monitoring.
                             </p>
                         </div>
                     </div>
