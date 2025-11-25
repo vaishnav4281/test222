@@ -51,8 +51,8 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
   };
 
   return (
-  <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
-  <CardHeader className="bg-gradient-to-r from-purple-600/10 to-pink-600/10 border-b border-purple-200/50 dark:border-pink-800/50 p-2 sm:p-3">
+    <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
+      <CardHeader className="bg-gradient-to-r from-purple-600/10 to-pink-600/10 border-b border-purple-200/50 dark:border-pink-800/50 p-2 sm:p-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
           <CardTitle className="flex items-center space-x-2">
             <div className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
@@ -67,7 +67,7 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
           </CardTitle>
         </div>
       </CardHeader>
-  <CardContent className="p-2 sm:p-3">
+      <CardContent className="p-2 sm:p-3">
         {results.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
             <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-950/50 dark:to-pink-950/50 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
@@ -79,8 +79,8 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
         ) : (
           <div className="space-y-4">
             {results.map((result, index) => (
-              <div 
-                key={result.id} 
+              <div
+                key={result.id}
                 className="border border-purple-200/50 dark:border-pink-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -129,13 +129,13 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
 
                 {!result.error && (
                   <Tabs defaultValue="basic" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 bg-purple-100 dark:bg-purple-950">
-                      <TabsTrigger value="basic" className="text-xs">Basic</TabsTrigger>
-                      <TabsTrigger value="social" className="text-xs">Social</TabsTrigger>
-                      <TabsTrigger value="content" className="text-xs">Content</TabsTrigger>
-                      <TabsTrigger value="tech" className="text-xs">Tech</TabsTrigger>
-                      <TabsTrigger value="media" className="text-xs">Media</TabsTrigger>
-                      <TabsTrigger value="schema" className="text-xs">Schema</TabsTrigger>
+                    <TabsList className="grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-start bg-slate-100 dark:bg-slate-800 h-auto gap-1 p-1">
+                      <TabsTrigger value="basic" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Basic</TabsTrigger>
+                      <TabsTrigger value="social" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Social</TabsTrigger>
+                      <TabsTrigger value="content" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Content</TabsTrigger>
+                      <TabsTrigger value="tech" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Tech</TabsTrigger>
+                      <TabsTrigger value="media" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Media</TabsTrigger>
+                      <TabsTrigger value="schema" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Schema</TabsTrigger>
                     </TabsList>
 
                     {/* BASIC TAB */}
@@ -331,9 +331,9 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                             <Image className="h-3 w-3" />
                             <span>Open Graph / Featured Image</span>
                           </p>
-                          <img 
-                            src={result.image} 
-                            alt={result.imageAlt || "Featured"} 
+                          <img
+                            src={result.image}
+                            alt={result.imageAlt || "Featured"}
                             className="w-full h-48 object-cover rounded-lg border border-purple-200 dark:border-pink-800"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
@@ -345,13 +345,13 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                         </div>
                       )}
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {result.favicon && (
                           <div>
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Favicon</p>
-                            <img 
-                              src={result.favicon} 
-                              alt="Favicon" 
+                            <img
+                              src={result.favicon}
+                              alt="Favicon"
                               className="h-16 w-16 object-contain rounded-lg border border-purple-200 dark:border-pink-800 bg-white dark:bg-slate-800 p-2"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
@@ -362,9 +362,9 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                         {result.logo && (
                           <div>
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Logo/Touch Icon</p>
-                            <img 
-                              src={result.logo} 
-                              alt="Logo" 
+                            <img
+                              src={result.logo}
+                              alt="Logo"
                               className="h-16 w-16 object-contain rounded-lg border border-purple-200 dark:border-pink-800 bg-white dark:bg-slate-800 p-2"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
