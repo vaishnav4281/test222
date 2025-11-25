@@ -1,11 +1,18 @@
 
 import React, { useState } from "react";
+import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_BASE_URL } from '../config';
 import { Button } from "@/components/ui/button";
+import { API_BASE_URL } from '../config';
 import { Label } from "@/components/ui/label";
+import { API_BASE_URL } from '../config';
 import { Database, Upload, Loader2 } from "lucide-react";
+import { API_BASE_URL } from '../config';
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from '../config';
 import { fetchThroughCorsProxy } from "@/lib/cors-proxy";
+import { API_BASE_URL } from '../config';
 
 const cleanDomain = (raw: string): string => {
   if (!raw) return "";
@@ -56,7 +63,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
         // VirusTotal
         (async () => {
           try {
-            const vtUrl = `/api/vt/domains/${encodeURIComponent(domain)}`;
+            const vtUrl = `${API_BASE_URL}/api/v1/scan/virustotal/${encodeURIComponent(domain)}`;
             let vtResponse = await fetchWithTimeout(vtUrl, 5000);
             if (!vtResponse.ok && vtResponse.status === 401 && import.meta.env.DEV && import.meta.env.VITE_VIRUSTOTAL_API_KEY) {
               const direct = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(domain)}`, {
@@ -72,7 +79,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
         // WHOIS
         (async () => {
           try {
-            const whoisRes = await fetchWithTimeout(`/api/whois?domain=${encodeURIComponent(domain)}`, 5000);
+            const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois/${encodeURIComponent(domain)}`, 5000);
             if (whoisRes.ok) return await whoisRes.json();
           } catch (e) { }
           return null;

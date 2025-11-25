@@ -1,12 +1,20 @@
 
 import React, { useState } from "react";
+import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_BASE_URL } from '../config';
 import { Button } from "@/components/ui/button";
+import { API_BASE_URL } from '../config';
 import { Input } from "@/components/ui/input";
+import { API_BASE_URL } from '../config';
 import { Label } from "@/components/ui/label";
+import { API_BASE_URL } from '../config';
 import { Search, Loader2 } from "lucide-react";
+import { API_BASE_URL } from '../config';
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from '../config';
 import { fetchThroughCorsProxy } from "@/lib/cors-proxy";
+import { API_BASE_URL } from '../config';
 
 interface DomainAnalysisCardProps {
   onResults: (result: any) => void;
@@ -59,7 +67,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         // VirusTotal
         (async () => {
           try {
-            const vtUrl = `/api/vt/domains/${encodeURIComponent(sanitizedDomain)}`;
+            const vtUrl = `${API_BASE_URL}/api/v1/scan/virustotal/${encodeURIComponent(sanitizedDomain)}`;
             let vtResponse = await fetchWithTimeout(vtUrl, 5000);
             if (!vtResponse.ok && vtResponse.status === 401 && import.meta.env.DEV && import.meta.env.VITE_VIRUSTOTAL_API_KEY) {
               const direct = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(sanitizedDomain)}`, {
@@ -77,7 +85,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         // WHOIS
         (async () => {
           try {
-            const whoisRes = await fetchWithTimeout(`/api/whois?domain=${encodeURIComponent(sanitizedDomain)}`, 5000);
+            const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois/${encodeURIComponent(sanitizedDomain)}`, 5000);
             if (whoisRes.ok) return await whoisRes.json();
           } catch (e) {
             console.warn('⚠️ WHOIS fetch failed:', e);
