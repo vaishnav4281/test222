@@ -37,9 +37,9 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            // Create a timeout promise
+            // Create a timeout promise (60s for auth operations)
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('timeout')), 30000)
+                setTimeout(() => reject(new Error('timeout')), 60000)
             );
 
             // Race between fetch and timeout
@@ -65,7 +65,7 @@ export default function LoginPage() {
             }
         } catch (error: any) {
             if (error.message === 'timeout') {
-                toast.error('Request timeout. Server may be starting up, please try again in 30 seconds.');
+                toast.error('Request timeout after 60 seconds. Server may be slow, please try again.');
             } else if (error.message?.includes('fetch')) {
                 toast.error('Connection failed. Please check your internet or try again.');
             } else {
