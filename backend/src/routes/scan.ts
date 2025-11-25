@@ -36,7 +36,7 @@ router.get('/vt', async (req, res) => {
         return res.status(400).json({ error: 'Missing domain parameter' });
     }
     const result = await checkVirusTotal(domain);
-    res.json({ stats: result });
+    res.json(result || {});
 });
 
 router.get('/ipqs', async (req, res) => {

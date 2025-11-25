@@ -22,7 +22,8 @@ export async function checkVirusTotal(domain: string) {
         }
 
         const data: any = await response.json();
-        return data.data?.attributes?.last_analysis_stats || null;
+        // Return full response so frontend can access data.attributes
+        return data;
     } catch (error: any) {
         console.error('VirusTotal check error:', error.message);
         return null;
