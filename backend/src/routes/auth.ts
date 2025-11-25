@@ -33,15 +33,10 @@ router.post('/signup', async (req, res) => {
         const otp = generateOTP();
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-        // Store OTP in database
-        await prisma.emailVerification.create({
-            data: {
-                userId: user.id,
-                email,
-                otp,
-                type: 'signup',
-                expiresAt,
-            },
+        // Store OTP in user.verificationToken (simple approach)
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { verificationToken: otp },
         });
 
         // Send verification email
@@ -68,29 +63,22 @@ router.post('/verify-email', async (req, res) => {
         if (!user) return res.status(400).json({ error: 'User not found' });
 
         // Find valid OTP
-        const verification = await prisma.emailVerification.findFirst({
-            where: {
-                email,
-                otp,
-                type: 'signup',
-                verified: false,
-                expiresAt: { gt: new Date() },
-            },
+        // Verify OTP against stored token on user
+        const userWithToken = await prisma.user.findUnique({
+            where: { email },
+            select: { verificationToken: true },
         });
-
-        if (!verification) {
+        if (!userWithToken || userWithToken.verificationToken !== otp) {
             return res.status(400).json({ error: 'Invalid or expired OTP' });
         }
 
-        // Mark as verified
-        await prisma.emailVerification.update({
-            where: { id: verification.id },
-            data: { verified: true },
-        });
 
+
+        // Mark as verified
+        // Mark email as verified and clear token
         await prisma.user.update({
             where: { id: user.id },
-            data: { emailVerified: true },
+            data: { emailVerified: true, verificationToken: null },
         });
 
         // Send welcome email (non-blocking)
@@ -123,25 +111,11 @@ router.post('/resend-otp', async (req, res) => {
             return res.status(400).json({ error: 'Email already verified' });
         }
 
-        // Generate new OTP
+        // Generate new OTP and store on user
         const otp = generateOTP();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-        // Invalidate old OTPs
-        await prisma.emailVerification.updateMany({
-            where: { email, type: 'signup', verified: false },
-            data: { verified: true }, // Mark as used
-        });
-
-        // Create new OTP
-        await prisma.emailVerification.create({
-            data: {
-                userId: user.id,
-                email,
-                otp,
-                type: 'signup',
-                expiresAt,
-            },
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { verificationToken: otp },
         });
 
         // Send email
@@ -194,24 +168,11 @@ router.post('/forgot-password', async (req, res) => {
             return res.json({ message: 'If an account exists, a password reset link has been sent' });
         }
 
-        // Generate reset token
+        // Generate reset token and store on user
         const resetToken = generateResetToken();
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-        // Store token
         await prisma.user.update({
             where: { id: user.id },
             data: { verificationToken: resetToken },
-        });
-
-        await prisma.emailVerification.create({
-            data: {
-                userId: user.id,
-                email,
-                otp: resetToken,
-                type: 'password_reset',
-                expiresAt,
-            },
         });
 
         // Send reset email
@@ -233,17 +194,12 @@ router.post('/reset-password', async (req, res) => {
         }
 
         // Find valid reset token
-        const verification = await prisma.emailVerification.findFirst({
-            where: {
-                otp: token,
-                type: 'password_reset',
-                verified: false,
-                expiresAt: { gt: new Date() },
-            },
-            include: { user: true },
+        // Verify reset token against user's verificationToken
+        const user = await prisma.user.findFirst({
+            where: { verificationToken: token },
+            select: { id: true, verificationToken: true },
         });
-
-        if (!verification || !verification.user) {
+        if (!user) {
             return res.status(400).json({ error: 'Invalid or expired reset token' });
         }
 
@@ -252,17 +208,8 @@ router.post('/reset-password', async (req, res) => {
 
         // Update password and clear token
         await prisma.user.update({
-            where: { id: verification.user.id },
-            data: {
-                password: hashedPassword,
-                verificationToken: null,
-            },
-        });
-
-        // Mark token as used
-        await prisma.emailVerification.update({
-            where: { id: verification.id },
-            data: { verified: true },
+            where: { id: user.id },
+            data: { password: hashedPassword, verificationToken: null },
         });
 
         res.json({ message: 'Password reset successfully' });
