@@ -37,21 +37,22 @@ export default function SignupPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        // Create abort controller for timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
         try {
-            const res = await fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 30000)
+            );
+
+            // Race between fetch and timeout
+            const fetchPromise = fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
-                signal: controller.signal,
             });
 
-            clearTimeout(timeoutId);
-
+            const res = await Promise.race([fetchPromise, timeoutPromise]) as Response;
             const data = await res.json();
+
             if (res.ok) {
                 toast.success('Verification code sent to your email!');
                 setRegisteredEmail(email);
@@ -60,11 +61,12 @@ export default function SignupPage() {
                 toast.error(data.error || 'Signup failed');
             }
         } catch (error: any) {
-            clearTimeout(timeoutId);
-            if (error.name === 'AbortError') {
+            if (error.message === 'timeout') {
                 toast.error('Request timeout. Server may be starting up, please try again in 30 seconds.');
-            } else {
+            } else if (error.message?.includes('fetch')) {
                 toast.error('Connection failed. Please check your internet or try again.');
+            } else {
+                toast.error(error.message || 'Something went wrong');
             }
             console.error('Signup error:', error);
         } finally {
