@@ -36,12 +36,21 @@ export default function SignupPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+
+        // Create abort controller for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
         try {
             const res = await fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
+                signal: controller.signal,
             });
+
+            clearTimeout(timeoutId);
+
             const data = await res.json();
             if (res.ok) {
                 toast.success('Verification code sent to your email!');
@@ -50,8 +59,14 @@ export default function SignupPage() {
             } else {
                 toast.error(data.error || 'Signup failed');
             }
-        } catch (error) {
-            toast.error('Something went wrong');
+        } catch (error: any) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                toast.error('Request timeout. Server may be starting up, please try again in 30 seconds.');
+            } else {
+                toast.error('Connection failed. Please check your internet or try again.');
+            }
+            console.error('Signup error:', error);
         } finally {
             setIsLoading(false);
         }
