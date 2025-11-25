@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Shield, Globe, Activity, Share2, Mail, Lock, User, Sun, Moon } from 'lucide-react';
+import { Shield, Globe, Activity, Share2, Mail, Lock, User, Sun, Moon, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import OTPVerificationModal from '@/components/OTPVerificationModal';
 
@@ -13,6 +13,7 @@ export default function SignupPage() {
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
     const [isDark, setIsDark] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [showOTPModal, setShowOTPModal] = useState(false);
     const [registeredEmail, setRegisteredEmail] = useState('');
     const { login } = useAuth();
@@ -34,6 +35,7 @@ export default function SignupPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
             const res = await fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
                 method: 'POST',
@@ -50,6 +52,8 @@ export default function SignupPage() {
             }
         } catch (error) {
             toast.error('Something went wrong');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -227,9 +231,17 @@ export default function SignupPage() {
 
                             <Button
                                 type="submit"
-                                className="w-full h-14 bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-500 hover:to-red-500 text-white font-bold text-base rounded-xl shadow-xl shadow-red-500/30 dark:shadow-red-900/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                                disabled={isLoading}
+                                className="w-full h-14 bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-500 hover:to-red-500 text-white font-bold text-base rounded-xl shadow-xl shadow-red-500/30 dark:shadow-red-900/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                             >
-                                Create Your Account
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        Creating account...
+                                    </>
+                                ) : (
+                                    'Create Your Account'
+                                )}
                             </Button>
                         </form>
 

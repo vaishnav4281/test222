@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon } from 'lucide-react';
+import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import OTPVerificationModal from '@/components/OTPVerificationModal';
 
@@ -12,6 +12,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isDark, setIsDark] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [showOTPModal, setShowOTPModal] = useState(false);
     const [unverifiedEmail, setUnverifiedEmail] = useState('');
     const { login } = useAuth();
@@ -33,6 +34,7 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
             const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
                 method: 'POST',
@@ -53,6 +55,8 @@ export default function LoginPage() {
             }
         } catch (error) {
             toast.error('Something went wrong');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -211,9 +215,17 @@ export default function LoginPage() {
 
                             <Button
                                 type="submit"
-                                className="w-full h-14 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white font-bold text-base rounded-xl shadow-xl shadow-blue-500/30 dark:shadow-blue-900/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                                disabled={isLoading}
+                                className="w-full h-14 bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-500 hover:to-blue-500 text-white font-bold text-base rounded-xl shadow-xl shadow-blue-500/30 dark:shadow-blue-900/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                             >
-                                Sign In to Dashboard
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                        Signing in...
+                                    </>
+                                ) : (
+                                    'Sign In to Dashboard'
+                                )}
                             </Button>
 
                             {/* Forgot Password Link */}
