@@ -26,7 +26,7 @@ export async function sendVerificationEmail(email: string, otp: string) {
 
         if (error) {
             console.error('Resend error:', error);
-            throw new Error('Failed to send verification email');
+            throw new Error(`Resend Error: ${error.message || 'Failed to send verification email'}`);
         }
 
         console.log('✅ Verification email sent:', data);

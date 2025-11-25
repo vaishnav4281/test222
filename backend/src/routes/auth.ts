@@ -48,7 +48,9 @@ router.post('/signup', async (req, res) => {
         });
     } catch (error) {
         console.error('Signup error:', error);
-        res.status(500).json({ error: 'Server error during signup' });
+        res.status(500).json({
+            error: error instanceof Error ? error.message : 'Server error during signup'
+        });
     }
 });
 
