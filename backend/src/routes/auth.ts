@@ -139,13 +139,13 @@ router.post('/login', async (req, res) => {
         if (!validPassword) return res.status(400).json({ error: 'Invalid password' });
 
         // Check if email is verified
-        if (!user.emailVerified) {
-            return res.status(403).json({
-                error: 'Email not verified',
-                code: 'EMAIL_NOT_VERIFIED',
-                email: user.email
-            });
-        }
+        // if (!user.emailVerified) {
+        //     return res.status(403).json({
+        //         error: 'Email not verified',
+        //         code: 'EMAIL_NOT_VERIFIED',
+        //         email: user.email
+        //     });
+        // }
 
         const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, user: { id: user.id, email: user.email, emailVerified: user.emailVerified } });
