@@ -6,12 +6,15 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Shield, Globe, Activity, Share2, Mail, Lock, User, Sun, Moon } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import OTPVerificationModal from '@/components/OTPVerificationModal';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
     const [isDark, setIsDark] = useState(true);
+    const [showOTPModal, setShowOTPModal] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -39,15 +42,24 @@ export default function SignupPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                login(data.token, data.user);
-                toast.success('Account created successfully!');
-                navigate('/');
+                toast.success('Verification code sent to your email!');
+                setRegisteredEmail(email);
+                setShowOTPModal(true);
             } else {
                 toast.error(data.error || 'Signup failed');
             }
         } catch (error) {
             toast.error('Something went wrong');
         }
+    };
+
+    const handleVerified = (token: string) => {
+        // Login with the token received after verification
+        const user = { id: 0, email: registeredEmail }; // id will be in the token
+        login(token, user);
+        setShowOTPModal(false);
+        toast.success('Welcome to DomainScope! 🎉');
+        navigate('/');
     };
 
     return (
@@ -225,7 +237,7 @@ export default function SignupPage() {
                             Already have an account?{' '}
                             <Link
                                 to="/login"
-                                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold hover:underline transition-all"
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-colors duration-300 hover:underline"
                             >
                                 Sign In
                             </Link>
@@ -233,6 +245,14 @@ export default function SignupPage() {
                     </div>
                 </div>
             </div>
+
+            {/* OTP Verification Modal */}
+            <OTPVerificationModal
+                open={showOTPModal}
+                onClose={() => setShowOTPModal(false)}
+                email={registeredEmail}
+                onVerified={handleVerified}
+            />
         </div>
     );
 }
