@@ -56,10 +56,6 @@ export default function LoginPage() {
                 login(data.token, data.user);
                 toast.success('Welcome back!');
                 navigate('/');
-            } else if (data.code === 'EMAIL_NOT_VERIFIED') {
-                toast.error('Please verify your email first');
-                setUnverifiedEmail(email);
-                setShowOTPModal(true);
             } else {
                 toast.error(data.error || 'Login failed');
             }
