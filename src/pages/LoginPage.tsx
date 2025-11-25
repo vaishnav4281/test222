@@ -3,14 +3,17 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mail, Lock, Sun, Moon, Shield, Globe, Activity, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import OTPVerificationModal from '@/components/OTPVerificationModal';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isDark, setIsDark] = useState(true);
+    const [showOTPModal, setShowOTPModal] = useState(false);
+    const [unverifiedEmail, setUnverifiedEmail] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -41,12 +44,24 @@ export default function LoginPage() {
                 login(data.token, data.user);
                 toast.success('Welcome back!');
                 navigate('/');
+            } else if (data.code === 'EMAIL_NOT_VERIFIED') {
+                toast.error('Please verify your email first');
+                setUnverifiedEmail(email);
+                setShowOTPModal(true);
             } else {
                 toast.error(data.error || 'Login failed');
             }
         } catch (error) {
             toast.error('Something went wrong');
         }
+    };
+
+    const handleVerified = (token: string) => {
+        const user = { id: 0, email: unverifiedEmail };
+        login(token, user);
+        setShowOTPModal(false);
+        toast.success('Email verified! Welcome to DomainScope! 🎉');
+        navigate('/');
     };
 
     return (
@@ -200,6 +215,16 @@ export default function LoginPage() {
                             >
                                 Sign In to Dashboard
                             </Button>
+
+                            {/* Forgot Password Link */}
+                            <div className="text-center mt-4">
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium hover:underline transition-colors"
+                                >
+                                    Forgot your password?
+                                </Link>
+                            </div>
                         </form>
 
                         <div className="text-center text-sm text-slate-600 dark:text-slate-400 mt-8">
@@ -214,6 +239,15 @@ export default function LoginPage() {
                     </div>
                 </div>
             </div>
+
+            {/* OTP Verification Modal for unverified users */}
+            <OTPVerificationModal
+                open={showOTPModal}
+                onClose={() => setShowOTPModal(false)}
+                email={unverifiedEmail}
+                onVerified={handleVerified}
+            />
         </div>
     );
 }
+```
