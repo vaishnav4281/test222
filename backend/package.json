@@ -11,7 +11,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "postbuild": "echo '=== Dist folder contents ===' && ls -la dist/ && echo '=== All JS files ===' && find dist -name '*.js' || echo 'No dist folder found!'",
-    "start": "node dist/index.js",
+    "start": "node dist/server.js",
     "migrate": "prisma db push --accept-data-loss --skip-generate",
     "generate": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
