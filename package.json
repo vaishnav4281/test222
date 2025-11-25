@@ -8,13 +8,12 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node dev-server.js",
-    "build": "vite build && npx prisma generate",
     "dev": "vite",
-    "dev:dnsbl": "node dev-server.js",
-    "build:dev": "vite build --mode development",
+    "build": "vite build",
+    "start": "vite preview",
+    "preview": "vite preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "dev:server": "node dev-server.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
