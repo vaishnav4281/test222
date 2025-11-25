@@ -1,7 +1,6 @@
 {
-  "buildCommand": "npm ci && npm run build",
-  "installCommand": "npm ci",
-  "nodeVersion": "18.x",
+  "buildCommand": "npm run build",
+  "framework": "vite",
   "env": {
     "NODE_ENV": "production"
   }
