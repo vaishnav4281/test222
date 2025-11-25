@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_BASE_URL } from '../config';
 import { Badge } from "@/components/ui/badge";
-import { API_BASE_URL } from '../config';
 import { Shield, Globe, AlertTriangle, ListChecks, MapPin, WifiOff, Server } from "lucide-react";
 import { API_BASE_URL } from '../config';
 
@@ -71,7 +68,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
           (typeof r.abuse_score === 'number') || // 0 is valid (means clean)
           r.is_vpn_proxy === true
         );
-        
+
         if (hasValidData) {
           // Only add fields that have actual meaningful values
           const dataObj: any = {};
@@ -96,12 +93,12 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
             dataObj.vpn = true;
             dataObj.proxy = true;
           }
-          
+
           existingData[r.ip_address] = dataObj;
         }
       }
     });
-    
+
     // Set existing data first (only if we have valid data)
     if (Object.keys(existingData).length > 0) {
       setIpqs(prev => ({ ...prev, ...existingData }));
@@ -140,20 +137,22 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                   const isProxy = Boolean(fallbackData.proxy);
                   if (isHosting) estimatedFraudScore += 40;
                   if (isProxy) estimatedFraudScore += 50;
-                  
-                  setIpqs(prev => ({ ...prev, [ip]: {
-                    country_code: fallbackData.countryCode,
-                    country: fallbackData.country,
-                    region: fallbackData.regionName,
-                    city: fallbackData.city,
-                    ISP: fallbackData.isp || fallbackData.org,
-                    isp: fallbackData.isp || fallbackData.org,
-                    organization: fallbackData.org,
-                    proxy: isProxy,
-                    vpn: isProxy, // Use proxy as VPN indicator
-                    tor: false, // ip-api.com doesn't detect Tor specifically
-                    fraud_score: estimatedFraudScore,
-                  }}));
+
+                  setIpqs(prev => ({
+                    ...prev, [ip]: {
+                      country_code: fallbackData.countryCode,
+                      country: fallbackData.country,
+                      region: fallbackData.regionName,
+                      city: fallbackData.city,
+                      ISP: fallbackData.isp || fallbackData.org,
+                      isp: fallbackData.isp || fallbackData.org,
+                      organization: fallbackData.org,
+                      proxy: isProxy,
+                      vpn: isProxy, // Use proxy as VPN indicator
+                      tor: false, // ip-api.com doesn't detect Tor specifically
+                      fraud_score: estimatedFraudScore,
+                    }
+                  }));
                   console.log('📊 Estimated fraud score:', estimatedFraudScore);
                 }
               }
@@ -166,7 +165,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // AbuseIPDB: use Vite proxy
         if (!abuse[ip]) {
           try {
-            const r = await fetch(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`);
             if (r.ok) {
               const data = await r.json();
               setAbuse(prev => ({ ...prev, [ip]: data }));
@@ -180,13 +179,15 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                   // Estimate abuse score: each blacklist adds ~25 points
                   const estimatedAbuse = Math.min(100, dnsblCheck.listedCount * 25);
                   console.log('📊 Estimated abuse score from DNSBL:', estimatedAbuse);
-                  setAbuse(prev => ({ ...prev, [ip]: {
-                    data: {
-                      abuseConfidenceScore: estimatedAbuse,
-                      totalReports: dnsblCheck.listedCount,
-                      lastReportedAt: new Date().toISOString(),
+                  setAbuse(prev => ({
+                    ...prev, [ip]: {
+                      data: {
+                        abuseConfidenceScore: estimatedAbuse,
+                        totalReports: dnsblCheck.listedCount,
+                        lastReportedAt: new Date().toISOString(),
+                      }
                     }
-                  }}));
+                  }));
                 }
               }, 2000);
             }
@@ -198,7 +199,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // DNSBL
         if (!dnsbl[ip]) {
           try {
-            const r = await fetch(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
             if (!r.ok) throw new Error(String(r.status));
             const data = await r.json();
             setDnsbl(prev => ({ ...prev, [ip]: data }));
@@ -210,7 +211,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
       }
     };
     run();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(ips)]);
 
   const getRiskGradient = (score?: number) => {
@@ -247,13 +248,13 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
               const ipqsData = ipqs[ip] as IpqsData | undefined;
               const abuseData = abuse[ip] as AbuseData | undefined;
               const dnsblData = dnsbl[ip] as DnsblData | undefined;
-              
+
               // Check if data has been loaded with actual values (not just empty objects)
               const risk = (ipqsData as any)?.fraud_score as number | undefined;
               const isVpn = (ipqsData as any)?.vpn;
               const isProxy = (ipqsData as any)?.proxy;
               const isTor = (ipqsData as any)?.tor;
-              
+
               // Data is considered "loaded" only if it has actual values
               const hasIpqsData = ipqsData !== undefined && (
                 risk !== undefined ||
@@ -274,15 +275,15 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
               const hasVpnProxy = isVpn || isProxy || isTor;
               const abuseScore = abuseData?.data?.abuseConfidenceScore;
               const abuseReports = abuseData?.data?.totalReports;
-              
+
               // Debug logging
               if (!hasIpqsData && ipqsData !== undefined) {
                 console.log(`⚠️ IP ${ip} has empty IPQS data object:`, ipqsData);
               }
 
               return (
-                <div 
-                  key={ip} 
+                <div
+                  key={ip}
                   className="border border-red-200/50 dark:border-blue-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
