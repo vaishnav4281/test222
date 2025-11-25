@@ -40,7 +40,7 @@ app.use('/api/keys', apiKeyRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', version: 'v1' });
+    res.json({ status: 'ok', version: 'v1.1-no-verify' });
 });
 
 // Prometheus metrics endpoint
