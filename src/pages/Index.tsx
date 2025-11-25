@@ -88,7 +88,7 @@ const Index = () => {
   const saveHistory = async (target: string, result: any) => {
     if (!token) return;
     try {
-      await fetch('/api/v1/history', {
+      await fetch(`${API_BASE_URL}/api/v1/history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const Index = () => {
   const fetchHistory = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/v1/history', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -119,7 +119,7 @@ const Index = () => {
   const downloadHistory = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/v1/history/download', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/history/download`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -139,7 +139,7 @@ const Index = () => {
     if (!token) return;
     // Confirmation handled by AlertDialog
     try {
-      const res = await fetch('/api/v1/history', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
