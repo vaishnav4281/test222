@@ -2,6 +2,8 @@ import express from 'express';
 import { checkDnsbl } from '../services/dnsbl.js';
 import { getWhois } from '../services/whois.js';
 import { checkVirusTotal } from '../services/vt.js';
+import { checkIPQS } from '../services/ipqs.js';
+import { checkAbuseIPDB } from '../services/abuseipdb.js';
 import { scanQueue } from '../queues/scanQueue.js';
 import { authenticateToken } from '../middleware/auth.js';
 import type { AuthRequest } from '../middleware/auth.js';
@@ -35,6 +37,24 @@ router.get('/vt', async (req, res) => {
     }
     const result = await checkVirusTotal(domain);
     res.json({ stats: result });
+});
+
+router.get('/ipqs', async (req, res) => {
+    const { ip } = req.query;
+    if (!ip || typeof ip !== 'string') {
+        return res.status(400).json({ error: 'Missing IP parameter' });
+    }
+    const result = await checkIPQS(ip);
+    res.json(result || {});
+});
+
+router.get('/abuseipdb', async (req, res) => {
+    const { ip } = req.query;
+    if (!ip || typeof ip !== 'string') {
+        return res.status(400).json({ error: 'Missing IP parameter' });
+    }
+    const result = await checkAbuseIPDB(ip);
+    res.json(result || {});
 });
 
 router.post('/full', authenticateToken, async (req: AuthRequest, res) => {

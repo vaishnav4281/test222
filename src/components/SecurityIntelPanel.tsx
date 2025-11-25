@@ -122,7 +122,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // IPQS: use Vite proxy (skip if we have existing data)
         if (!ipqs[ip] && !existingData[ip]) {
           try {
-            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`);
             if (r.ok) {
               const data = await r.json();
               setIpqs(prev => ({ ...prev, [ip]: data }));
@@ -166,7 +166,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // AbuseIPDB: use Vite proxy
         if (!abuse[ip]) {
           try {
-            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`);
             if (r.ok) {
               const data = await r.json();
               setAbuse(prev => ({ ...prev, [ip]: data }));
@@ -198,7 +198,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // DNSBL
         if (!dnsbl[ip]) {
           try {
-            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`);
             if (!r.ok) throw new Error(String(r.status));
             const data = await r.json();
             setDnsbl(prev => ({ ...prev, [ip]: data }));

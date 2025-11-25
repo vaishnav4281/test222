@@ -54,6 +54,53 @@
 ---
 
 <div align="center">
+  <svg width="980" height="220" viewBox="0 0 980 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="bannerTitle">
+    <defs>
+      <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#6EE7F9"/>
+        <stop offset="0.5" stop-color="#8B5CF6"/>
+        <stop offset="1" stop-color="#FB7185"/>
+      </linearGradient>
+      <filter id="f1" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#000" flood-opacity="0.12"/>
+      </filter>
+      <style>
+        .title { font: 700 34px/1.1 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; fill: #fff }
+        .subtitle { font: 400 14px/1.2 'Inter'; fill: rgba(255,255,255,0.95) }
+        .badge { font: 600 12px/1 'Inter'; fill: #0f172a }
+      </style>
+    </defs>
+
+    <!-- Background gradient -->
+    <rect width="100%" height="100%" rx="18" fill="url(#g1)"/>
+    <g transform="translate(36,32)">
+      <!-- Shield icon -->
+      <g transform="translate(0,0)">
+        <rect x="0" y="0" width="84" height="84" rx="18" fill="#0ea5e9" opacity="0.14" />
+        <path d="M42 16c0 .2-8 4-8 14 0 10 8 20 8 20s8-10 8-20c0-10-8-14-8-14z" fill="white" opacity="0.95"/>
+        <circle cx="42" cy="48" r="4" fill="#fb7185" opacity="0.95"/>
+      </g>
+
+      <!-- Title -->
+      <text x="110" y="36" class="title">DomainScope</text>
+      <text x="110" y="60" class="subtitle">Enterprise OSINT • Domain & IP Intelligence • Production-ready</text>
+
+      <!-- small badges -->
+      <g transform="translate(110,78)">
+        <rect x="0" y="0" rx="8" width="110" height="28" fill="#ffffff" opacity="0.12"/>
+        <text x="16" y="19" class="badge">Observability • Prometheus</text>
+      </g>
+      <g transform="translate(230,78)">
+        <rect x="0" y="0" rx="8" width="140" height="28" fill="#ffffff" opacity="0.08"/>
+        <text x="16" y="19" class="badge">Redis • BullMQ • Prisma</text>
+      </g>
+    </g>
+  </svg>
+</div>
+
+---
+
+<div align="center">
 
 # 🌍 DomainScope — Enterprise OSINT Intelligence Platform
 
