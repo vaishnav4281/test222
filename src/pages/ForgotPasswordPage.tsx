@@ -22,23 +22,36 @@ export default function ForgotPasswordPage() {
 
         setIsSubmitting(true);
         try {
-            const res = await fetch(`${API_BASE_URL}/api/v1/auth/forgot-password`, {
+            // Create a timeout promise (60s)
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 60000)
+            );
+
+            const fetchPromise = fetch(`${API_BASE_URL}/api/v1/auth/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
             });
 
+            const res = await Promise.race([fetchPromise, timeoutPromise]) as Response;
             const data = await res.json();
 
             if (res.ok) {
                 setEmailSent(true);
                 toast.success('Password reset link sent!');
             } else {
-                // Still show success to prevent user enumeration
+                // For debugging: show actual error if available, otherwise show success (security)
+                // In production, we should always show success or generic error
+                console.error('Forgot password error:', data);
                 setEmailSent(true);
             }
-        } catch (error) {
-            toast.error('Something went wrong. Please try again.');
+        } catch (error: any) {
+            if (error.message === 'timeout') {
+                toast.error('Request timeout. Server may be waking up, please try again.');
+            } else {
+                toast.error('Connection failed. Please try again.');
+            }
+            console.error('Forgot password error:', error);
         } finally {
             setIsSubmitting(false);
         }
