@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_BASE_URL } from '../config';
 import { Badge } from "@/components/ui/badge";
+import { API_BASE_URL } from '../config';
 import { Shield, Globe, AlertTriangle, ListChecks, MapPin, WifiOff, Server } from "lucide-react";
+import { API_BASE_URL } from '../config';
 
 interface ResultItem {
   domain: string;
@@ -118,7 +122,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // IPQS: use Vite proxy (skip if we have existing data)
         if (!ipqs[ip] && !existingData[ip]) {
           try {
-            const r = await fetch(`/api/ipqs/check?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
             if (r.ok) {
               const data = await r.json();
               setIpqs(prev => ({ ...prev, [ip]: data }));
@@ -162,7 +166,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // AbuseIPDB: use Vite proxy
         if (!abuse[ip]) {
           try {
-            const r = await fetch(`/api/abuseipdb/check?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
             if (r.ok) {
               const data = await r.json();
               setAbuse(prev => ({ ...prev, [ip]: data }));
@@ -194,7 +198,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         // DNSBL
         if (!dnsbl[ip]) {
           try {
-            const r = await fetch(`/api/dnsbl/check?ip=${encodeURIComponent(ip)}`);
+            const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
             if (!r.ok) throw new Error(String(r.status));
             const data = await r.json();
             setDnsbl(prev => ({ ...prev, [ip]: data }));

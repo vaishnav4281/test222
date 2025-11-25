@@ -129,8 +129,8 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
 
       if (isIp) {
         const [ipqsResult, abuseResult] = await Promise.allSettled([
-          fetchWithTimeout(`/api/ipqs/check?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
-          fetchWithTimeout(`/api/abuseipdb/check?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
+          fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
+          fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
         ]);
 
         const ipqs = ipqsResult.status === 'fulfilled' ? ipqsResult.value : null;
