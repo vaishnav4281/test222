@@ -63,7 +63,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
         // VirusTotal
         (async () => {
           try {
-            const vtUrl = `${API_BASE_URL}/api/v1/scan/virustotal/${encodeURIComponent(domain)}`;
+            const vtUrl = `${API_BASE_URL}/api/v1/scan/vt?domain=${encodeURIComponent(domain)}`;
             let vtResponse = await fetchWithTimeout(vtUrl, 5000);
             if (!vtResponse.ok && vtResponse.status === 401 && import.meta.env.DEV && import.meta.env.VITE_VIRUSTOTAL_API_KEY) {
               const direct = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(domain)}`, {
@@ -79,7 +79,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
         // WHOIS
         (async () => {
           try {
-            const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois/${encodeURIComponent(domain)}`, 5000);
+            const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois?domain=${encodeURIComponent(domain)}`, 5000);
             if (whoisRes.ok) return await whoisRes.json();
           } catch (e) { }
           return null;

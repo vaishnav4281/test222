@@ -67,7 +67,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         // VirusTotal
         (async () => {
           try {
-            const vtUrl = `${API_BASE_URL}/api/v1/scan/virustotal/${encodeURIComponent(sanitizedDomain)}`;
+            const vtUrl = `${API_BASE_URL}/api/v1/scan/vt?domain=${encodeURIComponent(sanitizedDomain)}`;
             let vtResponse = await fetchWithTimeout(vtUrl, 5000);
             if (!vtResponse.ok && vtResponse.status === 401 && import.meta.env.DEV && import.meta.env.VITE_VIRUSTOTAL_API_KEY) {
               const direct = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(sanitizedDomain)}`, {
@@ -85,7 +85,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         // WHOIS
         (async () => {
           try {
-            const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois/${encodeURIComponent(sanitizedDomain)}`, 5000);
+            const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois?domain=${encodeURIComponent(sanitizedDomain)}`, 5000);
             if (whoisRes.ok) return await whoisRes.json();
           } catch (e) {
             console.warn('⚠️ WHOIS fetch failed:', e);
