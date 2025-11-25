@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: free
     rootDir: backend
-    buildCommand: npm ci && npm run migrate && npx prisma generate && npm run build
+    buildCommand: npm ci && echo "=== Running DB migration ===" && npm run migrate && echo "=== Cleaning Prisma client ===" && rm -rf node_modules/.prisma node_modules/@prisma/client && echo "=== Generating Prisma client ===" && npx prisma generate && echo "=== Building TypeScript ===" && npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
