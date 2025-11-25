@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Shield, Globe, Activity, Share2, Mail, Lock, User, Sun, Moon } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -31,7 +32,7 @@ export default function SignupPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/auth/signup', {
+            const res = await fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
