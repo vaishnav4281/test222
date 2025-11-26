@@ -62,13 +62,30 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         // VirusTotal
         (async () => {
           try {
+
             const vtUrl = `${API_BASE_URL}/api/v1/scan/vt?domain=${encodeURIComponent(sanitizedDomain)}`;
-            let vtResponse = await fetchWithTimeout(vtUrl, 5000);
+            let vtResponse = await fetchWithTimeout(vtUrl, 15000); // Increased timeout to 15s
             if (!vtResponse.ok && vtResponse.status === 401 && import.meta.env.DEV && import.meta.env.VITE_VIRUSTOTAL_API_KEY) {
-              const direct = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(sanitizedDomain)}`, {
-                headers: { 'x-apikey': import.meta.env.VITE_VIRUSTOTAL_API_KEY }
-              });
-              if (direct.ok) return await direct.json();
+              console.warn('⚠️ Backend VT fetch failed (401), trying direct fallback...');
+              const vtKey = import.meta.env.VITE_VIRUSTOTAL_API_KEY;
+              const [directReport, directResolutions] = await Promise.allSettled([
+                fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(sanitizedDomain)}`, {
+                  headers: { 'x-apikey': vtKey }
+                }).then(r => r.json()),
+                fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(sanitizedDomain)}/resolutions?limit=10`, {
+                  headers: { 'x-apikey': vtKey }
+                }).then(r => r.json())
+              ]);
+
+              const reportData = directReport.status === 'fulfilled' ? directReport.value : {};
+              const resolutionsData = directResolutions.status === 'fulfilled' ? directResolutions.value : {};
+
+              if (reportData.data) {
+                return {
+                  ...reportData,
+                  resolutions: resolutionsData.data || []
+                };
+              }
             } else if (vtResponse.ok) {
               return await vtResponse.json();
             }
