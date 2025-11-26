@@ -18,7 +18,7 @@ export function generateResetToken(): string {
 export async function sendVerificationEmail(email: string, otp: string) {
     try {
         const { data, error } = await resend.emails.send({
-            from: 'DomainScope <onboarding@resend.dev>', // Will use custom domain later
+            from: 'noreply@hello.satheesankoroth.in',
             to: email,
             subject: 'Verify your DomainScope account',
             html: getVerificationEmailHTML(otp),
@@ -43,7 +43,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 
     try {
         const { data, error } = await resend.emails.send({
-            from: 'DomainScope <onboarding@resend.dev>',
+            from: 'noreply@hello.satheesankoroth.in',
             to: email,
             subject: 'Reset your DomainScope password',
             html: getPasswordResetEmailHTML(resetUrl),
@@ -66,7 +66,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 export async function sendWelcomeEmail(email: string) {
     try {
         const { data, error } = await resend.emails.send({
-            from: 'DomainScope <onboarding@resend.dev>',
+            from: 'noreply@hello.satheesankoroth.in',
             to: email,
             subject: 'Welcome to DomainScope! 🎉',
             html: getWelcomeEmailHTML(),
