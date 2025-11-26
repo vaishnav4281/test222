@@ -40,10 +40,8 @@ export default function ForgotPasswordPage() {
                 setEmailSent(true);
                 toast.success('Password reset link sent!');
             } else {
-                // For debugging: show actual error if available, otherwise show success (security)
-                // In production, we should always show success or generic error
-                console.error('Forgot password error:', data);
-                setEmailSent(true);
+                toast.error(data.error || 'Failed to send reset link');
+                // Do NOT set emailSent to true on error
             }
         } catch (error: any) {
             if (error.message === 'timeout') {
