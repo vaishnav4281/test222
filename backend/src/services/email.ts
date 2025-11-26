@@ -223,6 +223,9 @@ function getWelcomeEmailHTML(): string {
         .feature-icon { font-size: 24px; margin-bottom: 8px; }
         .feature-title { color: #1e293b; font-weight: 600; font-size: 14px; margin: 0 0 4px 0; }
         .feature-desc { color: #64748b; font-size: 12px; margin: 0; }
+        .button-container { text-align: center; margin: 32px 0; }
+        .button { display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-weight: 600; font-size: 16px; }
+        .button:hover { opacity: 0.9; }
         .footer { background-color: #f8fafc; padding: 24px 30px; text-align: center; border-top: 1px solid #e2e8f0; }
         .footer-text { color: #64748b; font-size: 12px; margin: 0; }
     </style>
@@ -261,6 +264,10 @@ function getWelcomeEmailHTML(): string {
             </div>
             
             <p class="text">Ready to get started? Log in to your account and run your first scan!</p>
+
+            <div class="button-container">
+                <a href="${FRONTEND_URL}" class="button">Go to Dashboard</a>
+            </div>
         </div>
         <div class="footer">
             <p class="footer-text">© 2025 DomainScope. All rights reserved.</p>

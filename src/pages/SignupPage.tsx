@@ -16,6 +16,7 @@ export default function SignupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showOTPModal, setShowOTPModal] = useState(false);
     const [registeredEmail, setRegisteredEmail] = useState('');
+    const [showDelayedMessage, setShowDelayedMessage] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -36,6 +37,12 @@ export default function SignupPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setShowDelayedMessage(false);
+
+        // Set a timer to show the delayed message after 3 seconds
+        const delayTimer = setTimeout(() => {
+            setShowDelayedMessage(true);
+        }, 3000);
 
         try {
             // Create a timeout promise (60s for email operations)
@@ -70,7 +77,9 @@ export default function SignupPage() {
             }
             console.error('Signup error:', error);
         } finally {
+            clearTimeout(delayTimer);
             setIsLoading(false);
+            setShowDelayedMessage(false);
         }
     };
 
@@ -245,6 +254,18 @@ export default function SignupPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {showDelayedMessage && (
+                                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-sm text-amber-800 dark:text-amber-200 animate-in fade-in slide-in-from-top-2">
+                                    <p className="font-semibold flex items-center gap-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Waking up the server...
+                                    </p>
+                                    <p className="mt-1 opacity-90">
+                                        This might take a few seconds if the backend was sleeping. Thanks for your patience!
+                                    </p>
+                                </div>
+                            )}
 
                             <Button
                                 type="submit"

@@ -794,7 +794,105 @@ class BloomFilter {
     return true;  // Probably in set (may be false positive)
   }
 }
+
+**### 3. User Experience & Onboarding **★★★★★**
+**Focus**: Frictionless onboarding and transparent feedback.
+
+**Features Implemented**:
+- **Smart Loading States**:
+  - "Waking up server" notification for cold starts (>3s delay).
+  - Prevents user frustration during initial platform spin-up.
+- **Enhanced Welcome Email**:
+  - Direct "Go to Dashboard" action button.
+  - HTML/CSS styled template matching platform branding.
+- **Glassmorphism UI**:
+  - Modern, translucent design language.
+  - Responsive gradients and micro-interactions.
+
+---
+
+## 🏗️ System Architecture Diagrams
+
+### High-Level Architecture
+```mermaid
+graph TD
+    User[User / Browser] -->|HTTPS| CDN[CDN / Edge]
+    CDN -->|Load Balance| FE[Frontend (React + Vite)]
+    FE -->|API Requests| Gateway[API Gateway / Backend]
+    
+    subgraph Backend Services
+        Gateway -->|Auth| AuthService[Auth Service]
+        Gateway -->|Scan| ScanService[Scan Service]
+        Gateway -->|History| HistoryService[History Service]
+    end
+    
+    subgraph Data Layer
+        AuthService -->|Read/Write| DB[(PostgreSQL)]
+        ScanService -->|Cache| Redis[(Redis)]
+        ScanService -->|Queue| BullMQ[Job Queue]
+    end
+    
+    subgraph External APIs
+        ScanService -->|Query| VT[VirusTotal]
+        ScanService -->|Query| WHOIS[WHOIS Servers]
+        ScanService -->|Query| IPQS[IP Quality Score]
+    end
 ```
+
+### Database Schema
+```mermaid
+erDiagram
+    User ||--o{ ScanHistory : "performs"
+    User ||--o{ UserHistory : "tracks"
+    
+    User {
+        int id PK
+        string email UK
+        string password
+        datetime createdAt
+    }
+    
+    ScanHistory {
+        int id PK
+        string target
+        json result
+        datetime createdAt
+        int userId FK
+    }
+    
+    UserHistory {
+        int id PK
+        int userId FK
+        string target
+        string type
+        string status
+        json results
+        datetime createdAt
+    }
+```
+
+---
+
+## 🔄 CI/CD & Deployment
+- **Version Control**: Git
+- **Build System**: Vite (Frontend), tsc (Backend)
+- **Linting**: ESLint
+- **Deployment**:
+  - Frontend: Vercel / Netlify
+  - Backend: Render / Railway
+  - Database: Neon / Supabase
+
+---
+
+## 📝 Future Roadmap
+- [ ] **Kubernetes Orchestration**: Helm charts for scalable deployment.
+- [ ] **Elasticsearch Integration**: Full-text search for historical scan data.
+- [ ] **GraphQL API**: Flexible data fetching for complex dashboards.
+- [ ] **Mobile App**: React Native companion app.
+
+---
+
+> **Note to Recruiters**: This project represents a comprehensive effort to build a scalable, secure, and user-centric application. It leverages modern patterns and tools to solve real-world problems in the OSINT domain.
 
 **Real-World Usage**:
 ```typescript
