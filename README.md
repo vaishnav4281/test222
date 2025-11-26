@@ -1,9 +1,5 @@
-# 🔍 DomainScope
-
-
-
 <div align="center">
-  <img src="assets/banner.png" width="100%" alt="DomainScope Banner Placeholder"/>
+ <img width="1024" height="256" alt="image" src="https://github.com/user-attachments/assets/0a4d867c-a39a-4dcd-b9ae-e71606ecfb3b" />
 </div>
 
 <br/>
