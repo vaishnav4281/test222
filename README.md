@@ -14,18 +14,8 @@ Under the hood, it runs on **distributed workers**, **fast caching**, **clever d
 
 *(Add screenshots here and make the page shine!)*
 
-# 🏗️ Architecture
-
-DomainScope is built on a **modern, event‑driven, horizontally scalable** backend.
-
-<br/>
-
-
-
-<br/>
-
-### Detailed System Boundary View
-
+# 🏗️ System Architecture
+### High-Level Architecture
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     INTERNET BOUNDARY                            │
