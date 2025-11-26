@@ -200,7 +200,7 @@ router.post('/forgot-password', async (req, res) => {
 
         // Always return success to prevent user enumeration
         if (!user) {
-            return res.json({ message: 'If an account exists, a password reset link has been sent' });
+            return res.status(400).json({ error: 'User not found' });
         }
 
         // Generate reset token and store on user
