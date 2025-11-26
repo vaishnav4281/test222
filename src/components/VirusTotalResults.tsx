@@ -33,6 +33,8 @@ interface VirusTotalData {
   tags?: string[];
   registrar?: string;
   jarm?: string;
+
+  resolutions?: any[];
   last_analysis_results?: { [key: string]: any };
   malicious_score?: number;
   suspicious_score?: number;
@@ -156,6 +158,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       <TabsTrigger value="reputation" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Reputation</TabsTrigger>
                       <TabsTrigger value="categories" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Categories</TabsTrigger>
                       <TabsTrigger value="dns" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">DNS/SSL</TabsTrigger>
+                      <TabsTrigger value="passive-dns" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Passive DNS</TabsTrigger>
                       <TabsTrigger value="info" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Info</TabsTrigger>
                     </TabsList>
 
@@ -337,6 +340,37 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       )}
                     </TabsContent>
 
+                    {/* PASSIVE DNS TAB */}
+                    <TabsContent value="passive-dns" className="space-y-3 mt-4">
+                      {result.resolutions && result.resolutions.length > 0 ? (
+                        <div>
+                          <p className="text-xs font-semibold text-green-600 dark:text-green-400 mb-2 flex items-center space-x-2">
+                            <Activity className="h-4 w-4 flex-shrink-0" />
+                            <span>Passive DNS Resolutions ({result.resolutions.length})</span>
+                          </p>
+                          <div className="space-y-2">
+                            {result.resolutions.map((res: any, idx) => (
+                              <div key={idx} className="p-2 sm:p-3 bg-slate-50 dark:bg-slate-950/50 rounded text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                  <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 text-xs w-fit">
+                                    {res.attributes?.host_name || result.domain}
+                                  </Badge>
+                                  <span className="text-slate-600 dark:text-slate-400 font-mono break-all text-xs">
+                                    {res.attributes?.ip_address}
+                                  </span>
+                                </div>
+                                <div className="text-slate-500 text-xs">
+                                  {res.attributes?.date ? new Date(res.attributes.date * 1000).toLocaleDateString() : 'Unknown Date'}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">No passive DNS data available</p>
+                      )}
+                    </TabsContent>
+
                     {/* INFO TAB */}
                     <TabsContent value="info" className="space-y-3 mt-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -376,6 +410,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                     </TabsContent>
                   </Tabs>
                 )}
+
 
                 {/* Timestamp */}
                 <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-green-200/50 dark:border-emerald-800/50 pt-3 bg-gradient-to-r from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-2">
