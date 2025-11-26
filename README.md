@@ -27,28 +27,7 @@ DomainScope is built on a **modern, event‑driven, horizontally scalable** back
 
 <br/>
 
-```mermaid
-graph TD
-    Client[💻 Client / Browser] -->|HTTPS| CDN[☁️ CDN (Cloudflare)]
-    CDN -->|HTTPS| LB[⚖️ Load Balancer]
-    LB -->|Round Robin| FE[⚛️ Frontend Cluster]
-    FE -->|API Calls| Gateway[🚪 API Gateway]
-    
-    subgraph Backend Services
-        Gateway --> Auth[🔐 Auth Service]
-        Gateway --> Scan[🔍 Scan Service]
-        Gateway --> History[📜 History Service]
-    end
-    
-    Scan -->|Job| Queue[📨 Redis Queue (BullMQ)]
-    Queue --> Worker[👷 Worker Pool]
-    
-    Worker -->|External API| VT[🦠 VirusTotal]
-    Worker -->|External API| WHOIS[🌍 WHOIS Servers]
-    
-    Scan -->|Cache Check| Redis[(🧠 Redis Cluster)]
-    Scan -->|Persist| DB[(💾 PostgreSQL)]
-```
+
 
 <br/>
 
