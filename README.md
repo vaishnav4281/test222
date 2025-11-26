@@ -1,9 +1,6 @@
-<div align="center" style="background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); padding: 40px 20px; border-radius: 12px; color: white;">
-  <h1 style="color: white; font-size: 48px; margin-bottom: 10px;">🔍 DomainScope</h1>
-  <p style="font-size: 18px; font-weight: 500;">Advanced Domain Intelligence Platform</p>
-</div>
+# 🔍 DomainScope
 
-<br/>
+
 
 <div align="center">
   <img src="assets/banner.png" width="100%" alt="DomainScope Banner Placeholder"/>
