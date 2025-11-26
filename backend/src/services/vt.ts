@@ -40,10 +40,19 @@ export async function checkVirusTotal(domain: string) {
 
 
 
+
         let resolutions: any[] = [];
-        if (resolutionsRes.status === 'fulfilled' && resolutionsRes.value.ok) {
-            const resData = await resolutionsRes.value.json();
-            resolutions = resData.data || [];
+        if (resolutionsRes.status === 'fulfilled') {
+            if (resolutionsRes.value.ok) {
+                const resData = await resolutionsRes.value.json();
+                resolutions = resData.data || [];
+                console.log(`[VT] Resolutions fetched: ${resolutions.length} items`);
+            } else {
+                const errText = await resolutionsRes.value.text();
+                console.warn(`[VT] Resolutions API failed: ${resolutionsRes.value.status} ${resolutionsRes.value.statusText} - ${errText}`);
+            }
+        } else {
+            console.warn(`[VT] Resolutions fetch rejected:`, resolutionsRes.reason);
         }
 
         // Return combined data
