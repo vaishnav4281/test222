@@ -809,6 +809,16 @@ class BloomFilter {
   - Modern, translucent design language.
   - Responsive gradients and micro-interactions.
 
+### 4. Secure Authentication Flow **★★★★★**
+**Focus**: Security and Performance.
+
+**Features Implemented**:
+- **Redis-Backed Signup**:
+  - **Two-Phase Registration**: User data is temporarily stored in Redis (10m TTL) during signup.
+  - **Zero-Database-Spam**: Unverified accounts never touch the primary PostgreSQL database.
+  - **Atomic Verification**: User creation only happens after successful OTP verification.
+- **Stateless JWT**: Secure session management without server-side state.
+
 ---
 
 ## 🏗️ System Architecture Diagrams
@@ -882,13 +892,7 @@ erDiagram
   - Backend: Render / Railway
   - Database: Neon / Supabase
 
----
 
-## 📝 Future Roadmap
-- [ ] **Kubernetes Orchestration**: Helm charts for scalable deployment.
-- [ ] **Elasticsearch Integration**: Full-text search for historical scan data.
-- [ ] **GraphQL API**: Flexible data fetching for complex dashboards.
-- [ ] **Mobile App**: React Native companion app.
 
 ---
 
@@ -1179,8 +1183,6 @@ Layer 7: Audit Logging (all mutations logged)
 ---
 
 **Built with ❤️ by Vaishnav K**  
-*Demonstrating FAANG-level engineering excellence through production-ready distributed systems*
-
 ---
 
 ## 📚 References & Inspiration

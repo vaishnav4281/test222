@@ -7,7 +7,9 @@ import { generateOTP, generateResetToken, sendVerificationEmail, sendPasswordRes
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
 
-// Signup - Create user and send OTP
+import { redis } from '../redis.js';
+
+// Signup - Store in Redis and send OTP
 router.post('/signup', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -19,32 +21,30 @@ router.post('/signup', async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Create user with unverified status
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                emailVerified: false
-            },
-        });
-
         // Generate OTP
         const otp = generateOTP();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Store OTP in user.verificationToken (simple approach)
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { verificationToken: otp },
-        });
+        // Store signup details in Redis with 10m TTL
+        const signupData = {
+            email,
+            password: hashedPassword,
+            otp
+        };
+
+        await redis.set(
+            `signup:${email}`,
+            JSON.stringify(signupData),
+            'EX',
+            600 // 10 minutes
+        );
 
         // Send verification email
         await sendVerificationEmail(email, otp);
 
         res.json({
             message: 'Verification email sent. Please check your inbox.',
-            email: user.email
+            email
         });
     } catch (error) {
         console.error('Signup error:', error);
@@ -60,28 +60,46 @@ router.post('/verify-email', async (req, res) => {
         const { email, otp } = req.body;
         if (!email || !otp) return res.status(400).json({ error: 'Email and OTP required' });
 
-        // Find user
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+        // Check Redis for pending signup
+        const cachedSignup = await redis.get(`signup:${email}`);
 
-        // Find valid OTP
-        // Verify OTP against stored token on user
-        const userWithToken = await prisma.user.findUnique({
-            where: { email },
-            select: { verificationToken: true },
-        });
-        if (!userWithToken || userWithToken.verificationToken !== otp) {
-            return res.status(400).json({ error: 'Invalid or expired OTP' });
+        if (!cachedSignup) {
+            // Fallback: Check if user exists but is unverified (legacy support)
+            const existingUser = await prisma.user.findUnique({ where: { email } });
+            if (existingUser && !existingUser.emailVerified && existingUser.verificationToken === otp) {
+                await prisma.user.update({
+                    where: { id: existingUser.id },
+                    data: { emailVerified: true, verificationToken: null },
+                });
+
+                const token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, JWT_SECRET, { expiresIn: '24h' });
+                return res.json({
+                    token,
+                    user: { id: existingUser.id, email: existingUser.email, emailVerified: true },
+                    message: 'Email verified successfully!'
+                });
+            }
+
+            return res.status(400).json({ error: 'Verification session expired or invalid. Please sign up again.' });
         }
 
+        const signupData = JSON.parse(cachedSignup);
 
+        if (signupData.otp !== otp) {
+            return res.status(400).json({ error: 'Invalid OTP' });
+        }
 
-        // Mark as verified
-        // Mark email as verified and clear token
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { emailVerified: true, verificationToken: null },
+        // Create user in DB
+        const user = await prisma.user.create({
+            data: {
+                email: signupData.email,
+                password: signupData.password,
+                emailVerified: true
+            },
         });
+
+        // Clear Redis key
+        await redis.del(`signup:${email}`);
 
         // Send welcome email (non-blocking)
         sendWelcomeEmail(email).catch(err => console.error('Welcome email error:', err));
@@ -106,24 +124,39 @@ router.post('/resend-otp', async (req, res) => {
         const { email } = req.body;
         if (!email) return res.status(400).json({ error: 'Email required' });
 
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+        // Check Redis first
+        const cachedSignup = await redis.get(`signup:${email}`);
 
-        if (user.emailVerified) {
-            return res.status(400).json({ error: 'Email already verified' });
+        if (cachedSignup) {
+            const signupData = JSON.parse(cachedSignup);
+            const newOtp = generateOTP();
+
+            // Update OTP in Redis
+            signupData.otp = newOtp;
+            await redis.set(
+                `signup:${email}`,
+                JSON.stringify(signupData),
+                'EX',
+                600 // Reset TTL to 10m
+            );
+
+            await sendVerificationEmail(email, newOtp);
+            return res.json({ message: 'New verification code sent to your email' });
         }
 
-        // Generate new OTP and store on user
-        const otp = generateOTP();
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { verificationToken: otp },
-        });
+        // Fallback: Check DB for unverified user
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (user && !user.emailVerified) {
+            const otp = generateOTP();
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { verificationToken: otp },
+            });
+            await sendVerificationEmail(email, otp);
+            return res.json({ message: 'New verification code sent to your email' });
+        }
 
-        // Send email
-        await sendVerificationEmail(email, otp);
-
-        res.json({ message: 'New verification code sent to your email' });
+        return res.status(400).json({ error: 'User not found or already verified' });
     } catch (error) {
         console.error('Resend OTP error:', error);
         res.status(500).json({ error: 'Server error' });
