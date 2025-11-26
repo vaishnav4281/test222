@@ -28,6 +28,10 @@ export async function checkVirusTotal(domain: string) {
             data = await reportRes.value.json();
         } else if (reportRes.status === 'fulfilled' && reportRes.value.status === 404) {
             // Domain not found in VT
+        } else if (reportRes.status === 'fulfilled' && !reportRes.value.ok) {
+            const errorText = await reportRes.value.text();
+            console.warn(`[VT] API Error: ${reportRes.value.status} ${reportRes.value.statusText} - ${errorText}`);
+            return { error: `VirusTotal API Error: ${reportRes.value.status} ${reportRes.value.statusText}` };
         } else {
             if (reportRes.status === 'fulfilled') {
                 console.warn(`VT Report Error: ${reportRes.value.statusText}`);
@@ -52,9 +56,9 @@ export async function checkVirusTotal(domain: string) {
         }
 
         return data;
-    } catch (error: any) {
-        console.error('VirusTotal check error:', error.message);
-        return null;
-    }
-}
 
+    } catch (error: any) {
+        console.error(`[VT] Error fetching data for ${domain}:`, error.message);
+        return { error: error.message };
+    }
+};

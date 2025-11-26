@@ -108,8 +108,19 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
 
 
 
+
       const vtData: any = vtResult.status === 'fulfilled' ? vtResult.value : null;
       console.log('🔍 VT Data received:', vtData);
+
+      if (vtData?.error) {
+        console.warn('VT Backend Error:', vtData.error);
+        toast({
+          title: "VirusTotal Error",
+          description: vtData.error,
+          variant: "destructive",
+        });
+      }
+
       const whoisData: any = whoisResult.status === 'fulfilled' ? whoisResult.value : null;
       const attrs: any = vtData?.data?.attributes || {};
       const resolutions: any[] = vtData?.resolutions || [];
