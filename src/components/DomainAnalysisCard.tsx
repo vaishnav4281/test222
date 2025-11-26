@@ -90,10 +90,13 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       ]);
 
 
+
       const vtData: any = vtResult.status === 'fulfilled' ? vtResult.value : null;
+      console.log('🔍 VT Data received:', vtData);
       const whoisData: any = whoisResult.status === 'fulfilled' ? whoisResult.value : null;
       const attrs: any = vtData?.data?.attributes || {};
       const resolutions: any[] = vtData?.resolutions || [];
+      console.log('🔍 Extracted Resolutions:', resolutions);
 
       const creationDateStr = attrs.creation_date ? new Date(attrs.creation_date * 1000).toLocaleString() : "-";
       const lastDns: any[] = Array.isArray(attrs.last_dns_records) ? attrs.last_dns_records : [];
@@ -247,8 +250,10 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         last_https_certificate: attrs.last_https_certificate || null,
         last_https_certificate_date: attrs.last_https_certificate_date ? new Date(attrs.last_https_certificate_date * 1000).toLocaleString() : null,
         tags: attrs.tags || [],
+
         registrar: attrs.registrar || null,
         jarm: attrs.jarm || null,
+        resolutions: resolutions, // Pass resolutions to the UI component
         last_analysis_results: attrs.last_analysis_results || {},
         malicious_score: attrs.last_analysis_stats?.malicious || 0,
         suspicious_score: attrs.last_analysis_stats?.suspicious || 0,
