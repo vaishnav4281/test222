@@ -7,6 +7,8 @@ const VT_API_KEY = process.env.VT_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY
 const VT_API_URL = 'https://www.virustotal.com/api/v3/domains';
 
 export async function checkVirusTotal(domain: string) {
+
+
     if (!VT_API_KEY) {
         console.warn('VT_API_KEY not set');
         return null;
