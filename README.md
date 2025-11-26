@@ -1,6 +1,15 @@
-# 🔍 DomainScope
+<div align="center" style="background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); padding: 40px 20px; border-radius: 12px; color: white;">
+  <h1 style="color: white; font-size: 48px; margin-bottom: 10px;">🔍 DomainScope</h1>
+  <p style="font-size: 18px; font-weight: 500;">Advanced Domain Intelligence Platform</p>
+</div>
 
-#
+<br/>
+
+<div align="center">
+  <img src="assets/banner.png" width="100%" alt="DomainScope Banner Placeholder"/>
+</div>
+
+<br/>
 
 **DomainScope** brings together **clarity, speed, and smart engineering** into one smooth experience. It gathers WHOIS data, DNS records, IP insights, threat signals, hosting details, and metadata — all wrapped inside a clean and friendly interface. ✨
 
@@ -15,6 +24,33 @@ Under the hood, it runs on **distributed workers**, **fast caching**, **clever d
 # 🏗️ Architecture
 
 DomainScope is built on a **modern, event‑driven, horizontally scalable** backend.
+
+<br/>
+
+```mermaid
+graph TD
+    Client[💻 Client / Browser] -->|HTTPS| CDN[☁️ CDN (Cloudflare)]
+    CDN -->|HTTPS| LB[⚖️ Load Balancer]
+    LB -->|Round Robin| FE[⚛️ Frontend Cluster]
+    FE -->|API Calls| Gateway[🚪 API Gateway]
+    
+    subgraph Backend Services
+        Gateway --> Auth[🔐 Auth Service]
+        Gateway --> Scan[🔍 Scan Service]
+        Gateway --> History[📜 History Service]
+    end
+    
+    Scan -->|Job| Queue[📨 Redis Queue (BullMQ)]
+    Queue --> Worker[👷 Worker Pool]
+    
+    Worker -->|External API| VT[🦠 VirusTotal]
+    Worker -->|External API| WHOIS[🌍 WHOIS Servers]
+    
+    Scan -->|Cache Check| Redis[(🧠 Redis Cluster)]
+    Scan -->|Persist| DB[(💾 PostgreSQL)]
+```
+
+<br/>
 
 ✨ **Core pieces:**
 
