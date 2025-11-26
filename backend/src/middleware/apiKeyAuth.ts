@@ -27,7 +27,7 @@ export const authenticateApiKey = async (req: Request, res: Response, next: Next
         // Let's assume we store the key as a plain string for now (as per "simple" requirement) OR
         // we change the `create` logic to store a lookup index.
 
-        // Actually, for "FAANG level", we should use a prefix.
+        // Actually, for "Enterprise level", we should use a prefix.
         // Key: `sk_live_PREFIX_SECRET`
         // DB: `prefix` (indexed), `hash` (bcrypt of secret).
 
