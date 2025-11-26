@@ -1,420 +1,146 @@
 # 🚀 DomainScope Deployment Guide
 
-Complete guide for deploying the DomainScope application to production.
+Welcome to the **DomainScope** deployment guide! This document is designed to be **simple and easy** to follow, whether you are running the project locally for development or deploying it to a production environment.
 
 ---
 
-## 📋 Prerequisites
-
-Before deploying, ensure you have:
-
-- **Node.js** v18 or higher
-- **PostgreSQL** database (local or cloud-based like Supabase, Neon, etc.)
-- **API Keys** for:
-  - VirusTotal API
-  - IPQualityScore (IPQS) API (2 keys recommended for rotation)
-  - AbuseIPDB API
+## 📋 Table of Contents
+1. [Local Development Setup](#1-local-development-setup) (The Easy Way)
+2. [Production Deployment](#2-production-deployment) (Render & Docker)
+3. [Environment Variables](#3-environment-variables)
+4. [Troubleshooting](#4-troubleshooting)
 
 ---
 
-## 🔑 1. Environment Configuration
+## 1. Local Development Setup
 
-### Create Production Environment File
+Follow these steps to get DomainScope running on your machine in minutes.
 
-Create an `env_config` file (or `.env`) in the project root:
+### ✅ Prerequisites
+Before you start, ensure you have the following installed:
+- **Node.js** (v18 or higher)
+- **Redis** (Running locally or via a cloud provider)
+- **PostgreSQL** (Running locally or via a cloud provider)
 
-```env
-# Database Configuration
-DATABASE_URL="postgresql://username:password@host:port/database?sslmode=require"
+### 🛠️ Step 1: Backend Setup
 
-# Authentication
-JWT_SECRET="your-super-secret-jwt-key-min-32-characters"
+The backend handles all the logic, database connections, and scanning tasks.
 
-# API Keys
-VITE_VIRUSTOTAL_API_KEY="your-virustotal-api-key"
-VITE_IPQS_API_KEY="your-first-ipqs-api-key"
-VITE_IPQS_API_KEY_2="your-second-ipqs-api-key"
-VITE_ABUSEIPDB_API_KEY="your-abuseipdb-api-key"
-```
+1.  **Navigate to the backend folder**:
+    ```bash
+    cd backend
+    ```
 
-### Obtaining API Keys
+2.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-#### VirusTotal API
-1. Visit [https://www.virustotal.com/](https://www.virustotal.com/)
-2. Sign up for a free account
-3. Navigate to your profile → API Key
-4. Copy the API key
+3.  **Configure Environment**:
+    Create a `.env` file in the `backend/` directory:
+    ```bash
+    cp .env.example .env
+    ```
+    *Open `.env` and fill in your `DATABASE_URL` and `REDIS_URL`.*
 
-#### IPQualityScore (IPQS) API
-1. Visit [https://www.ipqualityscore.com/](https://www.ipqualityscore.com/)
-2. Create a free account
-3. Go to Dashboard → API Keys
-4. Create two API keys for rotation (improves rate limits)
+4.  **Initialize Database**:
+    This command creates the necessary tables in your PostgreSQL database.
+    ```bash
+    npx prisma generate
+    npx prisma db push
+    ```
 
-#### AbuseIPDB API
-1. Visit [https://www.abuseipdb.com/](https://www.abuseipdb.com/)
-2. Sign up for an account
-3. Navigate to Account → API
-4. Generate an API key
+5.  **Start the Server**:
+    ```bash
+    npm run dev
+    ```
+    🎉 The backend is now running at `http://localhost:3001`.
+
+### 🎨 Step 2: Frontend Setup
+
+The frontend is the user interface where you interact with the system.
+
+1.  **Open a new terminal** and go to the project root (if you are in `backend/`, type `cd ..`).
+
+2.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Start the UI**:
+    ```bash
+    npm run dev
+    ```
+    🎉 The frontend is now running at `http://localhost:5173`.
 
 ---
 
-## 🗄️ 2. Database Setup
+## 2. Production Deployment
 
-### Initialize Prisma
+Ready to go live? We support **Render** and **Docker** out of the box.
 
+### ☁️ Option A: Deploy to Render (Recommended)
+
+We have included a `render.yaml` file for "Infrastructure as Code" deployment.
+
+1.  **Push your code** to a GitHub repository.
+2.  **Create a Render account** at [render.com](https://render.com).
+3.  **Connect your repository**:
+    - Go to "Blueprints" in Render.
+    - Select "New Blueprint Instance".
+    - Connect your DomainScope repo.
+4.  **Configure Environment**:
+    - Render will detect the `render.yaml`.
+    - You will be prompted to input your `DATABASE_URL`, `REDIS_URL`, and `VT_API_KEY`.
+5.  **Deploy**: Click "Apply" and Render will build and deploy your backend automatically.
+
+### 🐳 Option B: Docker Deployment
+
+You can containerize the application for deployment on AWS ECS, DigitalOcean, or any VPS.
+
+**Build the Backend Image:**
 ```bash
-# Install dependencies
-npm install
-
-# Generate Prisma client
-npx prisma generate
-
-# Run database migrations
-npx prisma migrate deploy
+cd backend
+docker build -t domainscope-backend .
 ```
 
-### Database Schema
-
-The application uses these tables:
-- **User** - User authentication and profiles
-- **UserHistory** - Scan history with detailed results
-
----
-
-## 🏗️ 3. Build the Application
-
-### Frontend Build
-
+**Run the Container:**
 ```bash
-# Build the frontend
-npm run build
-```
-
-This creates an optimized production build in the `dist/` folder.
-
-### Verify Build
-
-Check that `dist/` contains:
-- `index.html`
-- `assets/` folder with CSS and JS files
-
----
-
-## 🌐 4. Deployment Options
-
-### Option A: Vercel (Recommended - Easiest)
-
-#### Frontend Deployment
-
-1. **Install Vercel CLI**:
-   ```bash
-   npm install -g vercel
-   ```
-
-2. **Deploy Frontend**:
-   ```bash
-   vercel --prod
-   ```
-
-3. **Configure Environment Variables** in Vercel Dashboard:
-   - Go to Project Settings → Environment Variables
-   - Add all variables from `env_config`
-
-#### Backend API Deployment
-
-1. **Deploy backend to Vercel as serverless functions**:
-   ```bash
-   # The dev-server.js needs to be adapted for serverless
-   # Or use a separate service like Railway/Render for the backend
-   ```
-
----
-
-### Option B: Railway / Render (Full-Stack)
-
-#### Using Railway
-
-1. **Install Railway CLI**:
-   ```bash
-   npm install -g @railway/cli
-   ```
-
-2. **Login and Initialize**:
-   ```bash
-   railway login
-   railway init
-   ```
-
-3. **Add Environment Variables**:
-   ```bash
-   railway variables set DATABASE_URL="your-database-url"
-   railway variables set JWT_SECRET="your-jwt-secret"
-   # Add all other variables
-   ```
-
-4. **Create Start Script** in `package.json`:
-   ```json
-   {
-     "scripts": {
-       "start": "node dev-server.js",
-       "build": "vite build && npx prisma generate"
-     }
-   }
-   ```
-
-5. **Deploy**:
-   ```bash
-   railway up
-   ```
-
----
-
-### Option C: VPS/Docker Deployment
-
-#### Using Docker
-
-1. **Create `Dockerfile`**:
-   ```dockerfile
-   FROM node:18-alpine
-
-   WORKDIR /app
-
-   # Copy package files
-   COPY package*.json ./
-   COPY prisma ./prisma/
-
-   # Install dependencies
-   RUN npm ci --only=production
-
-   # Copy application files
-   COPY . .
-
-   # Generate Prisma client
-   RUN npx prisma generate
-
-   # Build frontend
-   RUN npm run build
-
-   EXPOSE 3001
-
-   # Start the server
-   CMD ["npm", "start"]
-   ```
-
-2. **Create `docker-compose.yml`**:
-   ```yaml
-   version: '3.8'
-   
-   services:
-     app:
-       build: .
-       ports:
-         - "3001:3001"
-       env_file:
-         - env_config
-       depends_on:
-         - db
-       
-     db:
-       image: postgres:15-alpine
-       environment:
-         POSTGRES_DB: domainscope
-         POSTGRES_USER: admin
-         POSTGRES_PASSWORD: your-secure-password
-       volumes:
-         - postgres_data:/var/lib/postgresql/data
-       ports:
-         - "5432:5432"
-
-   volumes:
-     postgres_data:
-   ```
-
-3. **Deploy**:
-   ```bash
-   docker-compose up -d
-   ```
-
----
-
-## 🔒 5. Security Checklist
-
-### Before Going Live
-
-- [ ] Change `JWT_SECRET` to a strong random string (min 32 characters)
-- [ ] Use strong database password
-- [ ] Enable SSL/TLS for database connections
-- [ ] Set up CORS properly in `dev-server.js`
-- [ ] Enable rate limiting on API endpoints
-- [ ] Use HTTPS for production domain
-- [ ] Keep API keys secret (never commit to Git)
-- [ ] Set up database backups
-- [ ] Configure firewall rules
-
----
-
-## 📊 6. Monitoring & Maintenance
-
-### Logging
-
-Monitor these logs:
-- Application errors in server console
-- Database connection status
-- API rate limit warnings
-- Failed login attempts
-
-### Database Maintenance
-
-```bash
-# Backup database
-pg_dump your_database > backup.sql
-
-# View Prisma Studio (database GUI)
-npx prisma studio
-```
-
-### API Rate Limits
-
-- **VirusTotal**: 4 requests/minute (free tier)
-- **IPQS**: Varies by plan
-- **AbuseIPDB**: 1000 checks/day (free tier)
-
----
-
-## 🧪 7. Testing Production Build
-
-### Test Locally Before Deploying
-
-```bash
-# Build the project
-npm run build
-
-# Start production server
-npm start
-
-# Test in browser
-open http://localhost:3001
-```
-
-### Verify Functionality
-
-- [ ] User registration works
-- [ ] User login works
-- [ ] Single domain scan works
-- [ ] Bulk domain scan works
-- [ ] Scan history saves and displays
-- [ ] Dark mode toggle works
-- [ ] Mobile responsiveness is correct
-
----
-
-## 🌍 8. Custom Domain Setup
-
-### For Vercel
-
-1. Go to Project Settings → Domains
-2. Add your custom domain
-3. Configure DNS records as instructed
-
-### DNS Configuration
-
-Add these records to your DNS provider:
-
-```
-Type    Name    Value
-A       @       76.76.21.21 (example - use your host's IP)
-CNAME   www     your-app.vercel.app
+docker run -p 3001:3001 \
+  -e DATABASE_URL="postgresql://..." \
+  -e REDIS_URL="redis://..." \
+  -e JWT_SECRET="secret" \
+  domainscope-backend
 ```
 
 ---
 
-## 📱 9. Post-Deployment
+## 3. Environment Variables
 
-### SSL Certificate
+These are the keys you need to configure in your `.env` file or deployment platform.
 
-Most platforms (Vercel, Railway, Render) automatically provision SSL certificates.
-
-### Performance Optimization
-
-- Enable CDN for static assets
-- Configure caching headers
-- Use image optimization
-- Enable gzip compression
-
-### Analytics (Optional)
-
-Add tracking:
-- Google Analytics
-- Plausible Analytics
-- Vercel Analytics
+| Variable | Required | Description | Example |
+|---|---|---|---|
+| `DATABASE_URL` | ✅ Yes | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` |
+| `REDIS_URL` | ✅ Yes | Redis connection string | `redis://host:6379` |
+| `JWT_SECRET` | ✅ Yes | Secret key for signing session tokens | `my_super_secure_secret_123` |
+| `VT_API_KEY` | ❌ No | VirusTotal API Key (for threat intel) | `abc12345...` |
+| `PORT` | ❌ No | Port for the backend server (default: 3001) | `3001` |
+| `NODE_ENV` | ❌ No | Environment mode (`development` or `production`) | `production` |
 
 ---
 
-## 🐛 10. Troubleshooting
+## 4. Troubleshooting
 
-### Common Issues
+**❌ Issue: "Prisma Client could not be initialized"**
+*   **Fix**: Run `npx prisma generate` in the `backend/` folder to regenerate the client.
 
-**Database Connection Failed**
-```bash
-# Check DATABASE_URL format
-# Ensure database is accessible
-# Verify SSL mode is correct
-```
+**❌ Issue: "Redis connection failed"**
+*   **Fix**: Ensure your Redis server is running and the `REDIS_URL` in your `.env` is correct. If using Docker, ensure the containers are on the same network.
 
-**API Keys Not Working**
-```bash
-# Verify keys are correctly set
-# Check API key quotas
-# Ensure keys are active
-```
-
-**Build Fails**
-```bash
-# Clear cache and rebuild
-rm -rf node_modules dist
-npm install
-npm run build
-```
-
-**Prisma Client Errors**
-```bash
-# Regenerate Prisma client
-npx prisma generate
-```
+**❌ Issue: "CORS Error" in Frontend**
+*   **Fix**: Ensure the backend is running on port 3001. If you changed the port, update the API URL in the frontend configuration.
 
 ---
 
-## 📞 Support
-
-For issues or questions:
-- Check application logs
-- Review Prisma documentation: https://www.prisma.io/docs
-- Check API provider status pages
-
----
-
-## ✅ Final Checklist
-
-Before launching:
-
-- [ ] Environment variables configured
-- [ ] Database migrations run
-- [ ] API keys are valid and working
-- [ ] Build completes without errors
-- [ ] Application tested locally
-- [ ] Security measures implemented
-- [ ] Domain configured (if using custom domain)
-- [ ] SSL certificate active
-- [ ] Monitoring/logging set up
-- [ ] Backup strategy in place
-
----
-
-## 🎉 You're Ready!
-
-Your DomainScope application is now ready for production deployment!
-
-**Deployed by:** Vaishnav K
-**GitHub:** https://github.com/vaishnav4281
-**LinkedIn:** https://www.linkedin.com/in/va1shnav
+*Happy Deploying! 🚀*
