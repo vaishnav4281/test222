@@ -1,7 +1,9 @@
 
 
 
-const VT_API_KEY = process.env.VT_API_KEY;
+
+const VT_API_KEY = process.env.VT_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY;
+
 const VT_API_URL = 'https://www.virustotal.com/api/v3/domains';
 
 export async function checkVirusTotal(domain: string) {
@@ -31,6 +33,8 @@ export async function checkVirusTotal(domain: string) {
                 console.warn(`VT Report Error: ${reportRes.value.statusText}`);
             }
         }
+
+
 
         let resolutions: any[] = [];
         if (resolutionsRes.status === 'fulfilled' && resolutionsRes.value.ok) {
