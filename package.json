@@ -13,7 +13,7 @@
     "start": "vite preview",
     "preview": "vite preview",
     "lint": "eslint .",
-    "dev:server": "node dev-server.js"
+    "dev:server": "npm --prefix backend run dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

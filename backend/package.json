@@ -8,7 +8,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "postbuild": "echo '=== Dist folder contents ===' && ls -la dist/ && echo '=== All JS files ===' && find dist -name '*.js' || echo 'No dist folder found!'",
     "start": "node dist/server.js",

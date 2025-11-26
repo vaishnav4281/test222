@@ -163,7 +163,7 @@ function getPasswordResetEmailHTML(resetUrl: string): string {
         .title { color: #1e293b; font-size: 24px; font-weight: 600; margin: 0 0 16px 0; }
         .text { color: #475569; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0; }
         .button-container { text-align: center; margin: 32px 0; }
-        .button { display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-weight: 600; font-size: 16px; }
+        .button { display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); color: #ffffff !important; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-weight: 600; font-size: 16px; }
         .button:hover { opacity: 0.9; }
         .info-box { background-color: #dbeafe; border-left: 4px solid #2563eb; padding: 16px; margin: 24px 0; border-radius: 4px; }
         .info-text { color: #1e40af; font-size: 14px; margin: 0; }
@@ -224,7 +224,7 @@ function getWelcomeEmailHTML(): string {
         .feature-title { color: #1e293b; font-weight: 600; font-size: 14px; margin: 0 0 4px 0; }
         .feature-desc { color: #64748b; font-size: 12px; margin: 0; }
         .button-container { text-align: center; margin: 32px 0; }
-        .button { display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-weight: 600; font-size: 16px; }
+        .button { display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #2563eb 100%); color: #ffffff !important; text-decoration: none; padding: 16px 48px; border-radius: 8px; font-weight: 600; font-size: 16px; }
         .button:hover { opacity: 0.9; }
         .footer { background-color: #f8fafc; padding: 24px 30px; text-align: center; border-top: 1px solid #e2e8f0; }
         .footer-text { color: #64748b; font-size: 12px; margin: 0; }
@@ -234,7 +234,6 @@ function getWelcomeEmailHTML(): string {
     <div class="container">
         <div class="header">
             <h1 class="logo">🔍 DomainScope</h1>
-            <div class="emoji">🎉</div>
         </div>
         <div class="content">
             <h2 class="title">Welcome to DomainScope!</h2>
