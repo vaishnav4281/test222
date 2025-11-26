@@ -24,34 +24,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        const checkToken = () => {
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
 
-        if (storedToken && storedUser) {
-            try {
-                const decoded: any = jwtDecode(storedToken);
-                const currentTime = Date.now() / 1000;
+            if (storedToken && storedUser) {
+                try {
+                    const decoded: any = jwtDecode(storedToken);
+                    const currentTime = Date.now() / 1000;
 
-                if (decoded.exp && decoded.exp < currentTime) {
-                    // Token expired
+                    if (decoded.exp && decoded.exp < currentTime) {
+                        // Token expired
+                        console.log('Session expired, logging out...');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        setToken(null);
+                        setUser(null);
+                    } else {
+                        // Token valid
+                        if (!token) {
+                            setToken(storedToken);
+                            setUser(JSON.parse(storedUser));
+                        }
+                    }
+                } catch (error) {
+                    // Invalid token
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     setToken(null);
                     setUser(null);
-                } else {
-                    // Token valid
-                    setToken(storedToken);
-                    setUser(JSON.parse(storedUser));
                 }
-            } catch (error) {
-                // Invalid token
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                setToken(null);
-                setUser(null);
             }
-        }
+        };
+
+        // Initial check
+        checkToken();
         setIsLoading(false);
+
+        // Periodic check every 60 seconds
+        const interval = setInterval(checkToken, 60000);
+        return () => clearInterval(interval);
     }, []);
 
     const login = (newToken: string, newUser: User) => {

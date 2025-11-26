@@ -3,8 +3,7 @@
 </div>
 
 <br/>
-<b>DomainScope</b> brings together clarity, speed, and smart engineering into one smooth experience. It collects WHOIS data, DNS records, IP details, threat signals, hosting info, and metadata, all inside a clean and easy-to-use interface. Behind the scenes, it runs on distributed workers, fast caching, efficient data structures, reliable fallbacks, and full observability to keep everything fast, stable, and accurate. A modern and intelligent OSINT platform built for quick, hassle-free insights.
-
+**DomainScope** brings together clarity, speed, and smart engineering into one smooth experience. It collects WHOIS data, DNS records, IP details, threat signals, hosting info, and metadata, all inside a clean and easy-to-use interface. Behind the scenes, it runs on distributed workers, fast caching, efficient data structures, reliable fallbacks, and full observability to keep everything fast, stable, and accurate. A modern and intelligent OSINT platform built for quick, hassle-free insights.
 # 🎨 UI Showcase
 
 <img width="1440" height="1024" alt="image" src="https://github.com/user-attachments/assets/4739db34-ce64-4d71-af92-45b47a9a3d6a" />

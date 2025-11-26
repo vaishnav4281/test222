@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Shield, Globe, Database, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+
 interface Result {
   id: number;
   domain: string;
@@ -14,6 +15,7 @@ interface Result {
   registrar: string;
   name_servers: string[];
   dns_records?: string;
+  passive_dns?: string;
   asn?: string;
   abuse_score: number;
   is_vpn_proxy: boolean;
@@ -64,6 +66,7 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
       "IP Address",
       "Name Servers",
       "DNS Records",
+      "Passive DNS",
       // Geolocation
       "Country",
       "Region",
@@ -109,6 +112,7 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
           escapeCsv(result.ip_address),
           escapeCsv((result.name_servers || []).join("; ")),
           escapeCsv(result.dns_records || "-"),
+          escapeCsv(result.passive_dns || "-"),
           // Geolocation
           escapeCsv(result.country),
           escapeCsv(result.region || "-"),
@@ -126,6 +130,7 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
           escapeCsv(result.timestamp)
         ].join(",");
       })
+
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });

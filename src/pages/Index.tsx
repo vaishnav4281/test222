@@ -88,7 +88,7 @@ const Index = () => {
   const saveHistory = async (target: string, result: any) => {
     if (!token) return;
     try {
-      await fetch(`${API_BASE_URL}/api/v1/history`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,6 +96,10 @@ const Index = () => {
         },
         body: JSON.stringify({ target, result })
       });
+      if (res.status === 401) {
+        logout();
+        return;
+      }
     } catch (e) {
       console.error('Failed to save history', e);
     }
@@ -107,6 +111,10 @@ const Index = () => {
       const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (res.status === 401) {
+        logout();
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setHistory(data);
@@ -122,6 +130,10 @@ const Index = () => {
       const res = await fetch(`${API_BASE_URL}/api/v1/history/download`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (res.status === 401) {
+        logout();
+        return;
+      }
       if (res.ok) {
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
@@ -143,6 +155,10 @@ const Index = () => {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (res.status === 401) {
+        logout();
+        return;
+      }
       if (res.ok) {
         setHistory([]);
       }

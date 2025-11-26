@@ -1,20 +1,15 @@
 
+
 import React, { useState } from "react";
 import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_BASE_URL } from '../config';
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL } from '../config';
 import { Input } from "@/components/ui/input";
-import { API_BASE_URL } from '../config';
 import { Label } from "@/components/ui/label";
-import { API_BASE_URL } from '../config';
 import { Search, Loader2 } from "lucide-react";
-import { API_BASE_URL } from '../config';
 import { useToast } from "@/hooks/use-toast";
-import { API_BASE_URL } from '../config';
 import { fetchThroughCorsProxy } from "@/lib/cors-proxy";
-import { API_BASE_URL } from '../config';
+
 
 interface DomainAnalysisCardProps {
   onResults: (result: any) => void;
@@ -94,9 +89,11 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         })()
       ]);
 
+
       const vtData: any = vtResult.status === 'fulfilled' ? vtResult.value : null;
       const whoisData: any = whoisResult.status === 'fulfilled' ? whoisResult.value : null;
       const attrs: any = vtData?.data?.attributes || {};
+      const resolutions: any[] = vtData?.resolutions || [];
 
       const creationDateStr = attrs.creation_date ? new Date(attrs.creation_date * 1000).toLocaleString() : "-";
       const lastDns: any[] = Array.isArray(attrs.last_dns_records) ? attrs.last_dns_records : [];
@@ -199,6 +196,11 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         ? lastDns.map((r: any) => `${r.type}: ${r.value}`).join('; ')
         : '-';
 
+      // Format Passive DNS for CSV export
+      const passiveDnsString = resolutions.length > 0
+        ? resolutions.map((r: any) => `${r.attributes.ip_address} (${new Date(r.attributes.date * 1000).toISOString().split('T')[0]})`).join('; ')
+        : '-';
+
       const result = {
         id: Date.now(),
         domain: sanitizedDomain,
@@ -208,6 +210,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         registrar: whoisRegistrar,
         name_servers: nsRecords,
         dns_records: dnsRecordsString,
+        passive_dns: passiveDnsString,
         abuse_score: abuseScore,
         is_vpn_proxy: isVpnProxy,
         ip_address: aRecord,
@@ -219,6 +222,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         isp: locIsp,
         timestamp: new Date().toLocaleString(),
       } as any;
+
 
       onResults(result);
 

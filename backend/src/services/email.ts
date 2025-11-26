@@ -118,8 +118,8 @@ function getVerificationEmailHTML(otp: string): string {
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="logo">🌐✨ DomainScope ✨🌐</h1>
-            <p class="subtitle">Modern OSINT Intelligence • Friendly UX • Serious Engineering</p>
+            <h1 class="logo">🔍 DomainScope</h1>
+            <p class="subtitle">Advanced Domain Intelligence Platform</p>
         </div>
         <div class="content">
             <h2 class="title">Verify Your Email Address</h2>
@@ -174,8 +174,7 @@ function getPasswordResetEmailHTML(resetUrl: string): string {
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="logo">🌐✨ DomainScope ✨🌐</h1>
-            <p class="subtitle" style="color: #f1f5f9; font-size: 14px; margin-top: 8px;">Modern OSINT Intelligence • Friendly UX • Serious Engineering</p>
+            <h1 class="logo">🔍 DomainScope</h1>
         </div>
         <div class="content">
             <h2 class="title">Reset Your Password</h2>
@@ -234,8 +233,7 @@ function getWelcomeEmailHTML(): string {
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="logo">🌐✨ DomainScope ✨🌐</h1>
-            <p class="subtitle" style="color: #f1f5f9; font-size: 14px; margin-top: 8px;">Modern OSINT Intelligence • Friendly UX • Serious Engineering</p>
+            <h1 class="logo">🔍 DomainScope</h1>
         </div>
         <div class="content">
             <h2 class="title">Welcome to DomainScope!</h2>
