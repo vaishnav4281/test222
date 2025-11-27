@@ -2,25 +2,38 @@
 
 
 
-const VT_API_KEY = process.env.VT_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY;
+const VT_API_KEYS = [
+    process.env.VT_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY,
+    process.env.VITE_VIRUSTOTAL_API_KEY_2,
+    process.env.VITE_VIRUSTOTAL_API_KEY_3
+].filter(Boolean) as string[];
+
+let currentKeyIndex = 0;
+
+const getNextKey = () => {
+    if (VT_API_KEYS.length === 0) return null;
+    const key = VT_API_KEYS[currentKeyIndex];
+    currentKeyIndex = (currentKeyIndex + 1) % VT_API_KEYS.length;
+    return key;
+};
 
 const VT_API_URL = 'https://www.virustotal.com/api/v3/domains';
 
 export async function checkVirusTotal(domain: string) {
+    const apiKey = getNextKey();
 
-
-    if (!VT_API_KEY) {
-        console.warn('VT_API_KEY not set');
+    if (!apiKey) {
+        console.warn('No VT_API_KEYs set');
         return null;
     }
 
     try {
         const [reportRes, resolutionsRes] = await Promise.allSettled([
             fetch(`${VT_API_URL}/${domain}`, {
-                headers: { 'x-apikey': VT_API_KEY }
+                headers: { 'x-apikey': apiKey }
             }),
             fetch(`${VT_API_URL}/${domain}/resolutions?limit=10`, {
-                headers: { 'x-apikey': VT_API_KEY }
+                headers: { 'x-apikey': apiKey }
             })
         ]);
 

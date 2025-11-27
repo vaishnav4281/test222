@@ -46,7 +46,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
   const [skipMetascraper, setSkipMetascraper] = useState(false); // Toggle for speed
   const { toast } = useToast();
 
-  const BATCH_SIZE = 15; // Process 15 domains concurrently (optimized for speed)
+  const BATCH_SIZE = 1; // Process 1 domain at a time to respect rate limits
 
   // Optimized single domain scan with parallel API calls
   const scanSingleDomain = async (rawDomain: string, index: number) => {
@@ -296,8 +296,23 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
 
     let completed = 0;
     // Process domains in parallel batches
+    // Process domains sequentially with delay
     for (let i = 0; i < domainList.length; i += BATCH_SIZE) {
       const batch = domainList.slice(i, i + BATCH_SIZE);
+
+      // Update status to show we are waiting if this isn't the first batch
+      if (i > 0) {
+        // Wait 5 seconds between requests (optimized for 3 keys * 4 req/min = 12 req/min)
+        const DELAY_MS = 5000;
+
+        // Show countdown
+        for (let t = 5; t > 0; t--) {
+          // Update a temporary status state if we had one, or just rely on the progress bar stalling
+          // For now we'll just wait
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
       await Promise.allSettled(
         batch.map((domain, batchIndex) => scanSingleDomain(domain.trim(), i + batchIndex))
       );
