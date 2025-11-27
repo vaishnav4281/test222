@@ -18,7 +18,7 @@ export default function ThreeBackground() {
             0.1,
             1000
         );
-        camera.position.z = 12;
+        camera.position.z = 10;
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -29,23 +29,23 @@ export default function ThreeBackground() {
         containerRef.current.appendChild(renderer.domElement);
 
         // Create globe wireframe (representing global domain connections)
-        const globeGeometry = new THREE.SphereGeometry(3, 32, 32);
+        const globeGeometry = new THREE.SphereGeometry(3.5, 32, 32);
         const globeMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x3b82f6 : 0xef4444,
             wireframe: true,
             transparent: true,
-            opacity: isDark ? 0.08 : 0.06,
+            opacity: isDark ? 0.15 : 0.12,
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
         scene.add(globe);
 
         // Create scattered particles (data points)
         const particles: THREE.Mesh[] = [];
-        const particleCount = 80;
+        const particleCount = 150;
 
         for (let i = 0; i < particleCount; i++) {
-            // Small uniform size
-            const geometry = new THREE.SphereGeometry(0.03, 8, 8);
+            // Small uniform size - more visible
+            const geometry = new THREE.SphereGeometry(0.04, 8, 8);
 
             // Mix of colors: white/black base + red/blue accents
             let color;
@@ -61,7 +61,7 @@ export default function ThreeBackground() {
             const material = new THREE.MeshBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: isDark ? 0.6 : 0.5,
+                opacity: isDark ? 0.8 : 0.7,
             });
 
             const particle = new THREE.Mesh(geometry, material);
@@ -78,7 +78,7 @@ export default function ThreeBackground() {
         }
 
         // Create lens/scan ring effect
-        const ringGeometry = new THREE.RingGeometry(2, 2.1, 64);
+        const ringGeometry = new THREE.RingGeometry(2.5, 2.7, 64);
         const ringMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x60a5fa : 0xf87171,
             transparent: true,
@@ -93,7 +93,7 @@ export default function ThreeBackground() {
         const lineMaterials: THREE.LineBasicMaterial[] = [];
 
         // Connect some random particles
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 25; i++) {
             const p1 = particles[Math.floor(Math.random() * particles.length)];
             const p2 = particles[Math.floor(Math.random() * particles.length)];
 
@@ -143,13 +143,13 @@ export default function ThreeBackground() {
 
             // Scan ring pulse effect (lens scanning)
             const scanPulse = Math.sin(elapsedTime * 2) * 0.3 + 0.3;
-            scanRing.material.opacity = scanPulse * 0.4;
+            scanRing.material.opacity = scanPulse * 0.6;
             scanRing.scale.setScalar(1 + Math.sin(elapsedTime * 2) * 0.3);
             scanRing.rotation.z = elapsedTime * 0.5;
 
             // Connection lines pulse
             lineMaterials.forEach((material, i) => {
-                const pulse = Math.sin(elapsedTime * 1.5 + i * 0.3) * 0.1 + 0.15;
+                const pulse = Math.sin(elapsedTime * 1.5 + i * 0.3) * 0.15 + 0.25;
                 material.opacity = pulse;
             });
 
