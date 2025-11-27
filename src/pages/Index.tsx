@@ -1,11 +1,13 @@
-
+```
 import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Search, Database, FileText, Globe, Activity, Moon, Sun, LogOut, History as HistoryIcon, Download, Trash2 } from "lucide-react";
+import { toast } from 'sonner';
+import ThreeBackground from '@/components/ThreeBackground';
 import { useAuth } from "../context/AuthContext";
-import DomainAnalysisCard from "@/components/DomainAnalysisCard";
+import DomainAnalysisCard from '../components/DomainAnalysisCard';
 import BulkScannerCard from "@/components/BulkScannerCard";
 import ResultsPanel from "@/components/ResultsPanel";
 import MetascraperResults from "@/components/MetascraperResults";
@@ -88,11 +90,11 @@ const Index = () => {
   const saveHistory = async (target: string, result: any) => {
     if (!token) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
+      const res = await fetch(`${ API_BASE_URL } /api/v1 / history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${ token } `
         },
         body: JSON.stringify({ target, result })
       });
@@ -108,8 +110,8 @@ const Index = () => {
   const fetchHistory = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch(`${ API_BASE_URL } /api/v1 / history`, {
+        headers: { 'Authorization': `Bearer ${ token } ` }
       });
       if (res.status === 401) {
         logout();
@@ -127,8 +129,8 @@ const Index = () => {
   const downloadHistory = async () => {
     if (!token) return;
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/history/download`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch(`${ API_BASE_URL } /api/v1 / history / download`, {
+        headers: { 'Authorization': `Bearer ${ token } ` }
       });
       if (res.status === 401) {
         logout();
@@ -151,9 +153,9 @@ const Index = () => {
     if (!token) return;
     // Confirmation handled by AlertDialog
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/history`, {
+      const res = await fetch(`${ API_BASE_URL } /api/v1 / history`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${ token } ` }
       });
       if (res.status === 401) {
         logout();
@@ -209,9 +211,15 @@ const Index = () => {
   }, [virusTotalResults]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-blue-500/[0.02] pointer-events-none dark:opacity-100 opacity-50" />
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden">
+      {/* Three.js 3D Background */}
+      <ThreeBackground />
+      
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.03] via-purple-500/[0.02] to-blue-500/[0.03] dark:from-red-500/[0.05] dark:via-purple-500/[0.03] dark:to-blue-500/[0.05] animate-gradient" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/[0.02] via-transparent to-red-500/[0.02] dark:from-blue-500/[0.04] dark:via-transparent dark:to-red-500/[0.04] animate-gradient" style={{ animationDelay: '1s', animationDuration: '4s' }} />
+      </div>
 
       {/* Header - Optimized spacing */}
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
@@ -261,7 +269,7 @@ const Index = () => {
             {/* Premium Typography - Clean and Simple */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2 animate-fade-in" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif", animationDelay: '100ms' }}>
               <span className="block mb-1 sm:mb-2">Domain Intelligence</span>
-              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-500">
+              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
                 Redefined
               </span>
             </h1>
@@ -395,12 +403,13 @@ const Index = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`
-                    relative flex items-center px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap
-                    ${activeTab === tab.id
-                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }
-                  `}
+                    relative flex items - center px - 4 sm: px - 6 py - 2 sm: py - 2.5 rounded - lg text - sm font - medium transition - all duration - 200 whitespace - nowrap
+                    ${
+  activeTab === tab.id
+    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+}
+`}
                 >
                   <tab.icon className="h-4 w-4 mr-2" />
                   <span>{tab.label}</span>
