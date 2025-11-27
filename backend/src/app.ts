@@ -26,12 +26,24 @@ app.use(helmet()); // Secure HTTP headers
 app.use(hpp()); // Prevent HTTP Parameter Pollution
 
 // CORS Configuration
-const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:5173'];
+// CORS Configuration
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',').map(url => url.trim());
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Check if origin is allowed
+        const isAllowed = allowedOrigins.includes(origin) ||
+            origin.startsWith('http://localhost:') ||
+            origin.endsWith('.vercel.app') ||
+            origin.endsWith('.onrender.com');
+
+        if (isAllowed) {
             callback(null, true);
         } else {
+            console.error(`Blocked by CORS: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },

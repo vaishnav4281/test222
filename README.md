@@ -190,6 +190,31 @@ When a user enters **example.com**, here's the journey:
 
 A smooth, fast, and scalable journey end‑to‑end.
 
+# ✨ Feature Deep Dive
+
+### 📦 Bulk Scanning Engine
+Process hundreds of domains in parallel. Simply paste a list of domains, and DomainScope's distributed workers will fetch intelligence for all of them simultaneously.
+*   **Real-time tracking:** Watch progress as each domain is analyzed.
+*   **CSV Export:** Download full datasets including domain age, registrar, and threat scores.
+*   **Smart Logging:** Automatically tracks failed lookups for retry.
+
+### 🗂️ Smart History & Management
+Never lose track of your investigations. Every scan is automatically saved to your secure history.
+*   **Auto-Save:** Instant persistence of all scan results.
+*   **One-Click Export:** Download your entire history as a CSV report.
+*   **Easy Management:** View, search, or clear your history with a simple UI.
+
+### 🛡️ Advanced Threat Intelligence
+Going beyond basic WHOIS, DomainScope integrates multiple top-tier security engines:
+*   **IPQS & AbuseIPDB:** Real-time fraud scores and abuse reporting.
+*   **VPN/Proxy/Tor Detection:** Instantly identify anonymous infrastructure.
+*   **DNSBL Checks:** Cross-reference IPs against Spamhaus, SpamCop, SORBS, and Barracuda.
+
+### 🌗 Adaptive UI
+Designed for any environment.
+*   **Dark/Light Mode:** Seamlessly switches based on system preference or user toggle.
+*   **Responsive Design:** Perfect experience on desktop, tablet, or mobile.
+
 # 🧩 Production-Ready Engineering
 
 Below are the core engineering systems, rewritten into friendly, simple, emoji‑enhanced mini‑paragraphs that feel alive and easy to read.
@@ -216,11 +241,12 @@ Growth is handled gracefully. Multi‑node backend instances, a Redis cluster, P
 
 DomainScope follows a layered security approach designed to keep every request safe and every workflow trustworthy. 🛡️✨ It uses smart protective layers like CDN filtering, strict rate limits, secure authentication, and clean input validation — all supported by detailed audit logs. Together, these guard against SQL injection, XSS, CSRF, DDoS, API misuse, and other real‑world threats.
 
-* 🛡️ CDN protection keeps bad traffic away early.
-* 🚦 Rate limiting ensures fair, safe usage.
-* 🔐 JWT and API keys secure access.
-* ✏️ Zod validation keeps inputs clean.
-* 🧾 Audit logging tracks important actions.
+* 🛡️ **CDN & Headers:** CloudFlare protection + Helmet for secure HTTP headers.
+* 🚦 **Smart Rate Limiting:** Global limits (100/15m) + Strict Auth limits (10/1h) to prevent brute-force.
+* 🔐 **Authentication:** JWT sessions, bcrypt password hashing, and API keys.
+* 🕵️ **Anti-Enumeration:** Login and Forgot Password endpoints return generic responses to prevent user harvesting.
+* 🧹 **Input Hygiene:** Zod validation, HPP (Parameter Pollution) protection, and Body Size limiting (10kb).
+* 🧾 **Audit Logging:** Tracks important actions for security review.
 
 # 🔭 Observability & SRE
 
@@ -236,12 +262,14 @@ DomainScope is fully observable — you can understand what's happening, where i
 
 Every scan produces clean, structured, and insightful domain intelligence — crafted for analysts, researchers, and automated pipelines. 📦✨ The results are easy to understand, nicely formatted, and ready to export.
 
-* 🪪 WHOIS details
-* 🌐 DNS records
-* 🛰️ IP & ASN data
-* 🔥 Threat scores
-* 🏷️ Domain metadata
-* 📤 Bulk exports for larger workflows
+* 🪪 **WHOIS details:** Registrar, dates, and contact info.
+* 🌐 **DNS records:** A, MX, NS, TXT, and CNAME records.
+* 📜 **Passive DNS:** Historical IP resolutions and domain associations.
+* 🛰️ **IP & ASN data:** Geolocation, ISP, and organization details.
+* 🔥 **Threat scores:** Real-time checks via VirusTotal, IPQS, and AbuseIPDB.
+* 🛡️ **Security Signals:** VPN/Proxy/Tor detection and DNSBL status.
+* 🏷️ **Domain metadata:** Tech stack, hosting info, and site description.
+* 📤 **Bulk exports:** Full CSV reports for larger workflows.
 
 Clear, actionable, and beautifully organized.
 
