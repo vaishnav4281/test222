@@ -180,7 +180,15 @@ export default function LoginPage() {
                 </div>
 
                 <div className="absolute bottom-16 text-sm text-slate-500 dark:text-slate-600">
-                    Built by <span className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Vaishnav K</span>
+                    Built by{' '}
+                    <a
+                        href="https://www.linkedin.com/in/va1shnav"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-300 hover:underline"
+                    >
+                        Vaishnav K
+                    </a>
                 </div>
             </div>
 
