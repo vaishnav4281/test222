@@ -1,4 +1,4 @@
-const IPQS_API_KEY = process.env.IPQS_API_KEY;
+const IPQS_API_KEY = process.env.IPQS_API_KEY || process.env.VITE_IPQS_API_KEY;
 const IPQS_API_URL = 'https://ipqualityscore.com/api/json/ip';
 
 export async function checkIPQS(ip: string) {

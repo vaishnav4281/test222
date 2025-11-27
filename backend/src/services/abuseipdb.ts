@@ -1,4 +1,4 @@
-const ABUSEIPDB_API_KEY = process.env.ABUSEIPDB_API_KEY;
+const ABUSEIPDB_API_KEY = process.env.ABUSEIPDB_API_KEY || process.env.VITE_ABUSEIPDB_API_KEY;
 const ABUSEIPDB_API_URL = 'https://api.abuseipdb.com/api/v2/check';
 
 export async function checkAbuseIPDB(ip: string) {

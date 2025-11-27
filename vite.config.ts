@@ -50,18 +50,62 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api\/whois/, '/whois'),
         },
-        // Dev proxy for VirusTotal to avoid CORS and inject API key server-side
+        // Dev proxy for VirusTotal with automatic key rotation
         '/api/vt': {
           target: 'https://www.virustotal.com',
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api\/vt/, '/api/v3'),
           configure: (proxy) => {
-            if (!vtKey) {
+            const vtKeys = [
+              env.VITE_VIRUSTOTAL_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY,
+              env.VITE_VIRUSTOTAL_API_KEY_2 || process.env.VITE_VIRUSTOTAL_API_KEY_2,
+              env.VITE_VIRUSTOTAL_API_KEY_3 || process.env.VITE_VIRUSTOTAL_API_KEY_3,
+              env.VITE_VIRUSTOTAL_API_KEY_4 || process.env.VITE_VIRUSTOTAL_API_KEY_4,
+              env.VITE_VIRUSTOTAL_API_KEY_5 || process.env.VITE_VIRUSTOTAL_API_KEY_5,
+            ].filter(Boolean);
+
+            if (vtKeys.length === 0) {
               console.warn('[vite] VITE_VIRUSTOTAL_API_KEY not loaded. VT requests will 401.');
+            } else {
+              console.log(`[vite] VirusTotal proxy configured with ${vtKeys.length} key(s)`);
             }
+
+            // Track key status: null = untested, true = working, false = exhausted
+            const keyStatus: (boolean | null)[] = vtKeys.map(() => null);
+            let currentKeyIndex = 0;
+
+            const findNextWorkingKey = () => {
+              for (let i = currentKeyIndex + 1; i < vtKeys.length; i++) {
+                if (keyStatus[i] !== false) return i;
+              }
+              // Loop back to start if needed (optional, but VT quotas are usually daily/hourly)
+              for (let i = 0; i < currentKeyIndex; i++) {
+                if (keyStatus[i] !== false) return i;
+              }
+              return currentKeyIndex;
+            };
+
             proxy.on('proxyReq', (proxyReq) => {
-              if (vtKey) {
-                proxyReq.setHeader('x-apikey', vtKey);
+              const currentKey = vtKeys[currentKeyIndex];
+              if (currentKey) {
+                proxyReq.setHeader('x-apikey', currentKey);
+                console.log(`[vite] 🛡️ VT: Using key #${currentKeyIndex + 1}`);
+              }
+            });
+
+            proxy.on('proxyRes', (proxyRes, req, res) => {
+              // VT returns 429 for quota exceeded or 204 for rate limit
+              if (proxyRes.statusCode === 429 || proxyRes.statusCode === 204) {
+                console.warn(`[vite] ⚠️ VT Key #${currentKeyIndex + 1} hit rate limit/quota (Status: ${proxyRes.statusCode})`);
+                keyStatus[currentKeyIndex] = false; // Mark as exhausted/limited
+
+                const nextKey = findNextWorkingKey();
+                if (nextKey !== currentKeyIndex) {
+                  console.log(`[vite] 🔄 Switching to VT Key #${nextKey + 1}`);
+                  currentKeyIndex = nextKey;
+                } else {
+                  console.error('[vite] ❌ All VirusTotal keys exhausted or rate limited');
+                }
               }
             });
           },

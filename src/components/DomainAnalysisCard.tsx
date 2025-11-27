@@ -152,11 +152,18 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       let whoisExpires = attrs.last_modification_date ? new Date(attrs.last_modification_date * 1000).toLocaleString() : "-";
       let whoisRegistrar = attrs.registrar || "-";
 
-      if (whoisData) {
-        const wd = whoisData || {};
+      // Logic: Use primary WHOIS if available, otherwise fallback to VT WHOIS data
+      if (whoisData && whoisData.created) {
+        const wd = whoisData;
         whoisCreated = wd.created || wd.creation_date || whoisCreated;
         whoisExpires = wd.expires || wd.expiry_date || whoisExpires;
         whoisRegistrar = wd.registrar || whoisRegistrar;
+        console.log('✅ Using Primary WHOIS data');
+      } else if (attrs.whois) {
+        // Fallback to parsing VT WHOIS text if possible, or just rely on VT attributes
+        console.log('⚠️ Primary WHOIS failed/empty, using VirusTotal fallback');
+        // VT 'whois' field is often a raw text blob, but 'creation_date' etc are parsed attributes
+        // We already set defaults from 'attrs' above, so we just confirm we are using them.
       }
 
       // IP intelligence (IPQS, AbuseIPDB)

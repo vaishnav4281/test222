@@ -3,6 +3,8 @@
  * Preemptively calls all backend APIs with test requests
  */
 
+import { API_BASE_URL } from '../config';
+
 // Test data for warmup requests
 const TEST_DOMAIN = 'example.com';
 const TEST_IP = '8.8.8.8';
@@ -55,11 +57,12 @@ async function warmupEndpoint(
 export async function warmupBackendServices(): Promise<WarmupResult[]> {
   console.log('🔥 Starting backend warmup...');
 
+  // Use the backend API endpoints directly
   const warmupTasks = [
-    warmupEndpoint('VirusTotal', `/api/vt/domains/${TEST_DOMAIN}`, 3000),
-    warmupEndpoint('WHOIS', `/api/whois?domain=${TEST_DOMAIN}`, 3000),
-    warmupEndpoint('IPQS', `/api/ipqs/check?ip=${TEST_IP}`, 3000),
-    warmupEndpoint('AbuseIPDB', `/api/abuseipdb/check?ip=${TEST_IP}`, 3000),
+    warmupEndpoint('VirusTotal', `${API_BASE_URL}/api/v1/scan/vt?domain=${TEST_DOMAIN}`, 3000),
+    warmupEndpoint('WHOIS', `${API_BASE_URL}/api/v1/scan/whois?domain=${TEST_DOMAIN}`, 3000),
+    warmupEndpoint('IPQS', `${API_BASE_URL}/api/v1/scan/ipqs?ip=${TEST_IP}`, 3000),
+    warmupEndpoint('AbuseIPDB', `${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${TEST_IP}`, 3000),
   ];
 
   const results = await Promise.allSettled(warmupTasks);
