@@ -61,6 +61,7 @@ The frontend is built with React, TypeScript, and Tailwind CSS.
 | **`App.tsx`** | The main component that sets up routing, providers (Theme, Auth), and layout. |
 | **`index.css`** | Global styles and Tailwind directives. |
 | **`config.ts`** | Global configuration constants (e.g., API base URL). |
+| **`lib/warmup.ts`** | Utility to warm up backend services on app load (excluding VirusTotal to save quota). |
 
 ### Pages (`/src/pages`)
 Top-level page components corresponding to routes.
@@ -118,7 +119,7 @@ Business logic and external API integrations.
 
 | File | Description |
 | :--- | :--- |
-| **`vt.ts`** | Integration with **VirusTotal API** for reputation and passive DNS. |
+| **`vt.ts`** | Integration with **VirusTotal API** for reputation and passive DNS. **Includes Redis caching.** |
 | **`ipqs.ts`** | Integration with **IPQualityScore** for fraud and risk analysis. |
 | **`abuseipdb.ts`** | Integration with **AbuseIPDB** for IP abuse reports. |
 | **`dnsbl.ts`** | Checks IPs against **DNS Blacklists**. |

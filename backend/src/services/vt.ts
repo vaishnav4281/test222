@@ -1,3 +1,5 @@
+import { redis } from '../redis.js';
+
 
 
 
@@ -20,6 +22,19 @@ const getNextKey = () => {
 const VT_API_URL = 'https://www.virustotal.com/api/v3/domains';
 
 export async function checkVirusTotal(domain: string) {
+    const cacheKey = `vt:${domain}`;
+
+    // Check cache first
+    try {
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+            console.log(`[VT] Returning cached result for ${domain}`);
+            return JSON.parse(cached);
+        }
+    } catch (err) {
+        console.warn('[VT] Redis cache error:', err);
+    }
+
     const apiKey = getNextKey();
 
     if (!apiKey) {
@@ -77,6 +92,11 @@ export async function checkVirusTotal(domain: string) {
         } else {
             // If main report failed but resolutions worked (unlikely but possible)
             data = { data: {}, resolutions };
+        }
+
+        // Cache the result for 1 hour (3600 seconds)
+        if (!data.error) {
+            await redis.setex(cacheKey, 3600, JSON.stringify(data));
         }
 
         return data;

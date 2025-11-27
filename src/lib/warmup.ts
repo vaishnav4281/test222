@@ -59,7 +59,8 @@ export async function warmupBackendServices(): Promise<WarmupResult[]> {
 
   // Use the backend API endpoints directly
   const warmupTasks = [
-    warmupEndpoint('VirusTotal', `${API_BASE_URL}/api/v1/scan/vt?domain=${TEST_DOMAIN}`, 3000),
+    // VirusTotal removed from warmup to save quota
+
     warmupEndpoint('WHOIS', `${API_BASE_URL}/api/v1/scan/whois?domain=${TEST_DOMAIN}`, 3000),
     warmupEndpoint('IPQS', `${API_BASE_URL}/api/v1/scan/ipqs?ip=${TEST_IP}`, 3000),
     warmupEndpoint('AbuseIPDB', `${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${TEST_IP}`, 3000),

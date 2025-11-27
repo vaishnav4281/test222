@@ -21,7 +21,7 @@ DomainScope is a comprehensive domain intelligence and OSINT platform designed t
 ### 3. Threat Intelligence
 *   **Feature**: Analyzes domains and IPs for malicious activity, reputation scores, and risk levels.
 *   **Providers**:
-    *   **VirusTotal**: Global reputation, malware detection, and categorization (`backend/src/services/vt.ts`).
+    *   **VirusTotal**: Global reputation, malware detection, and categorization (`backend/src/services/vt.ts`). **Optimized with Redis caching (1-hour TTL) to respect API quotas.**
     *   **AbuseIPDB**: IP abuse confidence scores and reporting history (`backend/src/services/abuseipdb.ts`).
     *   **IPQualityScore (IPQS)**: Fraud scoring, VPN/Proxy/Tor detection, and bot analysis (`backend/src/services/ipqs.ts`).
     *   **DNSBL**: Checks IP against multiple DNS Blacklists (`backend/src/services/dnsbl.ts`).
