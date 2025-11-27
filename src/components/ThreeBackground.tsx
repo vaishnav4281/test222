@@ -22,7 +22,7 @@ export default function ThreeBackground() {
             antialias: true,
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixel Ratio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         containerRef.current.appendChild(renderer.domElement);
 
         // Create particle wave geometry
