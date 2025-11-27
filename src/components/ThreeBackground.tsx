@@ -68,14 +68,12 @@ export default function ThreeBackground() {
             scene.add(particle);
         }
 
-        // Scanning ring removed
-
         // Create connection lines (data flow)
         const lines: THREE.Line[] = [];
         const lineMaterials: THREE.LineBasicMaterial[] = [];
 
         // Connect more random particles for richer network
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 25; i++) {
             const p1 = particles[Math.floor(Math.random() * particles.length)];
             const p2 = particles[Math.floor(Math.random() * particles.length)];
 
