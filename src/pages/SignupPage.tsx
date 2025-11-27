@@ -170,7 +170,15 @@ export default function SignupPage() {
                 </div>
 
                 <div className="absolute bottom-16 text-sm text-slate-500 dark:text-slate-600">
-                    Built by <span className="font-semibold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">Vaishnav K</span>
+                    Built by{' '}
+                    <a
+                        href="https://www.linkedin.com/in/va1shnav"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent hover:from-blue-500 hover:to-red-500 transition-all duration-300 hover:underline"
+                    >
+                        Vaishnav K
+                    </a>
                 </div>
             </div>
 
