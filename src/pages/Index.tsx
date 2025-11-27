@@ -32,7 +32,6 @@ const Index = () => {
   const [metascraperResults, setMetascraperResults] = useState([]);
   const [virusTotalResults, setVirusTotalResults] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Mouse tracking for interactive effects
   useEffect(() => {
@@ -223,34 +222,6 @@ const Index = () => {
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-blue-500/[0.02] pointer-events-none dark:opacity-100 opacity-50" />
 
-      {/* Interactive floating orbs with parallax effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute w-96 h-96 bg-gradient-to-br from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 rounded-full blur-3xl transition-transform duration-[2000ms] ease-out"
-          style={{
-            top: '10%',
-            left: '15%',
-            transform: `translate(${(mousePosition.x - window.innerWidth / 2) * 0.02}px, ${(mousePosition.y - window.innerHeight / 2) * 0.02}px)`
-          }}
-        />
-        <div
-          className="absolute w-[500px] h-[500px] bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 rounded-full blur-3xl transition-transform duration-[2500ms] ease-out"
-          style={{
-            top: '60%',
-            right: '10%',
-            transform: `translate(${(mousePosition.x - window.innerWidth / 2) * -0.03}px, ${(mousePosition.y - window.innerHeight / 2) * -0.03}px)`
-          }}
-        />
-        <div
-          className="absolute w-80 h-80 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-500/20 dark:to-indigo-500/20 rounded-full blur-3xl transition-transform duration-[1800ms] ease-out"
-          style={{
-            top: '40%',
-            left: '50%',
-            transform: `translate(${(mousePosition.x - window.innerWidth / 2) * 0.015}px, ${(mousePosition.y - window.innerHeight / 2) * 0.015}px)`
-          }}
-        />
-      </div>
-
       {/* Header - Optimized spacing */}
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
@@ -296,48 +267,12 @@ const Index = () => {
           </div>
 
           <div className="relative space-y-3 sm:space-y-5">
-            {/* Interactive Antigravity Text */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif" }}>
-              <div className="block mb-1 sm:mb-2">
-                {"Domain Intelligence".split('').map((char, index) => (
-                  <span
-                    key={index}
-                    className="inline-block transition-transform duration-200 ease-out"
-                    style={{
-                      transform: char === ' ' ? 'none' : (
-                        Math.abs(mousePosition.x - (window.innerWidth / 2 + (index - 10) * 30)) < 100 &&
-                          Math.abs(mousePosition.y - 250) < 100
-                          ? `translate(
-                              ${(mousePosition.x - (window.innerWidth / 2 + (index - 10) * 30)) * -0.3}px,
-                              ${(mousePosition.y - 250) * -0.3}px
-                            )`
-                          : 'translate(0, 0)'
-                      )
-                    }}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </div>
-              <div className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-500">
-                {"Redefined".split('').map((char, index) => (
-                  <span
-                    key={index}
-                    className="inline-block transition-transform duration-200 ease-out"
-                    style={{
-                      transform: Math.abs(mousePosition.x - (window.innerWidth / 2 + (index - 4) * 40)) < 100 &&
-                        Math.abs(mousePosition.y - 320) < 100
-                        ? `translate(
-                              ${(mousePosition.x - (window.innerWidth / 2 + (index - 4) * 40)) * -0.4}px,
-                              ${(mousePosition.y - 320) * -0.4}px
-                            )`
-                        : 'translate(0, 0)'
-                    }}
-                  >
-                    {char}
-                  </span>
-                ))}
-              </div>
+            {/* Premium Typography - Clean and Simple */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2 animate-fade-in" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif", animationDelay: '100ms' }}>
+              <span className="block mb-1 sm:mb-2">Domain Intelligence</span>
+              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-500">
+                Redefined
+              </span>
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4 animate-fade-in" style={{ fontFamily: "'Inter', system-ui, sans-serif", animationDelay: '200ms' }}>
