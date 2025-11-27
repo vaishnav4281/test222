@@ -28,22 +28,11 @@ export default function ThreeBackground() {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         containerRef.current.appendChild(renderer.domElement);
 
-        // Create globe wireframe (representing global domain connections)
-        const globeGeometry = new THREE.SphereGeometry(1.5, 32, 32);
-        const globeMaterial = new THREE.MeshBasicMaterial({
-            color: isDark ? 0x3b82f6 : 0xef4444,
-            wireframe: true,
-            transparent: true,
-            opacity: isDark ? 0.15 : 0.12,
-        });
-        const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-        globe.position.x = 5.5; // Further to the right
-        globe.position.y = 3; // Upper area of hero section
-        scene.add(globe);
+        // Globe and ring removed - keeping particles and connections only
 
         // Create scattered particles (data points)
         const particles: THREE.Mesh[] = [];
-        const particleCount = 200;
+        const particleCount = 300;
 
         for (let i = 0; i < particleCount; i++) {
             // Small uniform size - more visible
@@ -79,25 +68,14 @@ export default function ThreeBackground() {
             scene.add(particle);
         }
 
-        // Create lens/scan ring effect
-        const ringGeometry = new THREE.RingGeometry(1.5, 1.7, 64);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-            color: isDark ? 0x60a5fa : 0xf87171,
-            transparent: true,
-            opacity: 0,
-            side: THREE.DoubleSide,
-        });
-        const scanRing = new THREE.Mesh(ringGeometry, ringMaterial);
-        scanRing.position.x = 5.5; // Further to the right with globe
-        scanRing.position.y = 3; // Match globe height
-        scene.add(scanRing);
+        // Scanning ring removed
 
         // Create connection lines (data flow)
         const lines: THREE.Line[] = [];
         const lineMaterials: THREE.LineBasicMaterial[] = [];
 
-        // Connect some random particles
-        for (let i = 0; i < 25; i++) {
+        // Connect more random particles for richer network
+        for (let i = 0; i < 40; i++) {
             const p1 = particles[Math.floor(Math.random() * particles.length)];
             const p2 = particles[Math.floor(Math.random() * particles.length)];
 
@@ -135,21 +113,11 @@ export default function ThreeBackground() {
         const animate = () => {
             const elapsedTime = clock.getElapsedTime();
 
-            // Rotate globe slowly
-            globe.rotation.y = elapsedTime * 0.1;
-            globe.rotation.x = Math.sin(elapsedTime * 0.05) * 0.1;
-
             // Gentle particle drift
             particles.forEach((particle, i) => {
                 particle.position.y += Math.sin(elapsedTime + i) * 0.002;
                 particle.position.x += Math.cos(elapsedTime + i * 0.5) * 0.001;
             });
-
-            // Scan ring pulse effect (lens scanning)
-            const scanPulse = Math.sin(elapsedTime * 2) * 0.3 + 0.3;
-            scanRing.material.opacity = scanPulse * 0.6;
-            scanRing.scale.setScalar(1 + Math.sin(elapsedTime * 2) * 0.3);
-            scanRing.rotation.z = elapsedTime * 0.5;
 
             // Connection lines pulse
             lineMaterials.forEach((material, i) => {
@@ -184,16 +152,11 @@ export default function ThreeBackground() {
             cancelAnimationFrame(animationId);
             containerRef.current?.removeChild(renderer.domElement);
 
-            globe.geometry.dispose();
-            (globe.material as THREE.Material).dispose();
-
             particles.forEach(particle => {
                 particle.geometry.dispose();
                 (particle.material as THREE.Material).dispose();
             });
 
-            scanRing.geometry.dispose();
-            (scanRing.material as THREE.Material).dispose();
 
             lines.forEach(line => {
                 line.geometry.dispose();
