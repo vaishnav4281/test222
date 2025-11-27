@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon, Loader2, FileText } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import OTPVerificationModal from '@/components/OTPVerificationModal';
+import ThreeBackground from '@/components/ThreeBackground';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -91,7 +92,9 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen w-full flex bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0B0F19] dark:to-[#0f1419] text-slate-900 dark:text-white overflow-hidden relative transition-colors duration-300">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex items-center justify-center p-4 relative overflow-hidden text-slate-900 dark:text-white transition-colors duration-300">
+            {/* Three.js particle background */}
+            <ThreeBackground />
             {/* Background Grid & Glows */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1f293720_1px,transparent_1px),linear-gradient(to_bottom,#1f293720_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
