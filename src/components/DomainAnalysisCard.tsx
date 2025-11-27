@@ -133,7 +133,24 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       const creationDateStr = attrs.creation_date ? new Date(attrs.creation_date * 1000).toLocaleString() : "-";
       const lastDns: any[] = Array.isArray(attrs.last_dns_records) ? attrs.last_dns_records : [];
       const nsRecords = lastDns.filter(r => r?.type === 'NS').map(r => r?.value).filter(Boolean);
-      const aRecord = (lastDns.find(r => r?.type === 'A')?.value) || (lastDns.find(r => r?.type === 'AAAA')?.value) || "-";
+      let aRecord = (lastDns.find(r => r?.type === 'A')?.value) || (lastDns.find(r => r?.type === 'AAAA')?.value) || "-";
+
+      // Fallback: If VT didn't give us an IP, try to resolve it directly via our backend
+      if (aRecord === "-" || !aRecord) {
+        try {
+          console.log('⚠️ VT did not return an IP, attempting direct DNS resolution...');
+          const dnsRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/dns?domain=${encodeURIComponent(sanitizedDomain)}`, 3000);
+          if (dnsRes.ok) {
+            const dnsData = await dnsRes.json();
+            if (dnsData.ip) {
+              aRecord = dnsData.ip;
+              console.log('✅ Resolved IP via backend DNS:', aRecord);
+            }
+          }
+        } catch (e) {
+          console.warn('❌ DNS resolution failed:', e);
+        }
+      }
 
       const computeAge = (created: string) => {
         if (!created || created === '-') return '-';

@@ -95,7 +95,22 @@ export async function getWhois(domain: string, force = false) {
 
     const bestServer = await resolveBestWhoisServer(domain);
     let result = await queryWhoisServer(domain, bestServer);
+
+    // If best server failed, try IANA
     if (!result) {
+        console.log(`[WHOIS] Retrying ${domain} with IANA...`);
+        result = await queryWhoisServer(domain, 'whois.iana.org');
+    }
+
+    // If still failed, try Verisign for com/net
+    if (!result && (domain.endsWith('.com') || domain.endsWith('.net'))) {
+        console.log(`[WHOIS] Retrying ${domain} with Verisign...`);
+        result = await queryWhoisServer(domain, 'whois.verisign-grs.com');
+    }
+
+    // Final attempt with default (no server specified)
+    if (!result) {
+        console.log(`[WHOIS] Final retry for ${domain} with default server...`);
         result = await queryWhoisServer(domain);
     }
 
