@@ -37,12 +37,12 @@ export default function ThreeBackground() {
             opacity: isDark ? 0.15 : 0.12,
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-        globe.position.y = 2; // Position behind hero text
+        globe.position.y = 4; // Position behind 'Domain Intelligence Redefined'
         scene.add(globe);
 
         // Create scattered particles (data points)
         const particles: THREE.Mesh[] = [];
-        const particleCount = 150;
+        const particleCount = 200;
 
         for (let i = 0; i < particleCount; i++) {
             // Small uniform size - more visible
@@ -87,7 +87,7 @@ export default function ThreeBackground() {
             side: THREE.DoubleSide,
         });
         const scanRing = new THREE.Mesh(ringGeometry, ringMaterial);
-        scanRing.position.y = 2; // Superimpose with globe behind hero text
+        scanRing.position.y = 4; // Superimpose with globe behind main title
         scene.add(scanRing);
 
         // Create connection lines (data flow)
