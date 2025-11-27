@@ -372,9 +372,7 @@ const Index = () => {
                             </div>
                           </div>
                         </div>
-                        <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1">
-                          Completed
-                        </Badge>
+
                       </div>
                     ))}
                     {history.length === 0 && (

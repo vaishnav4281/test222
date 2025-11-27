@@ -150,7 +150,19 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
 
       let whoisCreated = creationDateStr;
       let whoisExpires = attrs.last_modification_date ? new Date(attrs.last_modification_date * 1000).toLocaleString() : "-";
-      let whoisRegistrar = attrs.registrar || "-";
+
+      // Enhanced Registrar Logic: Try structured attribute -> Regex from raw text -> Default
+      let whoisRegistrar = attrs.registrar;
+      if (!whoisRegistrar && attrs.whois) {
+        const match = attrs.whois.match(/Registrar:\s*(.+)/i) ||
+          attrs.whois.match(/Sponsoring Registrar:\s*(.+)/i) ||
+          attrs.whois.match(/Registrar Name:\s*(.+)/i);
+        if (match) {
+          whoisRegistrar = match[1].trim();
+          console.log('✅ Extracted Registrar from raw VT WHOIS:', whoisRegistrar);
+        }
+      }
+      whoisRegistrar = whoisRegistrar || "-";
 
       // Logic: Use primary WHOIS if available, otherwise fallback to VT WHOIS data
       if (whoisData && whoisData.created) {
