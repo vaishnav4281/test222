@@ -156,9 +156,13 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       if (!whoisRegistrar && attrs.whois) {
         const match = attrs.whois.match(/Registrar:\s*(.+)/i) ||
           attrs.whois.match(/Sponsoring Registrar:\s*(.+)/i) ||
-          attrs.whois.match(/Registrar Name:\s*(.+)/i);
+          attrs.whois.match(/Registrar Name:\s*(.+)/i) ||
+          attrs.whois.match(/Registrar Organization:\s*(.+)/i) ||
+          attrs.whois.match(/Registrar URL:\s*(.+)/i);
         if (match) {
           whoisRegistrar = match[1].trim();
+          // Clean up if it grabbed trailing punctuation or excessive whitespace
+          whoisRegistrar = whoisRegistrar.replace(/\.$/, '').trim();
           console.log('✅ Extracted Registrar from raw VT WHOIS:', whoisRegistrar);
         }
       }
