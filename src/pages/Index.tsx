@@ -287,8 +287,8 @@ const Index = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10 md:py-12 space-y-8 sm:space-y-12 relative">
-        {/* Premium Hero Section - Balanced spacing */}
-        <div className="relative text-center space-y-5 sm:space-y-7 animate-fade-in">
+        {/* Hero section - optimized spacing and centered */}
+        <div className="relative px-3 sm:px-4 lg:px-6 pt-10 sm:pt-16 pb-8 sm:pb-10 max-w-6xl mx-auto animate-fade-in">
           {/* Elegant gradient background */}
           <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
             <div className="absolute top-0 left-1/3 w-96 h-96 bg-gradient-to-br from-red-500/10 via-rose-400/5 to-transparent rounded-full blur-3xl" />
@@ -297,21 +297,21 @@ const Index = () => {
 
           <div className="relative space-y-3 sm:space-y-5">
             {/* Premium Typography */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif" }}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2 animate-slide-in-left" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif", animationDelay: '100ms' }}>
               <span className="block mb-1 sm:mb-2">Domain Intelligence</span>
-              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-500">
                 Redefined
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4 animate-fade-in" style={{ fontFamily: "'Inter', system-ui, sans-serif", animationDelay: '200ms' }}>
               Enterprise-grade threat analysis and security intelligence platform
             </p>
           </div>
         </div>
 
         {/* Feature Showcase Section - Enhanced with animations */}
-        <div className="relative bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-2xl animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <div className="relative bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-2xl hover:shadow-3xl transition-shadow duration-500 animate-scale-in" style={{ animationDelay: '300ms' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* WHOIS Details */}
             <div className="group relative bg-gradient-to-br from-red-50 to-white dark:from-red-900/10 dark:to-slate-800 p-6 rounded-2xl border border-red-200 dark:border-red-800/50 hover:border-red-400 dark:hover:border-red-600 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: '150ms' }}>
