@@ -37,7 +37,7 @@ export default function ThreeBackground() {
             opacity: isDark ? 0.15 : 0.12,
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-        globe.position.x = 3.5; // Offset to the right for visual balance
+        globe.position.x = 5.5; // Further to the right
         globe.position.y = 3; // Upper area of hero section
         scene.add(globe);
 
@@ -88,7 +88,7 @@ export default function ThreeBackground() {
             side: THREE.DoubleSide,
         });
         const scanRing = new THREE.Mesh(ringGeometry, ringMaterial);
-        scanRing.position.x = 3.5; // Match globe position
+        scanRing.position.x = 5.5; // Further to the right with globe
         scanRing.position.y = 3; // Match globe height
         scene.add(scanRing);
 
