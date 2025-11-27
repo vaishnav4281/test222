@@ -7,6 +7,9 @@ export default function ThreeBackground() {
     useEffect(() => {
         if (!containerRef.current) return;
 
+        // Detect theme
+        const isDark = document.documentElement.classList.contains('dark');
+
         // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(
@@ -25,35 +28,43 @@ export default function ThreeBackground() {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         containerRef.current.appendChild(renderer.domElement);
 
-        // Create particle wave geometry
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 3000;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for (let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 10;
-        }
-
-        particlesGeometry.setAttribute(
-            'position',
-            new THREE.BufferAttribute(posArray, 3)
-        );
-
-        // Create gradient material for particles
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.015,
+        // Create visible wave mesh
+        const geometry = new THREE.PlaneGeometry(15, 15, 50, 50);
+        const material = new THREE.MeshBasicMaterial({
+            color: isDark ? 0x3b82f6 : 0xef4444,
+            wireframe: true,
             transparent: true,
-            opacity: 0.6,
-            sizeAttenuation: true,
+            opacity: isDark ? 0.15 : 0.12,
         });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.x = -Math.PI / 3;
+        scene.add(mesh);
 
-        // Create particle system
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
+        // Add floating spheres for depth
+        const spheres: THREE.Mesh[] = [];
+        for (let i = 0; i < 8; i++) {
+            const sphereGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const sphereMaterial = new THREE.MeshBasicMaterial({
+                color: isDark ? 0x60a5fa : 0xf87171,
+                wireframe: true,
+                transparent: true,
+                opacity: isDark ? 0.3 : 0.25,
+            });
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.set(
+                (Math.random() - 0.5) * 10,
+                (Math.random() - 0.5) * 10,
+                (Math.random() - 0.5) * 5
+            );
+            spheres.push(sphere);
+            scene.add(sphere);
+        }
 
         // Mouse interaction
         let mouseX = 0;
         let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
 
         const handleMouseMove = (event: MouseEvent) => {
             mouseX = (event.clientX / window.innerWidth) * 2 - 1;
@@ -69,24 +80,45 @@ export default function ThreeBackground() {
         const animate = () => {
             const elapsedTime = clock.getElapsedTime();
 
-            // Rotate particles
-            particlesMesh.rotation.y = elapsedTime * 0.05;
-            particlesMesh.rotation.x = mouseY * 0.5;
-            particlesMesh.rotation.z = mouseX * 0.5;
+            // Smooth mouse following
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
 
-            // Animate particle positions for wave effect
-            const positions = particlesGeometry.attributes.position.array as Float32Array;
-            for (let i = 0; i < particlesCount; i++) {
-                const i3 = i * 3;
-                const x = positions[i3];
-                const y = positions[i3 + 1];
-                positions[i3 + 2] = Math.sin(elapsedTime + x + y) * 0.5;
+            // Animate wave mesh
+            const positions = geometry.attributes.position;
+            for (let i = 0; i < positions.count; i++) {
+                const x = positions.getX(i);
+                const y = positions.getY(i);
+                const wave1 = Math.sin(x * 0.5 + elapsedTime) * 0.5;
+                const wave2 = Math.sin(y * 0.5 + elapsedTime * 0.8) * 0.5;
+                positions.setZ(i, wave1 + wave2);
             }
-            particlesGeometry.attributes.position.needsUpdate = true;
+            positions.needsUpdate = true;
 
-            // Color shift effect for dark theme
-            const hue = (elapsedTime * 10) % 360;
-            particlesMaterial.color.setHSL(hue / 360, 0.5, 0.5);
+            // Rotate mesh with mouse
+            mesh.rotation.z = targetX * 0.3;
+            mesh.rotation.y = targetY * 0.2;
+
+            // Animate spheres
+            spheres.forEach((sphere, i) => {
+                sphere.position.y = Math.sin(elapsedTime + i) * 2;
+                sphere.rotation.y = elapsedTime * 0.5;
+                sphere.rotation.x = elapsedTime * 0.3;
+            });
+
+            // Color shift based on time
+            const hue = (elapsedTime * 20) % 360;
+            if (isDark) {
+                material.color.setHSL(hue / 360, 0.7, 0.5);
+                spheres.forEach(sphere => {
+                    (sphere.material as THREE.MeshBasicMaterial).color.setHSL((hue + 30) / 360, 0.7, 0.6);
+                });
+            } else {
+                material.color.setHSL(hue / 360, 0.8, 0.55);
+                spheres.forEach(sphere => {
+                    (sphere.material as THREE.MeshBasicMaterial).color.setHSL((hue + 30) / 360, 0.8, 0.6);
+                });
+            }
 
             renderer.render(scene, camera);
             animationId = requestAnimationFrame(animate);
@@ -109,8 +141,12 @@ export default function ThreeBackground() {
             window.removeEventListener('resize', handleResize);
             cancelAnimationFrame(animationId);
             containerRef.current?.removeChild(renderer.domElement);
-            particlesGeometry.dispose();
-            particlesMaterial.dispose();
+            geometry.dispose();
+            material.dispose();
+            spheres.forEach(sphere => {
+                sphere.geometry.dispose();
+                (sphere.material as THREE.Material).dispose();
+            });
             renderer.dispose();
         };
     }, []);
@@ -118,7 +154,7 @@ export default function ThreeBackground() {
     return (
         <div
             ref={containerRef}
-            className="fixed inset-0 pointer-events-none opacity-30 dark:opacity-50"
+            className="fixed inset-0 pointer-events-none"
             style={{ zIndex: 0 }}
         />
     );
