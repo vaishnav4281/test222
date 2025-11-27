@@ -29,7 +29,7 @@ export default function ThreeBackground() {
         containerRef.current.appendChild(renderer.domElement);
 
         // Create globe wireframe (representing global domain connections)
-        const globeGeometry = new THREE.SphereGeometry(2.5, 32, 32);
+        const globeGeometry = new THREE.SphereGeometry(2.0, 32, 32);
         const globeMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x3b82f6 : 0xef4444,
             wireframe: true,
@@ -37,7 +37,7 @@ export default function ThreeBackground() {
             opacity: isDark ? 0.15 : 0.12,
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-        globe.position.y = 4; // Position behind 'Domain Intelligence Redefined'
+        globe.position.y = 3; // Centered behind 'Domain Intelligence Redefined'
         scene.add(globe);
 
         // Create scattered particles (data points)
@@ -79,7 +79,7 @@ export default function ThreeBackground() {
         }
 
         // Create lens/scan ring effect
-        const ringGeometry = new THREE.RingGeometry(2.5, 2.7, 64);
+        const ringGeometry = new THREE.RingGeometry(2.0, 2.2, 64);
         const ringMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x60a5fa : 0xf87171,
             transparent: true,
@@ -87,7 +87,7 @@ export default function ThreeBackground() {
             side: THREE.DoubleSide,
         });
         const scanRing = new THREE.Mesh(ringGeometry, ringMaterial);
-        scanRing.position.y = 4; // Superimpose with globe behind main title
+        scanRing.position.y = 3; // Centered with globe behind main title
         scene.add(scanRing);
 
         // Create connection lines (data flow)
