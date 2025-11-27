@@ -29,7 +29,7 @@ export default function ThreeBackground() {
         containerRef.current.appendChild(renderer.domElement);
 
         // Create flowing particles
-        const particleCount = 150;
+        const particleCount = 120;
         const particles: {
             mesh: THREE.Mesh;
             velocity: THREE.Vector3;
@@ -37,11 +37,13 @@ export default function ThreeBackground() {
         }[] = [];
 
         for (let i = 0; i < particleCount; i++) {
-            const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+            // Smaller particles like Google Antigravity
+            const size = 0.03 + Math.random() * 0.02; // Small to medium: 0.03 to 0.05
+            const geometry = new THREE.SphereGeometry(size, 6, 6);
             const material = new THREE.MeshBasicMaterial({
-                color: isDark ? 0x60a5fa : 0xf87171,
+                color: isDark ? 0xffffff : 0x333333, // White in dark, dark gray in light
                 transparent: true,
-                opacity: isDark ? 0.4 : 0.3,
+                opacity: isDark ? 0.6 : 0.4,
             });
             const particle = new THREE.Mesh(geometry, material);
 
@@ -55,9 +57,9 @@ export default function ThreeBackground() {
             particles.push({
                 mesh: particle,
                 velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 0.02,
-                    (Math.random() - 0.5) * 0.02,
-                    (Math.random() - 0.5) * 0.01
+                    (Math.random() - 0.5) * 0.01,
+                    (Math.random() - 0.5) * 0.01,
+                    (Math.random() - 0.5) * 0.005
                 ),
                 originalPos: new THREE.Vector3(x, y, z),
             });
@@ -117,18 +119,6 @@ export default function ThreeBackground() {
                 if (particle.mesh.position.x < -10) particle.mesh.position.x = 10;
                 if (particle.mesh.position.y > 10) particle.mesh.position.y = -10;
                 if (particle.mesh.position.y < -10) particle.mesh.position.y = 10;
-
-                // Subtle color shift
-                const hue = ((elapsedTime * 20 + i * 10) % 360) / 360;
-                (particle.mesh.material as THREE.MeshBasicMaterial).color.setHSL(
-                    hue,
-                    isDark ? 0.6 : 0.7,
-                    isDark ? 0.6 : 0.65
-                );
-
-                // Subtle size pulse
-                const scale = 1 + Math.sin(elapsedTime * 2 + i) * 0.2;
-                particle.mesh.scale.setScalar(scale);
             });
 
             renderer.render(scene, camera);
