@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "domainscope-backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -23,6 +23,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/hpp": "^0.2.7",
     "@types/ioredis": "^4.28.10",
     "@types/json2csv": "^5.0.7",
     "@types/jsonwebtoken": "^9.0.10",
@@ -44,12 +45,16 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
     "ioredis": "^5.8.2",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "opossum": "^9.0.0",
     "prom-client": "^15.1.3",
     "resend": "^6.5.2",
-    "whois-json": "^2.0.4"
+    "whois-json": "^2.0.4",
+    "zod": "^4.1.13"
   }
 }

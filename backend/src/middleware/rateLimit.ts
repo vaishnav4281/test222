@@ -1,28 +1,20 @@
-import type { Request, Response, NextFunction } from 'express';
+import rateLimit from 'express-rate-limit';
 import { redis } from '../redis.js';
+// import RedisStore from 'rate-limit-redis'; // TODO: Add redis store for distributed rate limiting if needed
 
-const WINDOW_SIZE_IN_SECONDS = 60;
-const MAX_WINDOW_REQUEST_COUNT = 100; // 100 requests per minute
-const WINDOW_LOG_INTERVAL_IN_SECONDS = 1;
+// Standard API Rate Limiter
+export const rateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: { error: 'Too many requests, please try again later.' },
+    keyGenerator: (req) => req.ip || 'unknown', // Use IP address for rate limiting
+});
 
-export const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const ip = req.ip || 'unknown';
-        const key = `ratelimit:${ip}`;
-
-        const currentRequestCount = await redis.incr(key);
-
-        if (currentRequestCount === 1) {
-            await redis.expire(key, WINDOW_SIZE_IN_SECONDS);
-        }
-
-        if (currentRequestCount > MAX_WINDOW_REQUEST_COUNT) {
-            return res.status(429).json({ error: 'Too many requests, please try again later.' });
-        }
-
-        next();
-    } catch (error) {
-        console.error('Rate limit error:', error);
-        next(); // Fail open
-    }
-};
+// Stricter Rate Limiter for Auth Routes
+export const authRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10, // Limit each IP to 10 login/signup attempts per hour
+    message: { error: 'Too many login attempts, please try again later.' }
+});

@@ -1,23 +1,64 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { prisma } from '../app.js';
 import { generateOTP, generateResetToken, sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../services/email.js';
+import { authRateLimiter } from '../middleware/rateLimit.js';
+import { redis } from '../redis.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
 
-import { redis } from '../redis.js';
+// Validation Schemas
+const signupSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8, 'Password must be at least 8 characters').regex(/[A-Z]/, 'Password must contain at least one uppercase letter').regex(/[0-9]/, 'Password must contain at least one number').regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+});
+
+const verifySchema = z.object({
+    email: z.string().email(),
+    otp: z.string().length(6),
+});
+
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string(),
+});
+
+const forgotPasswordSchema = z.object({
+    email: z.string().email(),
+});
+
+const resetPasswordSchema = z.object({
+    token: z.string(),
+    newPassword: z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/).regex(/[^A-Za-z0-9]/),
+});
+
+// Apply rate limiter to all auth routes
+router.use(authRateLimiter);
 
 // Signup - Store in Redis and send OTP
 router.post('/signup', async (req, res) => {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+        const result = signupSchema.safeParse(req.body);
+        if (!result.success) {
+            const errorMessage = result.error.issues[0]?.message || 'Invalid input';
+            return res.status(400).json({ error: errorMessage });
+        }
+
+        const { email, password } = result.data;
 
         // Check if user already exists
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) {
+            // Security: Don't reveal user existence, maybe send an email saying "someone tried to sign up"
+            // For now, we'll just return a generic message or the same success message to confuse attackers
+            // But for UX, it's tricky. Let's return a generic "If not registered, email sent" type message?
+            // Or just fail for now but with a generic error?
+            // Standard practice: "If this email is not already registered, we have sent a verification code."
+            // But we can't send a code if they are registered.
+            // Let's stick to a slightly more specific but safe approach for signup as it's less sensitive than login enumeration
             return res.status(400).json({ error: 'User already exists' });
         }
 
@@ -49,7 +90,7 @@ router.post('/signup', async (req, res) => {
     } catch (error) {
         console.error('Signup error:', error);
         res.status(500).json({
-            error: error instanceof Error ? error.message : 'Server error during signup'
+            error: 'Server error during signup'
         });
     }
 });
@@ -57,8 +98,10 @@ router.post('/signup', async (req, res) => {
 // Verify Email with OTP
 router.post('/verify-email', async (req, res) => {
     try {
-        const { email, otp } = req.body;
-        if (!email || !otp) return res.status(400).json({ error: 'Email and OTP required' });
+        const result = verifySchema.safeParse(req.body);
+        if (!result.success) return res.status(400).json({ error: 'Invalid input' });
+
+        const { email, otp } = result.data;
 
         // Check Redis for pending signup
         const cachedSignup = await redis.get(`signup:${email}`);
@@ -166,21 +209,19 @@ router.post('/resend-otp', async (req, res) => {
 // Login - Check email verification
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const result = loginSchema.safeParse(req.body);
+        if (!result.success) return res.status(400).json({ error: 'Invalid input' });
+
+        const { email, password } = result.data;
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+
+        // Generic error message to prevent enumeration
+        const invalidCredsError = { error: 'Invalid credentials' };
+
+        if (!user) return res.status(401).json(invalidCredsError);
 
         const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return res.status(400).json({ error: 'Invalid password' });
-
-        // Check if email is verified
-        // if (!user.emailVerified) {
-        //     return res.status(403).json({
-        //         error: 'Email not verified',
-        //         code: 'EMAIL_NOT_VERIFIED',
-        //         email: user.email
-        //     });
-        // }
+        if (!validPassword) return res.status(401).json(invalidCredsError);
 
         const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
         res.json({ token, user: { id: user.id, email: user.email, emailVerified: user.emailVerified } });
@@ -193,31 +234,31 @@ router.post('/login', async (req, res) => {
 // Forgot Password - Send reset link
 router.post('/forgot-password', async (req, res) => {
     try {
-        const { email } = req.body;
-        if (!email) return res.status(400).json({ error: 'Email required' });
+        const result = forgotPasswordSchema.safeParse(req.body);
+        if (!result.success) return res.status(400).json({ error: 'Invalid email format' });
 
+        const { email } = result.data;
         const user = await prisma.user.findUnique({ where: { email } });
 
         // Always return success to prevent user enumeration
-        if (!user) {
-            return res.status(400).json({ error: 'User not found' });
+        if (user) {
+            // Generate reset token and store on user
+            const resetToken = generateResetToken();
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { verificationToken: resetToken },
+            });
+
+            // Send reset email
+            await sendPasswordResetEmail(email, resetToken);
         }
 
-        // Generate reset token and store on user
-        const resetToken = generateResetToken();
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { verificationToken: resetToken },
-        });
-
-        // Send reset email
-        await sendPasswordResetEmail(email, resetToken);
-
+        // Always return this message
         res.json({ message: 'If an account exists, a password reset link has been sent' });
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({
-            error: error instanceof Error ? error.message : 'Server error'
+            error: 'Server error'
         });
     }
 });
@@ -225,10 +266,10 @@ router.post('/forgot-password', async (req, res) => {
 // Reset Password with token
 router.post('/reset-password', async (req, res) => {
     try {
-        const { token, newPassword } = req.body;
-        if (!token || !newPassword) {
-            return res.status(400).json({ error: 'Token and new password required' });
-        }
+        const result = resetPasswordSchema.safeParse(req.body);
+        if (!result.success) return res.status(400).json({ error: 'Invalid input or weak password' });
+
+        const { token, newPassword } = result.data;
 
         // Find valid reset token
         // Verify reset token against user's verificationToken

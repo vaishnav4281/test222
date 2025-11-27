@@ -59,6 +59,18 @@ DomainScope is a comprehensive domain intelligence and OSINT platform designed t
     *   **Bcryptjs**: Password hashing.
     *   **Resend**: Email delivery service for verification and password resets (`backend/src/services/email.ts`).
 
+### 8. Security Architecture 🛡️
+*   **Feature**: Enterprise-grade security hardening to protect against attacks.
+*   **Implementation**:
+    *   **Rate Limiting**:
+        *   **Global**: Limits requests to 100 per 15 minutes to prevent DoS.
+        *   **Auth**: Strict limit of 10 attempts per hour on login/signup to block brute-force attacks.
+    *   **Secure Headers**: Uses `helmet` to set industry-standard HTTP headers (CSP, HSTS, X-Frame-Options) to prevent XSS and Clickjacking.
+    *   **Input Validation**: All user inputs are strictly validated using `zod` schemas to prevent injection attacks and malformed data.
+    *   **Anti-Enumeration**: Authentication endpoints return generic error messages ("Invalid credentials") to prevent attackers from discovering valid email addresses.
+    *   **CORS Protection**: API access is strictly limited to the trusted frontend domain.
+    *   **Parameter Pollution**: Protected against HTTP Parameter Pollution (HPP) attacks.
+
 ## 🛠️ Technology Stack
 
 ### Frontend

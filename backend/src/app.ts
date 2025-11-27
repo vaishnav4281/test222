@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import hpp from 'hpp';
 import { PrismaClient } from '@prisma/client';
 
 import authRoutes from './routes/auth.js';
@@ -7,7 +9,7 @@ import historyRoutes from './routes/history.js';
 import scanRoutes from './routes/scan.js';
 import apiKeyRoutes from './routes/apikeys.js';
 import webhookRoutes from './routes/webhooks.js';
-// import { rateLimiter } from './middleware/rateLimit.js'; // Temporarily disabled
+import { rateLimiter } from './middleware/rateLimit.js';
 import { metricsMiddleware } from './middleware/metrics.js';
 import { apiVersion } from './middleware/versioning.js';
 import { register } from './metrics.js';
@@ -19,11 +21,27 @@ initTelemetry();
 export const prisma = new PrismaClient();
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// Security Middleware
+app.use(helmet()); // Secure HTTP headers
+app.use(hpp()); // Prevent HTTP Parameter Pollution
+
+// CORS Configuration
+const allowedOrigins = [process.env.FRONTEND_URL || 'http://localhost:5173'];
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
+
+app.use(express.json({ limit: '10kb' })); // Limit body size
 app.use(metricsMiddleware); // Prometheus metrics
 app.use(apiVersion); // API versioning
-// app.use(rateLimiter); // Global rate limiter - TEMPORARILY DISABLED FOR DEBUGGING
+app.use(rateLimiter); // Global rate limiter
 
 // V1 API Routes
 app.use('/api/v1/auth', authRoutes);
