@@ -287,8 +287,8 @@ const Index = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10 md:py-12 space-y-8 sm:space-y-12 relative">
-        {/* Hero section - optimized spacing and centered */}
-        <div className="relative px-3 sm:px-4 lg:px-6 pt-10 sm:pt-16 pb-8 sm:pb-10 max-w-6xl mx-auto animate-fade-in">
+        {/* Hero section - centered and interactive */}
+        <div className="relative text-center px-3 sm:px-4 lg:px-6 pt-10 sm:pt-16 pb-8 sm:pb-10 max-w-6xl mx-auto animate-fade-in">
           {/* Elegant gradient background */}
           <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
             <div className="absolute top-0 left-1/3 w-96 h-96 bg-gradient-to-br from-red-500/10 via-rose-400/5 to-transparent rounded-full blur-3xl" />
@@ -296,12 +296,48 @@ const Index = () => {
           </div>
 
           <div className="relative space-y-3 sm:space-y-5">
-            {/* Premium Typography */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2 animate-slide-in-left" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif", animationDelay: '100ms' }}>
-              <span className="block mb-1 sm:mb-2">Domain Intelligence</span>
-              <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-500">
-                Redefined
-              </span>
+            {/* Interactive Antigravity Text */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif" }}>
+              <div className="block mb-1 sm:mb-2">
+                {"Domain Intelligence".split('').map((char, index) => (
+                  <span
+                    key={index}
+                    className="inline-block transition-transform duration-200 ease-out"
+                    style={{
+                      transform: char === ' ' ? 'none' : (
+                        Math.abs(mousePosition.x - (window.innerWidth / 2 + (index - 10) * 30)) < 100 &&
+                          Math.abs(mousePosition.y - 250) < 100
+                          ? `translate(
+                              ${(mousePosition.x - (window.innerWidth / 2 + (index - 10) * 30)) * -0.3}px,
+                              ${(mousePosition.y - 250) * -0.3}px
+                            )`
+                          : 'translate(0, 0)'
+                      )
+                    }}
+                  >
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
+              </div>
+              <div className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-500">
+                {"Redefined".split('').map((char, index) => (
+                  <span
+                    key={index}
+                    className="inline-block transition-transform duration-200 ease-out"
+                    style={{
+                      transform: Math.abs(mousePosition.x - (window.innerWidth / 2 + (index - 4) * 40)) < 100 &&
+                        Math.abs(mousePosition.y - 320) < 100
+                        ? `translate(
+                              ${(mousePosition.x - (window.innerWidth / 2 + (index - 4) * 40)) * -0.4}px,
+                              ${(mousePosition.y - 320) * -0.4}px
+                            )`
+                        : 'translate(0, 0)'
+                    }}
+                  >
+                    {char}
+                  </span>
+                ))}
+              </div>
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4 animate-fade-in" style={{ fontFamily: "'Inter', system-ui, sans-serif", animationDelay: '200ms' }}>
