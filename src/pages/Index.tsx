@@ -267,7 +267,7 @@ const Index = () => {
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
-              Comprehensive domain intelligence providing WHOIS data, DNS records, passive DNS, IP geolocation, threat scores, security signals, metadata extraction, and bulk export capabilities
+              Enterprise-grade threat analysis and security intelligence platform
             </p>
           </div>
 
@@ -546,25 +546,25 @@ const Index = () => {
                 </div>
                 <ul className="space-y-3 text-sm sm:text-base text-slate-700 dark:text-slate-300">
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> WHOIS registration data
+                    <span className="text-red-500">✦</span> <strong>WHOIS Data:</strong> Registrar tracking, domain age, expiry alerts
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> DNS record information
+                    <span className="text-blue-500">✦</span> <strong>DNS Records:</strong> A, AAAA, MX, NS, TXT, CNAME resolution
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> IP geolocation & ASN
+                    <span className="text-red-500">✦</span> <strong>IP Intelligence:</strong> ASN lookup, geolocation, ISP identification
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> Security reputation check
+                    <span className="text-blue-500">✦</span> <strong>Threat Scoring:</strong> VirusTotal, IPQS, AbuseIPDB integration
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> VPN/Proxy detection
+                    <span className="text-red-500">✦</span> <strong>Security Signals:</strong> VPN/Proxy/Tor, DNSBL blacklist checks
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> VirusTotal security analysis
+                    <span className="text-blue-500">✦</span> <strong>Passive DNS:</strong> Historical IP resolutions, domain history
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> Webpage metadata extraction
+                    <span className="text-red-500">✦</span> <strong>Web Metadata:</strong> Tech stack, hosting provider, SEO data
                   </li>
                 </ul>
               </div>
@@ -582,25 +582,25 @@ const Index = () => {
                 </div>
                 <ul className="space-y-3 text-sm sm:text-base text-slate-700 dark:text-slate-300">
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> Bulk scanning via text imports
+                    <span className="text-blue-500">✦</span> <strong>Mass Analysis:</strong> Process hundreds of domains simultaneously
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> Real-time progress tracking
+                    <span className="text-red-500">✦</span> <strong>Live Progress:</strong> Real-time status updates for each domain
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> Failed lookup logging
+                    <span className="text-blue-500">✦</span> <strong>Error Handling:</strong> Automatic retry and failure tracking
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> CSV export with domain age
+                    <span className="text-red-500">✦</span> <strong>CSV Export:</strong> Full data export with timestamps & metrics
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> Comprehensive reporting
+                    <span className="text-blue-500">✦</span> <strong>Smart Reports:</strong> Aggregated threat intelligence summaries
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-red-600 dark:hover:text-red-400">
-                    <span className="text-red-500">✦</span> Parallel batching for speed
+                    <span className="text-red-500">✦</span> <strong>Performance:</strong> Parallel processing for maximum speed
                   </li>
                   <li className="flex items-center gap-2 transition-all duration-300 hover:translate-x-2 hover:text-blue-600 dark:hover:text-blue-400">
-                    <span className="text-blue-500">✦</span> Per-domain status & timing
+                    <span className="text-blue-500">✦</span> <strong>Monitoring:</strong> Per-domain timing and success metrics
                   </li>
                 </ul>
               </div>
