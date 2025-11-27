@@ -32,7 +32,17 @@ const Index = () => {
   const [metascraperResults, setMetascraperResults] = useState([]);
   const [virusTotalResults, setVirusTotalResults] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  // const [apiStatus, setApiStatus] = useState({ backend: null, virustotal: null });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Mouse tracking for interactive effects
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   // API status check
   // useEffect(() => {
   //   const checkApis = async () => {
@@ -212,6 +222,34 @@ const Index = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.02] via-transparent to-blue-500/[0.02] pointer-events-none dark:opacity-100 opacity-50" />
+
+      {/* Interactive floating orbs with parallax effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          className="absolute w-96 h-96 bg-gradient-to-br from-red-500/10 to-pink-500/10 dark:from-red-500/20 dark:to-pink-500/20 rounded-full blur-3xl transition-transform duration-[2000ms] ease-out"
+          style={{
+            top: '10%',
+            left: '15%',
+            transform: `translate(${(mousePosition.x - window.innerWidth / 2) * 0.02}px, ${(mousePosition.y - window.innerHeight / 2) * 0.02}px)`
+          }}
+        />
+        <div
+          className="absolute w-[500px] h-[500px] bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 rounded-full blur-3xl transition-transform duration-[2500ms] ease-out"
+          style={{
+            top: '60%',
+            right: '10%',
+            transform: `translate(${(mousePosition.x - window.innerWidth / 2) * -0.03}px, ${(mousePosition.y - window.innerHeight / 2) * -0.03}px)`
+          }}
+        />
+        <div
+          className="absolute w-80 h-80 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-500/20 dark:to-indigo-500/20 rounded-full blur-3xl transition-transform duration-[1800ms] ease-out"
+          style={{
+            top: '40%',
+            left: '50%',
+            transform: `translate(${(mousePosition.x - window.innerWidth / 2) * 0.015}px, ${(mousePosition.y - window.innerHeight / 2) * 0.015}px)`
+          }}
+        />
+      </div>
 
       {/* Header - Optimized spacing */}
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
