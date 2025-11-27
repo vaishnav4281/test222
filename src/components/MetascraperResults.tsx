@@ -52,16 +52,14 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
 
   return (
     <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
-      <CardHeader className="bg-gradient-to-r from-purple-600/10 to-pink-600/10 border-b border-purple-200/50 dark:border-pink-800/50 p-2 sm:p-3">
+      <CardHeader className="bg-gradient-to-r from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-indigo-100 dark:border-slate-800 p-2 sm:p-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
           <CardTitle className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-md shadow-indigo-500/20">
               <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-lg sm:text-xl">
-              Metascraper Metadata
-            </span>
-            <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-slate-700 dark:from-purple-950 dark:to-pink-950 dark:text-slate-300 border-0">
+            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">Metadata Analysis</span>
+            <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               {results.length}
             </Badge>
           </CardTitle>
@@ -70,8 +68,8 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
       <CardContent className="p-2 sm:p-3">
         {results.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
-            <div className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-950/50 dark:to-pink-950/50 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
-              <Globe className="h-8 w-8 sm:h-12 sm:w-12 text-slate-400 dark:text-slate-600" />
+            <div className="bg-indigo-50 dark:bg-slate-800 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
+              <Globe className="h-8 w-8 sm:h-12 sm:w-12 text-indigo-300 dark:text-slate-600" />
             </div>
             <p className="text-base sm:text-lg font-medium mb-2">No metadata yet</p>
             <p className="text-sm">Metascraper results will appear here after domain analysis</p>
@@ -81,21 +79,21 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
             {results.map((result, index) => (
               <div
                 key={result.id}
-                className="border border-purple-200/50 dark:border-pink-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in"
+                className="border border-indigo-100 dark:border-slate-800 rounded-xl p-4 sm:p-6 space-y-4 bg-white dark:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:scale-[1.01] animate-fade-in group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* Header with Completeness Score */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 border-b border-purple-200/50 dark:border-pink-800/50">
+                {/* Header with Risk Level */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 border-b border-indigo-50 dark:border-slate-800">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
-                      <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
+                      <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base sm:text-lg bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent break-all">
+                      <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white break-all">
                         {result.domain}
                       </h3>
                       {result.type && (
-                        <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border-0 text-xs mt-1">
+                        <Badge className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 border-0 text-xs mt-1">
                           {result.type}
                         </Badge>
                       )}
@@ -104,14 +102,14 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                   <div className="flex items-center space-x-3">
                     {result.completenessScore !== undefined && (
                       <div className="flex items-center space-x-2">
-                        <Award className="h-4 w-4 text-purple-600" />
+                        <Award className="h-4 w-4 text-red-600" />
                         <Badge className={`text-xs font-medium border-0 ${getScoreBadge(result.completenessScore)}`}>
                           Completeness: {result.completenessScore}%
                         </Badge>
                       </div>
                     )}
                     {result.lang && (
-                      <Badge className="bg-pink-100 text-pink-800 dark:bg-pink-950 dark:text-pink-300 border-0 text-xs">
+                      <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-0 text-xs">
                         {result.lang.toUpperCase()}
                       </Badge>
                     )}
@@ -140,49 +138,48 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
 
                     {/* BASIC TAB */}
                     <TabsContent value="basic" className="space-y-3 mt-4">
-                      {result.title && (
-                        <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                          <div className="flex items-start space-x-2">
-                            <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-1 flex-shrink-0" />
-                            <div className="flex-1">
-                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Page Title</p>
-                              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{result.title}</p>
-                            </div>
-                          </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/30 border border-pink-100 dark:border-pink-800 transition-all duration-300">
+                          <span className="font-medium text-pink-700 dark:text-pink-300 flex items-center gap-2"><Globe className="h-4 w-4 text-pink-500" /> Title:</span>
+                          <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{result.title || 'N/A'}</span>
                         </div>
-                      )}
-
-                      {result.description && (
-                        <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                          <div className="flex items-start space-x-2">
-                            <Eye className="h-4 w-4 text-pink-600 dark:text-pink-400 mt-1 flex-shrink-0" />
-                            <div className="flex-1">
-                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Description</p>
-                              <p className="text-sm text-slate-700 dark:text-slate-300">{result.description}</p>
-                            </div>
-                          </div>
+                        <div className="flex flex-col space-y-2 p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/30 border border-pink-100 dark:border-pink-800 transition-all duration-300">
+                          <span className="font-medium text-pink-700 dark:text-pink-300 flex items-center gap-2"><FileText className="h-4 w-4 text-pink-500" /> Description:</span>
+                          <span className="text-slate-900 dark:text-white text-sm leading-relaxed">{result.description || 'N/A'}</span>
                         </div>
-                      )}
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {result.url && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <LinkIcon className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Canonical URL</p>
-                            <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-600 dark:text-purple-400 hover:underline truncate block">
-                              {result.url}
-                            </a>
-                          </div>
-                        )}
-
-                        {result.keywords && (
-                          <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                            <Hash className="h-4 w-4 text-pink-600 dark:text-pink-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Keywords</p>
-                            <p className="text-sm text-pink-600 dark:text-pink-400">{result.keywords}</p>
-                          </div>
-                        )}
                       </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 border border-rose-100 dark:border-rose-800 transition-all duration-300">
+                          <span className="font-medium text-rose-700 dark:text-rose-300 flex items-center gap-2"><Tag className="h-4 w-4 text-rose-500" /> Completeness:</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 h-2 bg-rose-200 dark:bg-rose-900 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-rose-500 rounded-full"
+                                style={{ width: `${result.completenessScore || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-slate-900 dark:text-white font-bold">{result.completenessScore || 0}%</span>
+                          </div>
+                        </div>
+                      </div>
+                      {result.url && (
+                        <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                          <LinkIcon className="h-4 w-4 text-green-600 dark:text-green-400 mb-1" />
+                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Canonical URL</p>
+                          <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 dark:text-green-400 hover:underline truncate block">
+                            {result.url}
+                          </a>
+                        </div>
+                      )}
+
+                      {result.keywords && (
+                        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg">
+                          <Hash className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mb-1" />
+                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Keywords</p>
+                          <p className="text-sm text-emerald-600 dark:text-emerald-400">{result.keywords}</p>
+                        </div>
+                      )}
                     </TabsContent>
 
                     {/* SOCIAL TAB */}
@@ -203,18 +200,18 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {result.author && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <User className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
+                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                            <User className="h-4 w-4 text-red-600 dark:text-red-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Author</p>
-                            <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">{result.author}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 font-medium">{result.author}</p>
                           </div>
                         )}
 
                         {result.publisher && (
-                          <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                            <Building2 className="h-4 w-4 text-pink-600 dark:text-pink-400 mb-1" />
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                            <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Publisher</p>
-                            <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">{result.publisher}</p>
+                            <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{result.publisher}</p>
                           </div>
                         )}
                       </div>
@@ -224,34 +221,34 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                     <TabsContent value="content" className="space-y-3 mt-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {result.date && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
+                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                            <Calendar className="h-4 w-4 text-red-600 dark:text-red-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Published Date</p>
-                            <p className="text-sm text-purple-600 dark:text-purple-400">{new Date(result.date).toLocaleDateString()}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400">{new Date(result.date).toLocaleDateString()}</p>
                           </div>
                         )}
 
                         {result.modifiedDate && (
-                          <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                            <Clock className="h-4 w-4 text-pink-600 dark:text-pink-400 mb-1" />
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                            <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Modified Date</p>
-                            <p className="text-sm text-pink-600 dark:text-pink-400">{new Date(result.modifiedDate).toLocaleDateString()}</p>
+                            <p className="text-sm text-blue-600 dark:text-blue-400">{new Date(result.modifiedDate).toLocaleDateString()}</p>
                           </div>
                         )}
 
                         {result.category && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <Tag className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
+                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                            <Tag className="h-4 w-4 text-red-600 dark:text-red-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Category</p>
-                            <p className="text-sm text-purple-600 dark:text-purple-400">{result.category}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400">{result.category}</p>
                           </div>
                         )}
 
                         {result.tags && (
-                          <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                            <Hash className="h-4 w-4 text-pink-600 dark:text-pink-400 mb-1" />
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                            <Hash className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Article Tags</p>
-                            <p className="text-sm text-pink-600 dark:text-pink-400">{result.tags}</p>
+                            <p className="text-sm text-blue-600 dark:text-blue-400">{result.tags}</p>
                           </div>
                         )}
                       </div>
@@ -280,44 +277,44 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                     <TabsContent value="tech" className="space-y-3 mt-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {result.generator && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <Code className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
+                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                            <Code className="h-4 w-4 text-red-600 dark:text-red-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Generator/CMS</p>
-                            <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">{result.generator}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 font-medium">{result.generator}</p>
                           </div>
                         )}
 
                         {result.robots && (
-                          <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                            <Settings className="h-4 w-4 text-pink-600 dark:text-pink-400 mb-1" />
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                            <Settings className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Robots</p>
-                            <p className="text-sm text-pink-600 dark:text-pink-400">{result.robots}</p>
+                            <p className="text-sm text-blue-600 dark:text-blue-400">{result.robots}</p>
                           </div>
                         )}
 
                         {result.charset && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <Code className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
+                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                            <Code className="h-4 w-4 text-red-600 dark:text-red-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Charset</p>
-                            <p className="text-sm text-purple-600 dark:text-purple-400">{result.charset}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400">{result.charset}</p>
                           </div>
                         )}
 
                         {result.viewport && (
-                          <div className="p-3 bg-pink-50 dark:bg-pink-950/30 rounded-lg">
-                            <Eye className="h-4 w-4 text-pink-600 dark:text-pink-400 mb-1" />
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                            <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
                             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Viewport</p>
-                            <p className="text-sm text-pink-600 dark:text-pink-400 text-xs">{result.viewport}</p>
+                            <p className="text-sm text-blue-600 dark:text-blue-400 text-xs">{result.viewport}</p>
                           </div>
                         )}
 
                         {result.themeColor && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
+                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
                             <div className="flex items-center space-x-2 mb-1">
                               <div className="h-4 w-4 rounded" style={{ backgroundColor: result.themeColor }}></div>
                               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Theme Color</p>
                             </div>
-                            <p className="text-sm text-purple-600 dark:text-purple-400">{result.themeColor}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400">{result.themeColor}</p>
                           </div>
                         )}
                       </div>
@@ -334,7 +331,7 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                           <img
                             src={result.image}
                             alt={result.imageAlt || "Featured"}
-                            className="w-full h-48 object-cover rounded-lg border border-purple-200 dark:border-pink-800"
+                            className="w-full h-48 object-cover rounded-lg border border-red-200 dark:border-blue-800"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
@@ -352,7 +349,7 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                             <img
                               src={result.favicon}
                               alt="Favicon"
-                              className="h-16 w-16 object-contain rounded-lg border border-purple-200 dark:border-pink-800 bg-white dark:bg-slate-800 p-2"
+                              className="h-16 w-16 object-contain rounded-lg border border-red-200 dark:border-blue-800 bg-white dark:bg-slate-800 p-2"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
                               }}
@@ -365,7 +362,7 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                             <img
                               src={result.logo}
                               alt="Logo"
-                              className="h-16 w-16 object-contain rounded-lg border border-purple-200 dark:border-pink-800 bg-white dark:bg-slate-800 p-2"
+                              className="h-16 w-16 object-contain rounded-lg border border-red-200 dark:border-blue-800 bg-white dark:bg-slate-800 p-2"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
                               }}
@@ -408,8 +405,9 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
                 )}
 
                 {/* Timestamp */}
-                <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-purple-200/50 dark:border-pink-800/50 pt-3 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg p-2">
-                  <span className="font-medium">Scraped:</span> {result.timestamp}
+                <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-indigo-50 dark:border-slate-800 pt-3 bg-indigo-50/30 dark:bg-slate-900/50 rounded-lg p-2 flex justify-between items-center">
+                  <span><span className="font-medium">Analyzed:</span> {result.timestamp}</span>
+                  <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">ID: {result.id}</span>
                 </div>
               </div>
             ))}
@@ -421,3 +419,4 @@ const MetascraperResults = ({ results }: MetascraperResultsProps) => {
 };
 
 export default MetascraperResults;
+

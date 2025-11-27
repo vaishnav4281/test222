@@ -17,6 +17,7 @@ export function generateResetToken(): string {
 // Send signup verification email with OTP
 export async function sendVerificationEmail(email: string, otp: string) {
     try {
+        console.log('📧 Sending verification email to:', email, 'OTP:', otp);
         const { data, error } = await resend.emails.send({
             from: 'noreply@hello.satheesankoroth.in',
             to: email,

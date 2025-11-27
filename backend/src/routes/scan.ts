@@ -1,4 +1,5 @@
 import express from 'express';
+import dns from 'node:dns/promises';
 import { checkDnsbl } from '../services/dnsbl.js';
 import { getWhois } from '../services/whois.js';
 import { checkVirusTotal } from '../services/vt.js';
@@ -10,6 +11,23 @@ import type { AuthRequest } from '../middleware/auth.js';
 import { prisma } from '../app.js';
 
 const router = express.Router();
+
+router.get('/dns', async (req, res) => {
+    const { domain } = req.query;
+    if (!domain || typeof domain !== 'string') {
+        return res.status(400).json({ error: 'Missing domain parameter' });
+    }
+    try {
+        const ips = await dns.resolve4(domain);
+        if (ips && ips.length > 0) {
+            res.json({ ip: ips[0] });
+        } else {
+            res.status(404).json({ error: 'No A records found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'DNS resolution failed' });
+    }
+});
 
 router.get('/dnsbl', async (req, res) => {
     const { ip } = req.query;

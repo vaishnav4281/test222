@@ -2,17 +2,11 @@
 import React, { useState } from "react";
 import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_BASE_URL } from '../config';
 import { Button } from "@/components/ui/button";
-import { API_BASE_URL } from '../config';
 import { Label } from "@/components/ui/label";
-import { API_BASE_URL } from '../config';
 import { Database, Upload, Loader2 } from "lucide-react";
-import { API_BASE_URL } from '../config';
 import { useToast } from "@/hooks/use-toast";
-import { API_BASE_URL } from '../config';
 import { fetchThroughCorsProxy } from "@/lib/cors-proxy";
-import { API_BASE_URL } from '../config';
 
 const cleanDomain = (raw: string): string => {
   if (!raw) return "";
@@ -29,9 +23,10 @@ interface BulkScannerCardProps {
   onResults: (result: any) => void;
   onMetascraperResults?: (result: any) => void;
   onVirusTotalResults?: (result: any) => void;
+  onStartScan?: () => void;
 }
 
-const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults }: BulkScannerCardProps) => {
+const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults, onStartScan }: BulkScannerCardProps) => {
   const fetchWithTimeout = async (url: string, timeout = 5000) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -124,10 +119,26 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
       // OPTIMIZED: IP intelligence with faster timeouts
       let abuseScore = 0, isVpnProxy = false, locCountry = "-", locRegion = "-", locCity = "-";
       let locLatitude = "-", locLongitude = "-", locIsp = "-";
-      const ip = aRecord;
+
+      // Resolve IP first using our new backend endpoint
+      let ip = aRecord;
       const isIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(ip) || /^[a-fA-F0-9:]+$/.test(ip);
 
-      if (isIp) {
+      if (!isIp || ip === '-') {
+        try {
+          const dnsRes = await fetch(`${API_BASE_URL}/api/v1/scan/dns?domain=${encodeURIComponent(domain)}`);
+          if (dnsRes.ok) {
+            const dnsData = await dnsRes.json();
+            if (dnsData.ip) ip = dnsData.ip;
+          }
+        } catch (e) {
+          console.warn('DNS resolution failed for', domain);
+        }
+      }
+
+      const validIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(ip) || /^[a-fA-F0-9:]+$/.test(ip);
+
+      if (validIp && ip !== '-') {
         const [ipqsResult, abuseResult] = await Promise.allSettled([
           fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
           fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
@@ -164,7 +175,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
         dns_records: dnsRecordsString,
         abuse_score: abuseScore,
         is_vpn_proxy: isVpnProxy,
-        ip_address: aRecord,
+        ip_address: ip !== '-' ? ip : aRecord,
         country: locCountry,
         region: locRegion,
         city: locCity,
@@ -276,6 +287,9 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults 
       });
       return;
     }
+
+    // Notify parent that scan is starting
+    if (onStartScan) onStartScan();
 
     setIsScanning(true);
     setScanProgress(0);

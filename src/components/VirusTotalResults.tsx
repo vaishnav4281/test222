@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, AlertTriangle, CheckCircle, XCircle, TrendingUp, Globe, Server, Lock, FileText, Activity, Award, Calendar, Tag, Building2 } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle, XCircle, TrendingUp, Globe, Server, Lock, FileText, Activity, Award, Calendar, Clock, Tag, Building2 } from "lucide-react";
 
 interface VirusTotalData {
   id: number;
@@ -71,16 +71,16 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
 
   return (
     <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
-      <CardHeader className="bg-gradient-to-r from-green-600/10 to-emerald-600/10 border-b border-green-200/50 dark:border-emerald-800/50 p-2 sm:p-3">
+      <CardHeader className="bg-gradient-to-r from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-indigo-100 dark:border-slate-800 p-2 sm:p-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
           <CardTitle className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-md shadow-indigo-500/20">
               <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent text-lg sm:text-xl">
+            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
               VirusTotal Security Analysis
             </span>
-            <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-slate-700 dark:from-green-950 dark:to-emerald-950 dark:text-slate-300 border-0">
+            <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
               {results.length}
             </Badge>
           </CardTitle>
@@ -89,8 +89,8 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
       <CardContent className="p-2 sm:p-3">
         {results.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
-            <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-950/50 dark:to-emerald-950/50 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
-              <Shield className="h-8 w-8 sm:h-12 sm:w-12 text-slate-400 dark:text-slate-600" />
+            <div className="bg-indigo-50 dark:bg-slate-800 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
+              <Shield className="h-8 w-8 sm:h-12 sm:w-12 text-indigo-300 dark:text-slate-600" />
             </div>
             <p className="text-base sm:text-lg font-medium mb-2">No VirusTotal data yet</p>
             <p className="text-sm">Security analysis will appear here after domain scan</p>
@@ -100,17 +100,17 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
             {results.map((result, index) => (
               <div
                 key={result.id}
-                className="border border-green-200/50 dark:border-emerald-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in"
+                className="border border-indigo-100 dark:border-slate-800 rounded-xl p-4 sm:p-6 space-y-4 bg-white dark:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:scale-[1.01] animate-fade-in group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Header with Risk Level */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 border-b border-green-200/50 dark:border-emerald-800/50">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 border-b border-indigo-50 dark:border-slate-800">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg">
-                      <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
+                      <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base sm:text-lg bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent break-all">
+                      <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white break-all">
                         {result.domain}
                       </h3>
                       {result.tags && result.tags.length > 0 && (
@@ -134,7 +134,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       </div>
                     )}
                     {result.reputation !== undefined && (
-                      <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-0 text-xs">
+                      <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-0 text-xs">
                         Rep: {result.reputation}
                       </Badge>
                     )}
@@ -164,33 +164,25 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
 
                     {/* SECURITY TAB */}
                     <TabsContent value="security" className="space-y-3 mt-4">
-                      {result.last_analysis_stats && (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
-                            <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Malicious</p>
-                            <p className="text-2xl font-bold text-red-600 dark:text-red-400">{result.last_analysis_stats.malicious || 0}</p>
-                          </div>
-
-                          <div className="p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
-                            <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Suspicious</p>
-                            <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{result.last_analysis_stats.suspicious || 0}</p>
-                          </div>
-
-                          <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
-                            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Harmless</p>
-                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">{result.last_analysis_stats.harmless || 0}</p>
-                          </div>
-
-                          <div className="p-3 bg-gray-50 dark:bg-gray-950/30 rounded-lg border border-gray-200 dark:border-gray-800">
-                            <Activity className="h-5 w-5 text-gray-600 dark:text-gray-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Undetected</p>
-                            <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">{result.last_analysis_stats.undetected || 0}</p>
-                          </div>
+                      {/* Analysis Stats Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-100 dark:border-red-800 text-center hover:scale-105 transition-transform duration-300">
+                          <div className="text-2xl font-bold text-red-600 dark:text-red-400">{result.malicious_score}</div>
+                          <div className="text-xs text-red-600/80 dark:text-red-400/80 font-medium uppercase tracking-wider">Malicious</div>
                         </div>
-                      )}
+                        <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg border border-orange-100 dark:border-orange-800 text-center hover:scale-105 transition-transform duration-300">
+                          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{result.suspicious_score}</div>
+                          <div className="text-xs text-orange-600/80 dark:text-orange-400/80 font-medium uppercase tracking-wider">Suspicious</div>
+                        </div>
+                        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-100 dark:border-green-800 text-center hover:scale-105 transition-transform duration-300">
+                          <div className="text-2xl font-bold text-green-600 dark:text-green-400">{result.harmless_score}</div>
+                          <div className="text-xs text-green-600/80 dark:text-green-400/80 font-medium uppercase tracking-wider">Harmless</div>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 text-center hover:scale-105 transition-transform duration-300">
+                          <div className="text-2xl font-bold text-slate-600 dark:text-slate-400">{result.undetected_score}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-500 font-medium uppercase tracking-wider">Undetected</div>
+                        </div>
+                      </div>
 
                       {result.total_votes && (
                         <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -238,15 +230,15 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                     <TabsContent value="reputation" className="space-y-3 mt-4">
                       {result.popularity_ranks && Object.keys(result.popularity_ranks).length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center space-x-2">
+                          <p className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center space-x-2">
                             <TrendingUp className="h-4 w-4" />
                             <span>Popularity Rankings</span>
                           </p>
                           {Object.entries(result.popularity_ranks).map(([source, data]: [string, any]) => (
-                            <div key={source} className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                            <div key={source} className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
                               <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium capitalize">{source}</span>
-                                <Badge className="bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300 text-xs">
+                                <Badge className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 text-xs">
                                   Rank: {data.rank ? data.rank.toLocaleString() : 'N/A'}
                                 </Badge>
                               </div>
@@ -269,9 +261,9 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                       {result.categories && Object.keys(result.categories).length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {Object.entries(result.categories).map(([source, category]) => (
-                            <div key={source} className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                            <div key={source} className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
                               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{source}</p>
-                              <p className="text-sm text-green-600 dark:text-green-400 font-medium">{category}</p>
+                              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{category}</p>
                             </div>
                           ))}
                         </div>
@@ -292,7 +284,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                     <TabsContent value="dns" className="space-y-3 mt-4">
                       {result.last_dns_records && result.last_dns_records.length > 0 && (
                         <div>
-                          <p className="text-xs font-semibold text-green-600 dark:text-green-400 mb-2 flex items-center space-x-2">
+                          <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center space-x-2">
                             <Server className="h-4 w-4 flex-shrink-0" />
                             <span>DNS Records ({result.last_dns_records.length})</span>
                           </p>
@@ -344,7 +336,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                     <TabsContent value="passive-dns" className="space-y-3 mt-4">
                       {result.resolutions && result.resolutions.length > 0 ? (
                         <div>
-                          <p className="text-xs font-semibold text-green-600 dark:text-green-400 mb-2 flex items-center space-x-2">
+                          <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center space-x-2">
                             <Activity className="h-4 w-4 flex-shrink-0" />
                             <span>Passive DNS Resolutions ({result.resolutions.length})</span>
                           </p>
@@ -374,29 +366,27 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                     {/* INFO TAB */}
                     <TabsContent value="info" className="space-y-3 mt-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {result.creation_date && (
-                          <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                            <Calendar className="h-4 w-4 text-green-600 dark:text-green-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Creation Date</p>
-                            <p className="text-sm text-green-600 dark:text-green-400">{result.creation_date}</p>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-purple-100 dark:border-purple-800 transition-all duration-300">
+                            <span className="font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2"><Globe className="h-4 w-4 text-purple-500" /> Registrar:</span>
+                            <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{result.registrar || 'N/A'}</span>
                           </div>
-                        )}
+                          <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-purple-100 dark:border-purple-800 transition-all duration-300">
+                            <span className="font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2"><Calendar className="h-4 w-4 text-purple-500" /> Created:</span>
+                            <span className="text-slate-900 dark:text-white font-semibold">{result.creation_date || 'N/A'}</span>
+                          </div>
+                        </div>
 
-                        {result.last_update_date && (
-                          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                            <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Last Update</p>
-                            <p className="text-sm text-blue-600 dark:text-blue-400">{result.last_update_date}</p>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/30 border border-violet-100 dark:border-violet-800 transition-all duration-300">
+                            <span className="font-medium text-violet-700 dark:text-violet-300 flex items-center gap-2"><Shield className="h-4 w-4 text-violet-500" /> Reputation:</span>
+                            <span className={`font-bold ${result.reputation < 0 ? 'text-red-600' : 'text-green-600'}`}>{result.reputation}</span>
                           </div>
-                        )}
-
-                        {result.whois_date && (
-                          <div className="p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                            <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400 mb-1" />
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">WHOIS Date</p>
-                            <p className="text-sm text-purple-600 dark:text-purple-400">{result.whois_date}</p>
+                          <div className="flex items-center justify-between p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/30 border border-violet-100 dark:border-violet-800 transition-all duration-300">
+                            <span className="font-medium text-violet-700 dark:text-violet-300 flex items-center gap-2"><Clock className="h-4 w-4 text-violet-500" /> Last Analysis:</span>
+                            <span className="text-slate-900 dark:text-white font-semibold">{result.last_analysis_date || 'N/A'}</span>
                           </div>
-                        )}
+                        </div>
                       </div>
 
                       {result.whois && (
@@ -413,8 +403,9 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
 
 
                 {/* Timestamp */}
-                <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-green-200/50 dark:border-emerald-800/50 pt-3 bg-gradient-to-r from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-2">
-                  <span className="font-medium">Analyzed:</span> {result.timestamp}
+                <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-indigo-50 dark:border-slate-800 pt-3 bg-indigo-50/30 dark:bg-slate-900/50 rounded-lg p-2 flex justify-between items-center">
+                  <span><span className="font-medium">Analyzed:</span> {result.timestamp}</span>
+                  <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">ID: {result.id}</span>
                 </div>
               </div>
             ))}

@@ -15,9 +15,10 @@ interface DomainAnalysisCardProps {
   onResults: (result: any) => void;
   onMetascraperResults: (result: any) => void;
   onVirusTotalResults: (result: any) => void;
+  onStartScan?: () => void;
 }
 
-const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResults }: DomainAnalysisCardProps) => {
+const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResults, onStartScan }: DomainAnalysisCardProps) => {
   const [domain, setDomain] = useState("");
   const [isScanning, setIsScanning] = useState(false);
   const { toast } = useToast();
@@ -44,6 +45,9 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
       });
       return;
     }
+
+    // Notify parent that scan is starting
+    if (onStartScan) onStartScan();
 
     // Sanitize domain: remove protocol and trailing slashes
     const sanitizedDomain = domain.trim()

@@ -224,20 +224,20 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
 
   return (
     <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-      <CardHeader className="bg-gradient-to-r from-red-600/10 to-blue-600/10 border-b border-red-200/50 dark:border-blue-800/50 p-2 sm:p-3">
+      <CardHeader className="bg-gradient-to-r from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-indigo-100 dark:border-slate-800 p-2 sm:p-3">
         <CardTitle className="flex items-center space-x-2">
-          <div className="p-2 bg-gradient-to-r from-red-600 to-blue-600 rounded-lg">
+          <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-md shadow-indigo-500/20">
             <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
-          <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent text-lg sm:text-xl">Security Intelligence</span>
-          <Badge className="bg-gradient-to-r from-blue-100 to-red-100 text-slate-700 dark:from-blue-950 dark:to-red-950 dark:text-slate-300 border-0">{ips.length}</Badge>
+          <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">Security Intelligence</span>
+          <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">{ips.length}</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2 sm:p-3">
         {ips.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
-            <div className="bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-950/50 dark:to-yellow-950/50 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
-              <Shield className="h-8 w-8 sm:h-12 sm:w-12 text-slate-400 dark:text-slate-600" />
+            <div className="bg-indigo-50 dark:bg-slate-800 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
+              <Shield className="h-8 w-8 sm:h-12 sm:w-12 text-indigo-300 dark:text-slate-600" />
             </div>
             <p className="text-base sm:text-lg font-medium mb-2">No IP data yet</p>
             <p className="text-sm">Scan a domain to analyze IP security intelligence</p>
@@ -284,16 +284,16 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
               return (
                 <div
                   key={ip}
-                  className="border border-red-200/50 dark:border-blue-800/50 rounded-xl p-4 sm:p-6 space-y-4 bg-gradient-to-r from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-lg transition-all duration-500 hover:scale-[1.01] animate-fade-in"
+                  className="border border-indigo-100 dark:border-slate-800 rounded-xl p-4 sm:p-6 space-y-4 bg-white dark:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:scale-[1.01] animate-fade-in group"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   {/* Header */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
                     <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-gradient-to-r from-blue-600 to-red-600 rounded-lg">
-                        <Globe className="h-5 w-5 text-white" />
+                      <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
+                        <Globe className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                       </div>
-                      <h3 className="font-bold text-base sm:text-lg font-mono bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">{ip}</h3>
+                      <h3 className="font-bold text-base sm:text-lg font-mono text-slate-900 dark:text-white">{ip}</h3>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${getRiskGradient(risk)} shadow-lg`} />
@@ -322,26 +322,26 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                   {/* Details Grid - 2x2 balanced layout */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 text-sm">
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-950/50 transition-colors duration-300">
-                        <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2"><MapPin className="h-4 w-4" /> Country:</span>
-                        <span className="text-purple-600 dark:text-purple-400 font-semibold">{country}</span>
+                      <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 transition-all duration-300">
+                        <span className="font-medium text-indigo-700 dark:text-indigo-300 flex items-center gap-2"><MapPin className="h-4 w-4 text-indigo-500" /> Country:</span>
+                        <span className="text-slate-900 dark:text-white font-semibold">{country}</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-teal-50 dark:bg-teal-950/30 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-950/50 transition-colors duration-300">
-                        <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2"><Server className="h-4 w-4" /> ISP:</span>
-                        <span className="text-teal-600 dark:text-teal-400 font-semibold text-right break-all">{isp}</span>
+                      <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 transition-all duration-300">
+                        <span className="font-medium text-indigo-700 dark:text-indigo-300 flex items-center gap-2"><Server className="h-4 w-4 text-indigo-500" /> ISP:</span>
+                        <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{isp}</span>
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-950/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-950/50 transition-colors duration-300">
-                        <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2"><Shield className="h-4 w-4" /> IPQS Fraud Score:</span>
-                        <span className="text-red-600 dark:text-red-400 font-semibold">
+                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
+                        <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><Shield className="h-4 w-4 text-blue-500" /> IPQS Fraud Score:</span>
+                        <span className="text-slate-900 dark:text-white font-semibold">
                           {!hasIpqsData ? '⏳ Checking...' : risk !== undefined ? `${risk}/100` : (country !== '-' || isp !== '-') ? '0/100' : '-'}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors duration-300">
-                        <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2"><AlertTriangle className="h-4 w-4" /> AbuseIPDB Score:</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
+                        <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-blue-500" /> AbuseIPDB Score:</span>
+                        <span className="text-slate-900 dark:text-white font-semibold">
                           {!hasAbuseData ? '⏳ Checking...' : typeof abuseScore === 'number' ? `${abuseScore}/100` : '-'}
                         </span>
                       </div>
@@ -350,7 +350,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
 
                   {/* Abuse Reports Note */}
                   {typeof abuseReports === 'number' && abuseReports > 0 && (
-                    <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-sm text-blue-700 dark:text-blue-400">
+                    <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-sm text-red-700 dark:text-red-400">
                       📊 {abuseReports} abuse report{abuseReports > 1 ? 's' : ''} filed
                     </div>
                   )}
@@ -381,7 +381,8 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                   </div>
 
                   {/* Blacklists Section */}
-                  <div className="border-t border-red-200/50 dark:border-blue-800/50 pt-4">
+                  {/* Blacklists Section */}
+                  <div className="border-t border-indigo-50 dark:border-slate-800 pt-4">
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
                         <ListChecks className="h-4 w-4" /> DNS Blacklist Status
