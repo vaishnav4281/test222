@@ -221,8 +221,11 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         // Fallback to IP-API if Country/ISP is still missing
         if (locCountry === '-' || locIsp === '-') {
           try {
-            console.log('⚠️ IPQS missing data, trying fallback to IP-API...');
-            const fallbackRes = await fetchWithTimeout(`/api/ip-api/json/${ip}`, 3000);
+            console.log('⚠️ IPQS missing data, trying fallback to IP-API via CORS proxy...');
+            // Use CORS proxy because direct HTTP call to ip-api.com will be blocked on HTTPS
+            // and the local /api/ip-api proxy only works in dev mode
+            const fallbackRes = await fetchThroughCorsProxy(`http://ip-api.com/json/${ip}`, { timeout: 4000 });
+
             if (fallbackRes.ok) {
               const fb = await fallbackRes.json();
               if (fb.status === 'success') {
