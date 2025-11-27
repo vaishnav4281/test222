@@ -18,82 +18,92 @@ export default function ThreeBackground() {
             0.1,
             1000
         );
-        camera.position.z = 8;
+        camera.position.z = 12;
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
             antialias: true,
         });
-        renderer.setSize(window.innerWidth, window.innerWidth);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         containerRef.current.appendChild(renderer.domElement);
 
-        // Create uniform particles (nodes)
-        const nodeCount = 15;
-        const nodes: THREE.Mesh[] = [];
-        const nodePositions: THREE.Vector3[] = [];
+        // Create globe wireframe (representing global domain connections)
+        const globeGeometry = new THREE.SphereGeometry(3, 32, 32);
+        const globeMaterial = new THREE.MeshBasicMaterial({
+            color: isDark ? 0x3b82f6 : 0xef4444,
+            wireframe: true,
+            transparent: true,
+            opacity: isDark ? 0.08 : 0.06,
+        });
+        const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+        scene.add(globe);
 
-        for (let i = 0; i < nodeCount; i++) {
-            // Uniform small size - perfectly round
-            const geometry = new THREE.SphereGeometry(0.08, 16, 16);
+        // Create scattered particles (data points)
+        const particles: THREE.Mesh[] = [];
+        const particleCount = 80;
 
-            // Alternate between red and blue
-            const isRed = i % 2 === 0;
-            const color = isRed ? 0xef4444 : 0x3b82f6;
+        for (let i = 0; i < particleCount; i++) {
+            // Small uniform size
+            const geometry = new THREE.SphereGeometry(0.03, 8, 8);
+
+            // Mix of colors: white/black base + red/blue accents
+            let color;
+            const rand = Math.random();
+            if (rand > 0.7) {
+                color = 0xef4444; // Red accent
+            } else if (rand > 0.4) {
+                color = 0x3b82f6; // Blue accent
+            } else {
+                color = isDark ? 0xffffff : 0x333333; // White/black base
+            }
 
             const material = new THREE.MeshBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: isDark ? 0.9 : 0.8,
+                opacity: isDark ? 0.6 : 0.5,
             });
 
             const particle = new THREE.Mesh(geometry, material);
 
-            // Distribute in 3D space
-            const radius = 5;
-            const theta = (i / nodeCount) * Math.PI * 2;
-            const phi = Math.acos(2 * (i / nodeCount) - 1);
+            // Scatter randomly across the screen
+            particle.position.set(
+                (Math.random() - 0.5) * 25,
+                (Math.random() - 0.5) * 25,
+                (Math.random() - 0.5) * 15
+            );
 
-            const x = radius * Math.sin(phi) * Math.cos(theta);
-            const y = radius * Math.sin(phi) * Math.sin(theta);
-            const z = radius * Math.cos(phi);
-
-            particle.position.set(x, y, z);
-            nodePositions.push(new THREE.Vector3(x, y, z));
-            nodes.push(particle);
+            particles.push(particle);
             scene.add(particle);
-
-            // Add glow effect
-            const glowGeometry = new THREE.SphereGeometry(0.12, 16, 16);
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: isDark ? 0.15 : 0.1,
-            });
-            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-            glow.position.copy(particle.position);
-            scene.add(glow);
-            nodes.push(glow); // Store for animation
         }
 
-        // Create shining connection lines
+        // Create lens/scan ring effect
+        const ringGeometry = new THREE.RingGeometry(2, 2.1, 64);
+        const ringMaterial = new THREE.MeshBasicMaterial({
+            color: isDark ? 0x60a5fa : 0xf87171,
+            transparent: true,
+            opacity: 0,
+            side: THREE.DoubleSide,
+        });
+        const scanRing = new THREE.Mesh(ringGeometry, ringMaterial);
+        scene.add(scanRing);
+
+        // Create connection lines (data flow)
         const lines: THREE.Line[] = [];
         const lineMaterials: THREE.LineBasicMaterial[] = [];
 
-        for (let i = 0; i < nodeCount; i++) {
-            // Connect each node to 2 nearby nodes
-            for (let j = 1; j <= 2; j++) {
-                const targetIndex = (i + j * 3) % nodeCount;
+        // Connect some random particles
+        for (let i = 0; i < 15; i++) {
+            const p1 = particles[Math.floor(Math.random() * particles.length)];
+            const p2 = particles[Math.floor(Math.random() * particles.length)];
 
-                const points = [nodePositions[i], nodePositions[targetIndex]];
+            if (p1 !== p2) {
+                const points = [p1.position, p2.position];
                 const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-                // Shining link color
                 const material = new THREE.LineBasicMaterial({
-                    color: isDark ? 0x60a5fa : 0xf87171,
+                    color: isDark ? 0x3b82f6 : 0xef4444,
                     transparent: true,
-                    opacity: 0.3,
-                    linewidth: 2,
+                    opacity: 0.15,
                 });
 
                 const line = new THREE.Line(geometry, material);
@@ -121,24 +131,32 @@ export default function ThreeBackground() {
         const animate = () => {
             const elapsedTime = clock.getElapsedTime();
 
-            // Smooth network rotation
-            scene.rotation.y += 0.001;
-            scene.rotation.x += mouseY * 0.0005;
-            scene.rotation.z += mouseX * 0.0005;
+            // Rotate globe slowly
+            globe.rotation.y = elapsedTime * 0.1;
+            globe.rotation.x = Math.sin(elapsedTime * 0.05) * 0.1;
 
-            // Pulsing glow effect on particles
-            nodes.forEach((node, i) => {
-                if (i % 2 === 1) { // Only glow spheres
-                    const pulse = Math.sin(elapsedTime * 3 + i) * 0.1 + 0.15;
-                    (node.material as THREE.MeshBasicMaterial).opacity = isDark ? pulse : pulse * 0.7;
-                }
+            // Gentle particle drift
+            particles.forEach((particle, i) => {
+                particle.position.y += Math.sin(elapsedTime + i) * 0.002;
+                particle.position.x += Math.cos(elapsedTime + i * 0.5) * 0.001;
             });
 
-            // Shining link animation
+            // Scan ring pulse effect (lens scanning)
+            const scanPulse = Math.sin(elapsedTime * 2) * 0.3 + 0.3;
+            scanRing.material.opacity = scanPulse * 0.4;
+            scanRing.scale.setScalar(1 + Math.sin(elapsedTime * 2) * 0.3);
+            scanRing.rotation.z = elapsedTime * 0.5;
+
+            // Connection lines pulse
             lineMaterials.forEach((material, i) => {
-                const pulse = Math.sin(elapsedTime * 2 + i * 0.5) * 0.2 + 0.4;
+                const pulse = Math.sin(elapsedTime * 1.5 + i * 0.3) * 0.1 + 0.15;
                 material.opacity = pulse;
             });
+
+            // Subtle camera movement with mouse
+            camera.position.x += (mouseX * 2 - camera.position.x) * 0.01;
+            camera.position.y += (mouseY * 2 - camera.position.y) * 0.01;
+            camera.lookAt(scene.position);
 
             renderer.render(scene, camera);
             animationId = requestAnimationFrame(animate);
@@ -162,10 +180,16 @@ export default function ThreeBackground() {
             cancelAnimationFrame(animationId);
             containerRef.current?.removeChild(renderer.domElement);
 
-            nodes.forEach(node => {
-                node.geometry.dispose();
-                (node.material as THREE.Material).dispose();
+            globe.geometry.dispose();
+            (globe.material as THREE.Material).dispose();
+
+            particles.forEach(particle => {
+                particle.geometry.dispose();
+                (particle.material as THREE.Material).dispose();
             });
+
+            scanRing.geometry.dispose();
+            (scanRing.material as THREE.Material).dispose();
 
             lines.forEach(line => {
                 line.geometry.dispose();
