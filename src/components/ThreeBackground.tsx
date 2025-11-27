@@ -29,7 +29,7 @@ export default function ThreeBackground() {
         containerRef.current.appendChild(renderer.domElement);
 
         // Create globe wireframe (representing global domain connections)
-        const globeGeometry = new THREE.SphereGeometry(2.0, 32, 32);
+        const globeGeometry = new THREE.SphereGeometry(1.5, 32, 32);
         const globeMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x3b82f6 : 0xef4444,
             wireframe: true,
@@ -80,7 +80,7 @@ export default function ThreeBackground() {
         }
 
         // Create lens/scan ring effect
-        const ringGeometry = new THREE.RingGeometry(2.0, 2.2, 64);
+        const ringGeometry = new THREE.RingGeometry(1.5, 1.7, 64);
         const ringMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x60a5fa : 0xf87171,
             transparent: true,

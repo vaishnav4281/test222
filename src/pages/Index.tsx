@@ -264,7 +264,7 @@ const Index = () => {
             <div className="absolute top-20 right-1/3 w-96 h-96 bg-gradient-to-br from-blue-600/10 via-blue-400/5 to-transparent rounded-full blur-3xl" />
           </div>
 
-          <div className="relative space-y-3 sm:space-y-5">
+          <div className="relative space-y-3 sm:space-y-5 max-w-3xl">
             {/* Premium Typography - Clean and Simple */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] px-2 animate-fade-in" style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif", animationDelay: '100ms' }}>
               <span className="block mb-1 sm:mb-2">Domain Intelligence</span>
@@ -273,7 +273,7 @@ const Index = () => {
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4 animate-fade-in" style={{ fontFamily: "'Inter', system-ui, sans-serif", animationDelay: '200ms' }}>
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl px-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
               Enterprise-grade threat analysis and security intelligence platform
             </p>
           </div>
