@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { API_BASE_URL } from '../config';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,7 +159,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         const diffTime = Math.abs(now.getTime() - d.getTime());
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays < 0) return 'Unknown';
+        if (diffDays < 0) return 'Unknown'; // Future date?
         if (diffDays === 0) return 'Less than 1 day';
 
         const years = Math.floor(diffDays / 365);
@@ -293,7 +291,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         expires: whoisExpires,
         domain_age: computeAge(whoisCreated),
         registrar: whoisRegistrar,
-          name_servers: nsRecords,
+        name_servers: nsRecords,
           dns_records: dnsRecordsString,
           passive_dns: passiveDnsString,
           abuse_score: abuseScore,
@@ -306,16 +304,17 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
           latitude: locLatitude,
           isp: locIsp,
           timestamp: new Date().toLocaleString(),
-          as any;
-          
-          Results(result);
-          
-           Send full VirusTotal result
-          nst virusTotalResult = {
-          id: Date.now() + 2,
+        } as any;
+
+
+        onResults(result);
+
+        // Send full VirusTotal result
+        const virusTotalResult = {
+        id: Date.now() + 2,
         domain: sanitizedDomain,
         timestamp: new Date().toLocaleString(),
-          reputation: attrs.reputation || 0,
+        reputation: attrs.reputation || 0,
         last_analysis_stats: attrs.last_analysis_stats || {},
         total_votes: attrs.total_votes || {},
         categories: attrs.categories || {},
@@ -341,151 +340,153 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         harmless_score: attrs.last_analysis_stats?.harmless || 0,
           undetected_score: attrs.last_analysis_stats?.undetected || 0,
           risk_level: (() => {
-            const malicious = attrs.last_analysis_stats?.malicious || 0;
-            const suspicious = attrs.last_analysis_stats?.suspicious || 0;
-            if (malicious > 5) return 'High';
-            if (malicious > 0 || suspicious > 3) return 'Medium';
-            if (suspicious > 0) return 'Low';
-            return 'Clean';
+          const malicious = attrs.last_analysis_stats?.malicious || 0;
+          const suspicious = attrs.last_analysis_stats?.suspicious || 0;
+          if (malicious > 5) return 'High';
+          if (malicious > 0 || suspicious > 3) return 'Medium';
+          if (suspicious > 0) return 'Low';
+          return 'Clean';
           })()
-            
-            rusTotalResults(virusTotalResult);
-            
-            ick off Metascraper in background (non-blocking) with parallel CORS proxy
-             (async () => {
-            y {
-            const targetUrl = `https://${sanitizedDomain}`;
-            const metascraperResponse = await fetchThroughCorsProxy(targetUrl, { timeout: 5000, parallelAttempts: 3 });
-            const html = await metascraperResponse.text();
-          const metaData: any = { id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString() };
-          const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-          onst ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i);
-    const twitterTitleMatch = html.match(/<meta[^>]*name=["']twitter:title["'][^>]*content=["']([^"']+)["']/i);
-    metaData.title = (ogTitleMatch?.[1] || twitterTitleMatch?.[1] || titleMatch?.[1] || '').trim();
-    const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
-    const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i);
-    const twitterDescMatch = html.match(/<meta[^>]*name=["']twitter:description["'][^>]*content=["']([^"']+)["']/i);
-    metaData.description = (ogDescMatch?.[1] || twitterDescMatch?.[1] || descMatch?.[1] || '').trim();
-    const keywordsMatch = html.match(/<meta[^>]*name=["']keywords["'][^>]*content=["']([^"']+)["']/i);
-    if (keywordsMatch) metaData.keywords = keywordsMatch[1].trim();
-    const authorMatch = html.match(/<meta[^>]*name=["']author["'][^>]*content=["']([^"']+)["']/i);
-    const articleAuthorMatch = html.match(/<meta[^>]*property=["']article:author["'][^>]*content=["']([^"']+)["']/i);
-    if (authorMatch || articleAuthorMatch) metaData.author = (articleAuthorMatch?.[1] || authorMatch?.[1] || '').trim();
-    const langMatch = html.match(/<html[^>]*lang=["']([^"']+)["']/i);
-    const ogLocaleMatch = html.match(/<meta[^>]*property=["']og:locale["'][^>]*content=["']([^"']+)["']/i);
-    if (langMatch || ogLocaleMatch) metaData.lang = (langMatch?.[1] || ogLocaleMatch?.[1] || '').trim();
-    const publisherMatch = html.match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["']/i);
-    if (publisherMatch) metaData.publisher = publisherMatch[1].trim();
-    const ogTypeMatch = html.match(/<meta[^>]*property=["']og:type["'][^>]*content=["']([^"']+)["']/i);
-    if (ogTypeMatch) metaData.type = ogTypeMatch[1].trim();
-    const imageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
-    const twitterImageMatch = html.match(/<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
-    if (imageMatch || twitterImageMatch) metaData.image = (imageMatch?.[1] || twitterImageMatch?.[1] || '').trim();
-    const imageAltMatch = html.match(/<meta[^>]*property=["']og:image:alt["'][^>]*content=["']([^"']+)["']/i);
-    if (imageAltMatch) metaData.imageAlt = imageAltMatch[1].trim();
-    const ogUrlMatch = html.match(/<meta[^>]*property=["']og:url["'][^>]*content=["']([^"']+)["']/i);
-    const canonicalMatch = html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i);
-    metaData.url = (ogUrlMatch?.[1] || canonicalMatch?.[1] || targetUrl).trim();
-    const twitterCardMatch = html.match(/<meta[^>]*name=["']twitter:card["'][^>]*content=["']([^"']+)["']/i);
-    if (twitterCardMatch) metaData.twitterCard = twitterCardMatch[1].trim();
-    const twitterSiteMatch = html.match(/<meta[^>]*name=["']twitter:site["'][^>]*content=["']([^"']+)["']/i);
-    if (twitterSiteMatch) metaData.twitterSite = twitterSiteMatch[1].trim();
-    const twitterCreatorMatch = html.match(/<meta[^>]*name=["']twitter:creator["'][^>]*content=["']([^"']+)["']/i);
-    if (twitterCreatorMatch) metaData.twitterCreator = twitterCreatorMatch[1].trim();
-    const publishedMatch = html.match(/<meta[^>]*property=["']article:published_time["'][^>]*content=["']([^"']+)["']/i);
-    const dateMatch = html.match(/<meta[^>]*name=["']date["'][^>]*content=["']([^"']+)["']/i);
-    if (publishedMatch || dateMatch) metaData.date = (publishedMatch?.[1] || dateMatch?.[1] || '').trim();
-    const modifiedMatch = html.match(/<meta[^>]*property=["']article:modified_time["'][^>]*content=["']([^"']+)["']/i);
-    if (modifiedMatch) metaData.modifiedDate = modifiedMatch[1].trim();
-    const sectionMatch = html.match(/<meta[^>]*property=["']article:section["'][^>]*content=["']([^"']+)["']/i);
-    if (sectionMatch) metaData.category = sectionMatch[1].trim();
-    const articleTagsMatches = html.match(/<meta[^>]*property=["']article:tag["'][^>]*content=["']([^"']+)["']/gi);
-    if (articleTagsMatches) {
-      metaData.tags = articleTagsMatches.map(tag => {
-        const match = tag.match(/content=["']([^"']+)["']/i);
-        return match ? match[1] : '';
-      }).filter(Boolean).join(', ');
-    }
-    const faviconMatch = html.match(/<link[^>]*rel=["'](?:icon|shortcut icon)["'][^>]*href=["']([^"']+)["']/i);
-    if (faviconMatch) {
-      const faviconUrl = faviconMatch[1].trim();
-        taData.favicon = faviconUrl.startsWith('http') ? faviconUrl : `https://${sanitizedDomain}${faviconUrl.startsWith('/') ? '' : '/'}${faviconUrl}`;
+          }; 
+          onVirusTotalResults(virusTotalResult);
+
+        // Kick off Metascraper in background (non-blocking) with parallel CORS proxy
+        void (sync () => {
+        try {
+          const targetUrl = `https://${sanitizedDomain}`;
+       etascraperResponse = await fetchThroughCorsProxy(targetUrl, { timeout: 5000, parallelAttempts: 3 });
+          const html = await metascraperResponse.text();
+        const metaData: any = { id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString() };
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+          const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i);
+        const twitterTitleMatch = html.match(/<meta[^>]*name=["']twitter:title["'][^>]*content=["']([^"']+)["']/i);
+        metaData.title = (ogTitleMatch?.[1] || twitterTitleMatch?.[1] || titleMatch?.[1] || '').trim();
+        const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
+        const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i);
+        const twitterDescMatch = html.match(/<meta[^>]*name=["']twitter:description["'][^>]*content=["']([^"']+)["']/i);
+        metaData.description = (ogDescMatch?.[1] || twitterDescMatch?.[1] || descMatch?.[1] || '').trim();
+        const keywordsMatch = html.match(/<meta[^>]*name=["']keywords["'][^>]*content=["']([^"']+)["']/i);
+        if (keywordsMatch) metaData.keywords = keywordsMatch[1].trim();
+        const authorMatch = html.match(/<meta[^>]*name=["']author["'][^>]*content=["']([^"']+)["']/i);
+        const articleAuthorMatch = html.match(/<meta[^>]*property=["']article:author["'][^>]*content=["']([^"']+)["']/i);
+        if (authorMatch || articleAuthorMatch) metaData.author = (articleAuthorMatch?.[1] || authorMatch?.[1] || '').trim();
+        const langMatch = html.match(/<html[^>]*lang=["']([^"']+)["']/i);
+        const ogLocaleMatch = html.match(/<meta[^>]*property=["']og:locale["'][^>]*content=["']([^"']+)["']/i);
+        if (langMatch || ogLocaleMatch) metaData.lang = (langMatch?.[1] || ogLocaleMatch?.[1] || '').trim();
+        const publisherMatch = html.match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["']/i);
+        if (publisherMatch) metaData.publisher = publisherMatch[1].trim();
+        const ogTypeMatch = html.match(/<meta[^>]*property=["']og:type["'][^>]*content=["']([^"']+)["']/i);
+        if (ogTypeMatch) metaData.type = ogTypeMatch[1].trim();
+        const imageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
+        const twitterImageMatch = html.match(/<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
+        if (imageMatch || twitterImageMatch) metaData.image = (imageMatch?.[1] || twitterImageMatch?.[1] || '').trim();
+        const imageAltMatch = html.match(/<meta[^>]*property=["']og:image:alt["'][^>]*content=["']([^"']+)["']/i);
+        if (imageAltMatch) metaData.imageAlt = imageAltMatch[1].trim();
+        const ogUrlMatch = html.match(/<meta[^>]*property=["']og:url["'][^>]*content=["']([^"']+)["']/i);
+        const canonicalMatch = html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i);
+        metaData.url = (ogUrlMatch?.[1] || canonicalMatch?.[1] || targetUrl).trim();
+        const twitterCardMatch = html.match(/<meta[^>]*name=["']twitter:card["'][^>]*content=["']([^"']+)["']/i);
+        if (twitterCardMatch) metaData.twitterCard = twitterCardMatch[1].trim();
+        const twitterSiteMatch = html.match(/<meta[^>]*name=["']twitter:site["'][^>]*content=["']([^"']+)["']/i);
+        if (twitterSiteMatch) metaData.twitterSite = twitterSiteMatch[1].trim();
+        const twitterCreatorMatch = html.match(/<meta[^>]*name=["']twitter:creator["'][^>]*content=["']([^"']+)["']/i);
+        if (twitterCreatorMatch) metaData.twitterCreator = twitterCreatorMatch[1].trim();
+        const publishedMatch = html.match(/<meta[^>]*property=["']article:published_time["'][^>]*content=["']([^"']+)["']/i);
+        const dateMatch = html.match(/<meta[^>]*name=["']date["'][^>]*content=["']([^"']+)["']/i);
+        if (publishedMatch || dateMatch) metaData.date = (publishedMatch?.[1] || dateMatch?.[1] || '').trim();
+        const modifiedMatch = html.match(/<meta[^>]*property=["']article:modified_time["'][^>]*content=["']([^"']+)["']/i);
+        if (modifiedMatch) metaData.modifiedDate = modifiedMatch[1].trim();
+        const sectionMatch = html.match(/<meta[^>]*property=["']article:section["'][^>]*content=["']([^"']+)["']/i);
+        if (sectionMatch) metaData.category = sectionMatch[1].trim();
+        const articleTagsMatches = html.match(/<meta[^>]*property=["']article:tag["'][^>]*content=["']([^"']+)["']/gi);
+           (articleTagsMatches) {
+            metaData.tags = articleTagsMatches.map(tag => {
+            const match = tag.match(/content=["']([^"']+)["']/i);
+              return match ? match[1] : '';
+          }).filter(Boolean).join(', ');
+        }
+        const faviconMatch = html.match(/<link[^>]*rel=["'](?:icon|shortcut icon)["'][^>]*href=["']([^"']+)["']/i);
+           (faviconMatch) {
+            const faviconUrl = faviconMatch[1].trim();
+            metaData.favicon = faviconUrl.startsWith('http') ? faviconUrl : `https://${sanitizedDomain}${faviconUrl.startsWith('/') ? '' : '/'}${faviconUrl}`;
+          }
         
-      nst appleTouchMatch = html.match(/<link[^>]*rel=["']apple-touch-icon["'][^>]*href=["']([^"']+)["']/i);
-    if (appleTouchMatch) {
-      const appleUrl = appleTouchMatch[1].trim();
-      metaData.logo = appleUrl.startsWith('http') ? appleUrl : `https://${sanitizedDomain}${appleUrl.startsWith('/') ? '' : '/'}${appleUrl}`;
-      
-      nst robotsMatch = html.match(/<meta[^>]*name=["']robots["'][^>]*content=["']([^"']+)["']/i);
-    if (robotsMatch) metaData.robots = robotsMatch[1].trim();
-    const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
-    if (viewportMatch) metaData.viewport = viewportMatch[1].trim();
-      nst themeColorMatch = html.match(/<meta[^>]*name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
-       (themeColorMatch) metaData.themeColor = themeColorMatch[1].trim();
-    const charsetMatch = html.match(/<meta[^>]*charset=["']?([^"'\s>]+)["']?/i);
-    if (charsetMatch) metaData.charset = charsetMatch[1].trim();
-    const generatorMatch = html.match(/<meta[^>]*name=["']generator["'][^>]*content=["']([^"']+)["']/i);
-    if (generatorMatch) metaData.generator = generatorMatch[1].trim();
-    const rssFeedMatch = html.match(/<link[^>]*type=["']application\/rss\+xml["'][^>]*href=["']([^"']+)["']/i);
-    if (rssFeedMatch) {
-      const rssUrl = rssFeedMatch[1].trim();
-      metaData.rssFeed = rssUrl.startsWith('http') ? rssUrl : `https://${sanitizedDomain}${rssUrl.startsWith('/') ? '' : '/'}${rssUrl}`;
+  const appleTouchMatch = html.match(/<link[^>]*rel=["']apple-touch-icon["'][^>]*href=["']([^"']+)["']/i);
+          if (appleTouchMatch) {
+     onst appleUrl = appleTouchMatch[1].trim();
+    metaData.logo = appleUrl.startsWith('http') ? appleUrl : `https://${sanitizedDomain}${appleUrl.startsWith('/') ? '' : '/'}${appleUrl}`;
+  }
+const robotsMatch = html.match(/<meta[^>]*name=["']robots["'][^>]*content=["']([^"']+)["']/i);
+if (robotsMatch) metaData.robots = robotsMatch[1].trim();
+const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
+          if (viewportMatch) metaData.viewport = viewportMatch[1].trim();
+          const themeColorMatch = html.match(/<meta[^>]*name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
+if (themeColorMatch) metaData.themeColor = themeColorMatch[1].trim();
+const charsetMatch = html.match(/<meta[^>]*charset=["']?([^"'\s>]+)["']?/i);
+if (charsetMatch) metaData.charset = charsetMatch[1].trim();
+const generatorMatch = html.match(/<meta[^>]*name=["']generator["'][^>]*content=["']([^"']+)["']/i);
+if (generatorMatch) metaData.generator = generatorMatch[1].trim();
+const rssFeedMatch = html.match(/<link[^>]*type=["']application\/rss\+xml["'][^>]*href=["']([^"']+)["']/i);
+   (rssFeedMatch) {
+            const rssUrl = rssFeedMatch[1].trim();
+  metaData.rssFeed = rssUrl.startsWith('http') ? rssUrl : `https://${sanitizedDomain}${rssUrl.startsWith('/') ? '' : '/'}${rssUrl}`;
+}
+const atomFeedMatch = html.match(/<link[^>]*type=["']application\/atom\+xml["'][^>]*href=["']([^"']+)["']/i);
+          if (atomFeedMatch) {
+   onst atomUrl = atomFeedMatch[1].trim();
+  metaData.atomFeed = atomUrl.startsWith('http') ? atomUrl : `https://${sanitizedDomain}${atomUrl.startsWith('/') ? '' : '/'}${atomUrl}`;
     }
-    const atomFeedMatch = html.match(/<link[^>]*type=["']application\/atom\+xml["'][^>]*href=["']([^"']+)["']/i);
-    if (atomFeedMatch) {
-      const atomUrl = atomFeedMatch[1].trim();
-      metaData.atomFeed = atomUrl.startsWith('http') ? atomUrl : `https://${sanitizedDomain}${atomUrl.startsWith('/') ? '' : '/'}${atomUrl}`;
-      
-       JSON-LD
-    const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
-    if (jsonLdMatches) {
-      try {
-        const jsonLdData = jsonLdMatches.map(script => {
-          const content = script.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
-          if (content && content[1]) {
-            try { return JSON.parse(content[1]); } catch { return null; }
-          }
-          return null;
-        }).filter(Boolean);
-        if (jsonLdData.length > 0) {
-          metaData.jsonLd = jsonLdData;
-          const firstSchema = Array.isArray(jsonLdData[0]) ? jsonLdData[0][0] : jsonLdData[0];
-             (firstSchema) {
-            if (firstSchema['@type']) metaData.schemaType = firstSchema['@type'];
-            if (firstSchema.name && !metaData.title) metaData.title = firstSchema.name;
-            if (firstSchema.description && !metaData.description) metaData.description = firstSchema.description;
-          }
-          
-          tch (e) { /* ignore */ }
-          
-            talFields = 30;
-            lledFields = Object.keys(metaData).filter(key => key !== 'id' && key !== 'domain' && key !== 'timestamp' && key !== 'jsonLd' && metaData[key]).length;
-            .completenessScore = Math.round((filledFields / totalFields) * 100);
-          scraperResults(metaData);
-        h (metaError: any) {
-      nst errorMessage = metaError.name === 'AbortError'
-      ? 'Request timed out while fetching metadata (try again or website may be slow)'
-      : metaError.message || 'Failed to fetch metadata';
-    onMetascraperResults({ id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString(), error: errorMessage });
-    
-    ;
-  
-    emoved background VT fetch (we already fetched it above)
-      canning(false);
-      ain("");
-    
-  ast({
-   title: "Scan Complete",
-        description: `Successfully analyzed ${sanitizedDomain}`,
-});
-catch (error: any) {
-setIsScanning(false);
+          // JSON-LD
+const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+   (jsonLdMatches) {
+            try {
+              const jsonLdData = jsonLdMatches.map(script => {
+            const content = script.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
+      if (content && content[1]) {
+        try { return JSON.parse(content[1]); } catch { return null; }
+            }
+                return null;
+    }).filter(Boolean);
+       (jsonLdData.length > 0) {
+      metaData.jsonLd = jsonLdData;
+                const firstSchema = Array.isArray(jsonLdData[0]) ? jsonLdData[0][0] : jsonLdData[0];
+            if (firstSchema) {
+                  if (firstSchema['@type']) metaData.schemaType = firstSchema['@type'];
+              if (firstSchema.name && !metaData.title) metaData.title = firstSchema.name;
+        if (firstSchema.description && !metaData.description) metaData.description = firstSchema.description;
+      }
+    }
+  tch (e) { /* ignore */ }
+  }
+  const totalFields = 30;
+  const filldFields = Object.keys(metaData).filter(key => key !== 'id' && key !== 'domain' && key !== 'timestamp' && key !== 'jsonLd' && metaData[key]).length;
+  metaDa
+ta.completenessScore = Math.round((filledFields / totalFields) * 100);
+          onMetascraperResults(metaData);
+catch (metaError: any) {
+          const errorMessage = metaError.name === 'AbortError'
+  ? 'Request timed out while fetching metadata (try again or website may be slow)'
+  : metaError.message || 'Failed to fetch metadata';
+          onMetascraperResults({ id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString(), error: errorMessage });
+         }
+      })();
+
+// Rem oved background VT fetch (we already fetched it above)
+      setIsScanning(false);
+      setDomain("");
+
       toast({
+        title: "Scan Complete",
+        description: `Successfully analyzed ${sanitizedDomain}`,
+      });
+catch (error: any) {
+      setIsScanning(false);
+toast({
   title: "Scan Failed",
   description: error.message || "Something went wrong while fetching data.",
   variant: "destructive",
-});
-      // Still try to fetch Metascraper even if VT fails
+      });
+  // Still try to fetch Metascraper even if VT fails
   void (async () => {
     try {
       const targetUrl = `https://${sanitizedDomain}`;
@@ -541,83 +542,85 @@ setIsScanning(false);
         }).filter(Boolean).join(', ');
       }
       const faviconMatch = html.match(/<link[^>]*rel=["'](?:icon|shortcut icon)["'][^>]*href=["']([^"']+)["']/i);
-      if (faviconMatch) {
-        const faviconUrl = faviconMatch[1].trim();
-          taData.favicon = faviconUrl.startsWith('http') ? faviconUrl : `https://${sanitizedDomain}${faviconUrl.startsWith('/') ? '' : '/'}${faviconUrl}`;
-          
-        nst appleTouchMatch = html.match(/<link[^>]*rel=["']apple-touch-icon["'][^>]*href=["']([^"']+)["']/i);
-      if (appleTouchMatch) {
-        const appleUrl = appleTouchMatch[1].trim();
-        metaData.logo = appleUrl.startsWith('http') ? appleUrl : `https://${sanitizedDomain}${appleUrl.startsWith('/') ? '' : '/'}${appleUrl}`;
-        
-        nst robotsMatch = html.match(/<meta[^>]*name=["']robots["'][^>]*content=["']([^"']+)["']/i);
-      if (robotsMatch) metaData.robots = robotsMatch[1].trim();
-      const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
-      if (viewportMatch) metaData.viewport = viewportMatch[1].trim();
-        nst themeColorMatch = html.match(/<meta[^>]*name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
-         (themeColorMatch) metaData.themeColor = themeColorMatch[1].trim();
-      const charsetMatch = html.match(/<meta[^>]*charset=["']?([^"'\s>]+)["']?/i);
-      if (charsetMatch) metaData.charset = charsetMatch[1].trim();
-      const generatorMatch = html.match(/<meta[^>]*name=["']generator["'][^>]*content=["']([^"']+)["']/i);
-      if (generatorMatch) metaData.generator = generatorMatch[1].trim();
-      const rssFeedMatch = html.match(/<link[^>]*type=["']application\/rss\+xml["'][^>]*href=["']([^"']+)["']/i);
-      if (rssFeedMatch) {
-        const rssUrl = rssFeedMatch[1].trim();
-        metaData.rssFeed = rssUrl.startsWith('http') ? rssUrl : `https://${sanitizedDomain}${rssUrl.startsWith('/') ? '' : '/'}${rssUrl}`;
+         (faviconMatch) {
+            const faviconUrl = faviconMatch[1].trim();
+          metaData.favicon = faviconUrl.startsWith('http') ? faviconUrl : `https://${sanitizedDomain}${faviconUrl.startsWith('/') ? '' : '/'}${faviconUrl}`;
+        }
+      
+    const appleTouchMatch = html.match(/<link[^>]*rel=["']apple-touch-icon["'][^>]*href=["']([^"']+)["']/i);
+          if (appleTouchMatch) {
+      const appleUrl = appleTouchMatch[1].trim();
+      metaData.logo = appleUrl.startsWith('http') ? appleUrl : `https://${sanitizedDomain}${appleUrl.startsWith('/') ? '' : '/'}${appleUrl}`;
+    }
+  const robotsMatch = html.match(/<meta[^>]*name=["']robots["'][^>]*content=["']([^"']+)["']/i);
+          if (robotsMatch) metaData.robots = robotsMatch[1].trim();
+  const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
+          if (viewportMatch) metaData.viewport = viewportMatch[1].trim();
+    const themeColorMatch = html.match(/<meta[^>]*name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
+  if (themeColorMatch) metaData.themeColor = themeColorMatch[1].trim();
+  const charsetMatch = html.match(/<meta[^>]*charset=["']?([^"'\s>]+)["']?/i);
+  if (charsetMatch) metaData.charset = charsetMatch[1].trim();
+  const generatorMatch = html.match(/<meta[^>]*name=["']generator["'][^>]*content=["']([^"']+)["']/i);
+  if (generatorMatch) metaData.generator = generatorMatch[1].trim();
+  const rssFeedMatch = html.match(/<link[^>]*type=["']application\/rss\+xml["'][^>]*href=["']([^"']+)["']/i);
+  if (rssFeedMatch) {
+    const rssUrl = rssFeedMatch[1].trim();
+    metaData.rssFeed = rssUrl.startsWith('http') ? rssUrl : `https://${sanitizedDomain}${rssUrl.startsWith('/') ? '' : '/'}${rssUrl}`;
+  }
+  const atomFeedMatch = html.match(/<link[^>]*type=["']application\/atom\+xml["'][^>]*href=["']([^"']+)["']/i);
+  if (atomFeedMatch) {
+    const atomUrl = atomFeedMatch[1].trim();
+    metaData.atomFeed = atomUrl.startsWith('http') ? atomUrl : `https://${sanitizedDomain}${atomUrl.startsWith('/') ? '' : '/'}${atomUrl}`;
+  }
+const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+if (jsonLdMatches) {
+  try {
+    const jsonLdData = jsonLdMatches.map(script => {
+      const content = script.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
+      if (content && content[1]) {
+        try { return JSON.parse(content[1]); } catch { return null; }
       }
-      const atomFeedMatch = html.match(/<link[^>]*type=["']application\/atom\+xml["'][^>]*href=["']([^"']+)["']/i);
-      if (atomFeedMatch) {
-        const atomUrl = atomFeedMatch[1].trim();
-        metaData.atomFeed = atomUrl.startsWith('http') ? atomUrl : `https://${sanitizedDomain}${atomUrl.startsWith('/') ? '' : '/'}${atomUrl}`;
-        
-        nst jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
-      if (jsonLdMatches) {
-        try {
-          const jsonLdData = jsonLdMatches.map(script => {
-            const content = script.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
-            if (content && content[1]) {
-              try { return JSON.parse(content[1]); } catch { return null; }
-            }
-            return null;
-          }).filter(Boolean);
-          if (jsonLdData.length > 0) {
-            metaData.jsonLd = jsonLdData;
-            const firstSchema = Array.isArray(jsonLdData[0]) ? jsonLdData[0][0] : jsonLdData[0];
-               (firstSchema) {
-              if (firstSchema['@type']) metaData.schemaType = firstSchema['@type'];
-              if (firstSchema.name && !metaData.title) metaData.title = firstSchema.name;
-              if (firstSchema.description && !metaData.description) metaData.description = firstSchema.description;
-            }
-            
-            tch (e) { /* ignore */ }
-            
-              talFields = 30;
-              lledFields = Object.keys(metaData).filter(key => key !== 'id' && key !== 'domain' && key !== 'timestamp' && key !== 'jsonLd' && metaData[key]).length;
-              .completenessScore = Math.round((filledFields / totalFields) * 100);
-            scraperResults(metaData);
-          h (metaError: any) {
-        nst errorMessage = metaError.name === 'AbortError'
-        ? 'Request timed out while fetching metadata (try again or website may be slow)'
-        : metaError.message || 'Failed to fetch metadata';
-      onMetascraperResults({ id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString(), error: errorMessage });
-      
-      ;
-    
-      
-        
-        
-      className="h-fit border-0 shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-    ardHeader className="bg-gradient-to-r from-red-600/10 to-blue-600/10 border-b border-red-200/50 dark:border-blue-800/50">
-    <CardTitle className="flex items-center space-x-2">
-      <div className="p-2 bg-gradient-to-r from-red-600 to-blue-600 rounded-lg">
+      return null;
+    }).filter(Boolean);
+       (jsonLdData.length > 0) {
+      metaData.jsonLd = jsonLdData;
+                const firstSchema = Array.isArray(jsonLdData[0]) ? jsonLdData[0][0] : jsonLdData[0];
+      if (firstSchema) {
+        if (firstSchema['@type']) metaData.schemaType = firstSchema['@type'];
+        if (firstSchema.name && !metaData.title) metaData.title = firstSchema.name;
+        if (firstSchema.description && !metaData.description) metaData.description = firstSchema.description;
+      }
+    }
+  tch (e) { /* ignore */ }
+  }
+  const totalFields = 30;
+  const filldFields = Object.keys(metaData).filter(key => key !== 'id' && key !== 'domain' && key !== 'timestamp' && key !== 'jsonLd' && metaData[key]).length;
+  metaDa
+ta.completenessScore = Math.round((filledFields / totalFields) * 100);
+          onMetascraperResults(metaData);
+catch (metaError: any) {
+          const errorMessage = metaError.name === 'AbortError'
+  ? 'Request timed out while fetching metadata (try again or website may be slow)'
+  : metaError.message || 'Failed to fetch metadata';
+          onMetascraperResults({ id: Date.now() + 1, domain: sanitizedDomain, timestamp: new Date().toLocaleString(), error: errorMessage });
+         }
+      })();
+   
+  
+
+turn (
+ard className="h-fit border-0 shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+      <CardHeader className="bg-gradient-to-r from-red-600/10 to-blue-600/10 border-b border-red-200/50 dark:border-blue-800/50">
+        <CardTitle className="flex items-center space-x-2">
+          <div className="p-2 bg-gradient-to-r from-red-600 to-blue-600 rounded-lg">
             <Search className="h-5 w-5 text-white" />
-          </div>
+        </div>
         <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">Domain Analysis</span>
       </CardTitle>
-    </CardHeader>
-      ardContent className="space-y-6 p-4 sm:p-6">
-        iv className="space-y-3">
-          abel htmlFor="domain" className="text-sm font-medium text-slate-700 dark:text-slate-300">Domain Name</Label>
+      </CardHeader>
+      <CardContent className="space-y-6 p-4 sm:p-6">
+        <div className="space-y-3">
+        <Label htmlFor="domain" className="text-sm font-medium text-slate-700 dark:text-slate-300">Domain Name</Label>
         <Input
           id="domain"
           type="text"
@@ -626,31 +629,31 @@ setIsScanning(false);
           onChange={(e) => setDomain(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !isScanning && handleScan()}
           className="border-red-200 dark:border-blue-800 focus:border-red-500 dark:focus:border-blue-500 focus:ring-red-500/20 dark:focus:ring-blue-500/20 transition-all duration-300"
-          
-          v>
-          
-          ton
-          Click={handleScan}
-          sabled={isScanning}
-          assName="w-full bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-        
-        {isScanning ? (
-            <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Scanning...
-          </>
-        ) : (
-          <>
-            <Search className="mr-2 h-4 w-4" />
-            Analyze Domain
-            >
-            
-          tton>
-        
-          
-            ntent>
-            
-          
-        
+        />
+      v>
       
+      utton
+      onClick={handleScan}
+      disabled={isScanning}
+          className="w-full bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+    >
+          {isScanning ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Scanning...
+        </>
+      ) : (
+        <>
+              <Search className="mr-2 h-4 w-4" />
+              Analyze Domain
+        </>
+      )}
+Button>
+  
+      
+      </Ca r ntent>
+    </Card>
+  );
+}; 
+
 export default DomainAnalysisCard;
