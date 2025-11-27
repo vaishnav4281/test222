@@ -29,7 +29,7 @@ export default function ThreeBackground() {
         containerRef.current.appendChild(renderer.domElement);
 
         // Create globe wireframe (representing global domain connections)
-        const globeGeometry = new THREE.SphereGeometry(3.5, 32, 32);
+        const globeGeometry = new THREE.SphereGeometry(2.5, 32, 32);
         const globeMaterial = new THREE.MeshBasicMaterial({
             color: isDark ? 0x3b82f6 : 0xef4444,
             wireframe: true,
@@ -37,6 +37,7 @@ export default function ThreeBackground() {
             opacity: isDark ? 0.15 : 0.12,
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+        globe.position.y = -3; // Position above glassmorphism cards
         scene.add(globe);
 
         // Create scattered particles (data points)
