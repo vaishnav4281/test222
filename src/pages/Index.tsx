@@ -33,15 +33,6 @@ const Index = () => {
   const [virusTotalResults, setVirusTotalResults] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Mouse tracking for interactive effects
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
   // API status check
   // useEffect(() => {
   //   const checkApis = async () => {
