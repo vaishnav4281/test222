@@ -117,81 +117,85 @@ export default function LoginPage() {
             </button>
 
             {/* Left Panel - Feature Highlights */}
-            <div className="hidden lg:flex w-1/2 flex-col justify-center px-20 relative z-10">
-                <div className="mb-16">
-                    <div className="flex items-center gap-4 mb-8">
-                        <div className="bg-gradient-to-br from-red-600 to-blue-600 p-4 rounded-2xl shadow-2xl shadow-red-500/30 dark:shadow-red-500/20">
-                            <Shield className="h-10 w-10 text-white" />
+            <div className="hidden lg:flex w-1/2 flex-col justify-center px-12 relative z-10">
+                {/* Glassmorphism card for features */}
+                <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-slate-700/30 shadow-2xl p-10">
+                    <div className="mb-12">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="bg-gradient-to-br from-red-600 to-blue-600 p-4 rounded-2xl shadow-2xl shadow-red-500/30 dark:shadow-red-500/20">
+                                <Shield className="h-10 w-10 text-white" />
+                            </div>
+                            <h1 className="text-5xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                                DomainScope
+                            </h1>
                         </div>
-                        <h1 className="text-5xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
-                            DomainScope
-                        </h1>
-                    </div>
-                    <p className="text-2xl text-slate-600 dark:text-slate-400 font-light tracking-wide">
-                        Advanced OSINT Intelligence Platform
-                    </p>
-                </div>
-
-                <div className="space-y-8 max-w-lg">
-                    <div className="flex items-start gap-5 group cursor-pointer">
-                        <div className="p-4 rounded-xl bg-red-500/10 dark:bg-red-500/10 text-red-600 dark:text-red-400 group-hover:bg-red-500/20 dark:group-hover:bg-red-500/20 transition-all duration-300 shadow-lg">
-                            <Globe className="h-7 w-7" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">WHOIS Details & DNS Records</h3>
-                            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Complete registrar information, registration dates, contact details, and comprehensive DNS records including A, MX, NS, TXT, and CNAME entries.
-                            </p>
-                        </div>
+                        <p className="text-xl text-slate-700 dark:text-slate-300 font-light tracking-wide">
+                            Advanced OSINT Intelligence Platform
+                        </p>
                     </div>
 
-                    <div className="flex items-start gap-5 group cursor-pointer">
-                        <div className="p-4 rounded-xl bg-blue-500/10 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:bg-blue-500/20 dark:group-hover:bg-blue-500/20 transition-all duration-300 shadow-lg">
-                            <Activity className="h-7 w-7" />
+                    <div className="space-y-6 max-w-lg mb-8">
+                        <div className="flex items-start gap-4 group cursor-pointer">
+                            <div className="p-3 rounded-xl bg-red-500/10 dark:bg-red-500/10 text-red-600 dark:text-red-400 group-hover:bg-red-500/20 dark:group-hover:bg-red-500/20 transition-all duration-300 shadow-lg flex-shrink-0">
+                                <Globe className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-1">WHOIS Details & DNS Records</h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                    Complete registrar information, registration dates, contact details, and comprehensive DNS records including A, MX, NS, TXT, and CNAME entries.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Passive DNS & IP Intelligence</h3>
-                            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Historical IP resolutions, domain associations, geolocation data, ISP details, and ASN organization information for comprehensive tracking.
-                            </p>
+
+                        <div className="flex items-start gap-4 group cursor-pointer">
+                            <div className="p-3 rounded-xl bg-blue-500/10 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:bg-blue-500/20 dark:group-hover:bg-blue-500/20 transition-all duration-300 shadow-lg flex-shrink-0">
+                                <Activity className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-1">Passive DNS & IP Intelligence</h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                    Historical IP resolutions, domain associations, geolocation data, ISP details, and ASN organization information for comprehensive tracking.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4 group cursor-pointer">
+                            <div className="p-3 rounded-xl bg-purple-500/10 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:bg-purple-500/20 dark:group-hover:bg-purple-500/20 transition-all duration-300 shadow-lg flex-shrink-0">
+                                <Share2 className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-1">Multi-Source Threat Scores</h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                    Real-time threat intelligence from VirusTotal, IPQualityScore (IPQS), and AbuseIPDB with VPN/Proxy/Tor detection and DNSBL blacklist monitoring.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4 group cursor-pointer">
+                            <div className="p-3 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500/20 dark:group-hover:bg-emerald-500/20 transition-all duration-300 shadow-lg flex-shrink-0">
+                                <FileText className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-1">Domain Metadata & Bulk Export</h3>
+                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                                    Tech stack analysis, hosting information, site descriptions, and full CSV export capabilities for bulk domain scanning workflows.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-start gap-5 group cursor-pointer">
-                        <div className="p-4 rounded-xl bg-purple-500/10 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:bg-purple-500/20 dark:group-hover:bg-purple-500/20 transition-all duration-300 shadow-lg">
-                            <Share2 className="h-7 w-7" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Multi-Source Threat Scores</h3>
-                            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Real-time threat intelligence from VirusTotal, IPQualityScore (IPQS), and AbuseIPDB with VPN/Proxy/Tor detection and DNSBL blacklist monitoring.
-                            </p>
-                        </div>
+                    {/* Built by section inside the glassmorphism card */}
+                    <div className="text-sm text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-6">
+                        Built by{' '}
+                        <a
+                            href="https://www.linkedin.com/in/va1shnav"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-300 hover:underline"
+                        >
+                            Vaishnav K
+                        </a>
                     </div>
-
-                    <div className="flex items-start gap-5 group cursor-pointer">
-                        <div className="p-4 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500/20 dark:group-hover:bg-emerald-500/20 transition-all duration-300 shadow-lg">
-                            <FileText className="h-7 w-7" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Domain Metadata & Bulk Export</h3>
-                            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Tech stack analysis, hosting information, site descriptions, and full CSV export capabilities for bulk domain scanning workflows.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="absolute bottom-16 text-sm text-slate-500 dark:text-slate-600">
-                    Built by{' '}
-                    <a
-                        href="https://www.linkedin.com/in/va1shnav"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hover:from-red-500 hover:to-blue-500 transition-all duration-300 hover:underline"
-                    >
-                        Vaishnav K
-                    </a>
                 </div>
             </div>
 
