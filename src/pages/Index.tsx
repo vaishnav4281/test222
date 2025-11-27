@@ -267,20 +267,138 @@ const Index = () => {
             </h1>
 
             <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
-              Enterprise-grade threat analysis and security intelligence platform
+              Comprehensive domain intelligence providing WHOIS data, DNS records, passive DNS, IP geolocation, threat scores, security signals, metadata extraction, and bulk export capabilities
             </p>
           </div>
 
           {/* Premium feature badges */}
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3 pt-2 sm:pt-3">
             <div className="group px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40 hover:scale-105 transition-all duration-300">
-              Real-time Scanning
+              8 Intelligence Sources
             </div>
             <div className="group px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 transition-all duration-300">
-              Multi-Source Intelligence
+              Real-time Threat Analysis
             </div>
             <div className="group px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-xs sm:text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-              Instant Reports
+              Bulk CSV Export
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Showcase Section - NEW */}
+        <div className="relative bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-2xl animate-fade-in" style={{ animationDelay: '100ms' }}>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
+              Comprehensive Intelligence Output
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+              Every scan delivers 8 categories of actionable intelligence for complete domain analysis
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {/* WHOIS Details */}
+            <div className="group relative bg-gradient-to-br from-red-50 to-white dark:from-red-900/10 dark:to-slate-800 p-6 rounded-2xl border border-red-200 dark:border-red-800/50 hover:border-red-400 dark:hover:border-red-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-red-600 to-red-700 shadow-lg">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">WHOIS Details</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Registrar information, creation/expiry dates, and complete contact details
+              </p>
+            </div>
+
+            {/* DNS Records */}
+            <div className="group relative bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-slate-800 p-6 rounded-2xl border border-blue-200 dark:border-blue-800/50 hover:border-blue-400 dark:hover:border-blue-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg">
+                  <Globe className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">DNS Records</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Complete A, MX, NS, TXT, and CNAME record analysis
+              </p>
+            </div>
+
+            {/* Passive DNS */}
+            <div className="group relative bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/10 dark:to-slate-800 p-6 rounded-2xl border border-purple-200 dark:border-purple-800/50 hover:border-purple-400 dark:hover:border-purple-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg">
+                  <Activity className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Passive DNS</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Historical IP resolutions and domain association tracking
+              </p>
+            </div>
+
+            {/* IP & ASN Data */}
+            <div className="group relative bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-slate-800 p-6 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 shadow-lg">
+                  <Database className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">IP & ASN Data</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Geolocation, ISP details, and organization information
+              </p>
+            </div>
+
+            {/* Threat Scores */}
+            <div className="group relative bg-gradient-to-br from-orange-50 to-white dark:from-orange-900/10 dark:to-slate-800 p-6 rounded-2xl border border-orange-200 dark:border-orange-800/50 hover:border-orange-400 dark:hover:border-orange-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-orange-600 to-orange-700 shadow-lg">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Threat Scores</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                VirusTotal, IPQS, and AbuseIPDB real-time threat checks
+              </p>
+            </div>
+
+            {/* Security Signals */}
+            <div className="group relative bg-gradient-to-br from-rose-50 to-white dark:from-rose-900/10 dark:to-slate-800 p-6 rounded-2xl border border-rose-200 dark:border-rose-800/50 hover:border-rose-400 dark:hover:border-rose-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 shadow-lg">
+                  <Search className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Security Signals</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                VPN/Proxy/Tor detection and DNSBL blacklist status
+              </p>
+            </div>
+
+            {/* Domain Metadata */}
+            <div className="group relative bg-gradient-to-br from-cyan-50 to-white dark:from-cyan-900/10 dark:to-slate-800 p-6 rounded-2xl border border-cyan-200 dark:border-cyan-800/50 hover:border-cyan-400 dark:hover:border-cyan-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-600 to-cyan-700 shadow-lg">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Domain Metadata</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Tech stack, hosting info, and site description analysis
+              </p>
+            </div>
+
+            {/* Bulk Exports */}
+            <div className="group relative bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-900/10 dark:to-slate-800 p-6 rounded-2xl border border-indigo-200 dark:border-indigo-800/50 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all duration-300 hover:shadow-xl hover:scale-105">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-lg">
+                  <Download className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Bulk Exports</h3>
+              </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Full CSV reports for comprehensive workflow integration
+              </p>
             </div>
           </div>
         </div>

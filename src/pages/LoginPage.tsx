@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon, Loader2 } from 'lucide-react';
+import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon, Loader2, FileText } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import OTPVerificationModal from '@/components/OTPVerificationModal';
 
@@ -129,15 +129,15 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <div className="space-y-10 max-w-lg">
+                <div className="space-y-8 max-w-lg">
                     <div className="flex items-start gap-5 group cursor-pointer">
                         <div className="p-4 rounded-xl bg-red-500/10 dark:bg-red-500/10 text-red-600 dark:text-red-400 group-hover:bg-red-500/20 dark:group-hover:bg-red-500/20 transition-all duration-300 shadow-lg">
                             <Globe className="h-7 w-7" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Domain Intelligence</h3>
+                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">WHOIS Details & DNS Records</h3>
                             <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Real-time threat analysis and reputation scoring for any domain with comprehensive insights.
+                                Complete registrar information, registration dates, contact details, and comprehensive DNS records including A, MX, NS, TXT, and CNAME entries.
                             </p>
                         </div>
                     </div>
@@ -147,9 +147,9 @@ export default function LoginPage() {
                             <Activity className="h-7 w-7" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Live Monitoring</h3>
+                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Passive DNS & IP Intelligence</h3>
                             <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Server-Sent Events for real-time updates, instant alerts, and comprehensive scan tracking.
+                                Historical IP resolutions, domain associations, geolocation data, ISP details, and ASN organization information for comprehensive tracking.
                             </p>
                         </div>
                     </div>
@@ -159,9 +159,21 @@ export default function LoginPage() {
                             <Share2 className="h-7 w-7" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Security Scoring</h3>
+                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Multi-Source Threat Scores</h3>
                             <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
-                                Multi-source threat intelligence with IPQS fraud detection, AbuseIPDB reports, and DNS blacklist monitoring.
+                                Real-time threat intelligence from VirusTotal, IPQualityScore (IPQS), and AbuseIPDB with VPN/Proxy/Tor detection and DNSBL blacklist monitoring.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-start gap-5 group cursor-pointer">
+                        <div className="p-4 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500/20 dark:group-hover:bg-emerald-500/20 transition-all duration-300 shadow-lg">
+                            <FileText className="h-7 w-7" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-xl text-slate-800 dark:text-slate-200 mb-2">Domain Metadata & Bulk Export</h3>
+                            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed">
+                                Tech stack analysis, hosting information, site descriptions, and full CSV export capabilities for bulk domain scanning workflows.
                             </p>
                         </div>
                     </div>
