@@ -241,12 +241,26 @@ Growth is handled gracefully. Multi‑node backend instances, a Redis cluster, P
 
 DomainScope follows a layered security approach designed to keep every request safe and every workflow trustworthy. 🛡️✨ It uses smart protective layers like CDN filtering, strict rate limits, secure authentication, and clean input validation — all supported by detailed audit logs. Together, these guard against SQL injection, XSS, CSRF, DDoS, API misuse, and other real‑world threats.
 
-* 🛡️ **CDN & Headers:** CloudFlare protection + Helmet for secure HTTP headers.
-* 🚦 **Smart Rate Limiting:** Global limits (100/15m) + Strict Auth limits (10/1h) to prevent brute-force.
-* 🔐 **Authentication:** JWT sessions, bcrypt password hashing, and API keys.
-* 🕵️ **Anti-Enumeration:** Login and Forgot Password endpoints return generic responses to prevent user harvesting.
-* 🧹 **Input Hygiene:** Zod validation, HPP (Parameter Pollution) protection, and Body Size limiting (10kb).
-* 🧾 **Audit Logging:** Tracks important actions for security review.
+### 🚦 Advanced Rate Limiting & Anti-Flooding
+We implement a dual-layer rate limiting strategy to balance user experience with strict security:
+
+*   **Global Flood Protection:**
+    *   **Limit:** 100 requests per 15 minutes per IP.
+    *   **Purpose:** Prevents DDoS attacks and general API abuse.
+    *   **Mechanism:** Token bucket algorithm using Redis/Memory.
+
+*   **Strict Auth Protection:**
+    *   **Limit:** 10 requests per 1 hour per IP.
+    *   **Purpose:** Specifically targets brute-force password guessing and SMS/Email flooding.
+    *   **Scope:** Applies to Login, Signup, OTP, and Password Reset endpoints.
+    *   **Privacy:** IP tracking is **in-memory only** and is NOT stored in the permanent database.
+
+### 🔐 Core Security Features
+*   **CDN & Headers:** CloudFlare protection + Helmet for secure HTTP headers.
+*   **Authentication:** JWT sessions, bcrypt password hashing, and API keys.
+*   **Anti-Enumeration:** Login and Forgot Password endpoints return generic responses to prevent user harvesting.
+*   **Input Hygiene:** Zod validation, HPP (Parameter Pollution) protection, and Body Size limiting (10kb).
+*   **Audit Logging:** Tracks important actions for security review.
 
 # 🔭 Observability & SRE
 
