@@ -37,7 +37,7 @@ export default function ThreeBackground() {
             opacity: isDark ? 0.15 : 0.12,
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
-        globe.position.y = -3; // Position above glassmorphism cards
+        globe.position.y = 2; // Position behind hero text
         scene.add(globe);
 
         // Create scattered particles (data points)
@@ -87,6 +87,7 @@ export default function ThreeBackground() {
             side: THREE.DoubleSide,
         });
         const scanRing = new THREE.Mesh(ringGeometry, ringMaterial);
+        scanRing.position.y = 2; // Superimpose with globe behind hero text
         scene.add(scanRing);
 
         // Create connection lines (data flow)
