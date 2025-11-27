@@ -368,7 +368,7 @@ const Index = () => {
                             <div className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{item.target}</div>
                           </div>
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 group-hover:border-blue-200 dark:group-hover:border-blue-800 transition-colors duration-300">
+                        <div className="text-xs text-green-600 dark:text-green-400 flex items-center bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full border border-green-200 dark:border-green-800 group-hover:border-green-300 dark:group-hover:border-green-700 transition-colors duration-300">
                           <HistoryIcon className="h-3 w-3 mr-1.5" />
                           {new Date(item.createdAt).toLocaleString()}
                         </div>
