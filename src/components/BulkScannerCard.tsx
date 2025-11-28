@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Database, Upload, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { fetchThroughCorsProxy } from "@/lib/cors-proxy";
+import { computeAge } from "@/lib/date-utils";
 
 const cleanDomain = (raw: string): string => {
   if (!raw) return "";
@@ -90,22 +91,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
       const nsRecords = lastDns.filter(r => r?.type === 'NS').map(r => r?.value).filter(Boolean);
       const aRecord = (lastDns.find(r => r?.type === 'A')?.value) || (lastDns.find(r => r?.type === 'AAAA')?.value) || "-";
 
-      const computeAge = (created: string) => {
-        if (!created || created === '-') return '-';
-        const d = new Date(created);
-        if (isNaN(d.getTime())) return created;
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - d.getTime());
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        const years = Math.floor(diffDays / 365);
-        const months = Math.floor((diffDays % 365) / 30);
-        const days = Math.floor((diffDays % 365) % 30);
-        const parts = [] as string[];
-        if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
-        if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
-        if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-        return parts.length ? parts.join(" ") : "Less than 1 day";
-      };
+
 
       let whoisCreated = creationDateStr;
       let whoisExpires = attrs.last_modification_date ? new Date(attrs.last_modification_date * 1000).toLocaleString() : "-";
@@ -200,7 +186,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
         domain,
         created: whoisCreated,
         expires: whoisExpires,
-        domain_age: whoisCreated !== "-" ? computeAge(whoisCreated) : "-",
+        domain_age: computeAge(whoisCreated),
         registrar: whoisRegistrar,
         name_servers: nsRecords,
         dns_records: dnsRecordsString,

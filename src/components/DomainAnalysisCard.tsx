@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { fetchThroughCorsProxy } from "@/lib/cors-proxy";
+import { computeAge } from "@/lib/date-utils";
 
 
 interface DomainAnalysisCardProps {
@@ -253,29 +254,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         whoisRegistrar = whoisData.registrar || "-";
       }
 
-      const computeAge = (created: string) => {
-        if (!created || created === '-' || created === 'Unknown' || created === 'Loading...') return 'Unknown';
-        const d = new Date(created);
-        if (isNaN(d.getTime())) return 'Unknown';
 
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - d.getTime());
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays < 0) return 'Unknown'; // Future date?
-        if (diffDays === 0) return 'Less than 1 day';
-
-        const years = Math.floor(diffDays / 365);
-        const months = Math.floor((diffDays % 365) / 30);
-        const days = Math.floor((diffDays % 365) % 30);
-
-        const parts = [] as string[];
-        if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
-        if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
-        if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-
-        return parts.length ? parts.join(" ") : "Less than 1 day";
-      };
 
       const stage2Result = {
         ...stage1Result,
@@ -370,7 +349,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         onVirusTotalResults(virusTotalResult);
       } else {
         // If VT failed, we still need to mark as final so history saves
-        const finalResult = { ...stage2Result, partial: false };
+        const finalResult = { ...stage2Result, passive_dns: '-', partial: false };
         onResults(finalResult);
       }
 
