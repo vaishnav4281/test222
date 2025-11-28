@@ -1,247 +1,92 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Globe, AlertTriangle, ListChecks, MapPin, WifiOff, Server, CheckCircle } from "lucide-react";
+import { Shield, Globe, AlertTriangle, ListChecks, MapPin, WifiOff, CheckCircle, Server } from "lucide-react";
 import { API_BASE_URL } from '../config';
 
-interface ResultItem {
-  domain: string;
-  ip_address: string;
-  country?: string;
-  region?: string;
-  city?: string;
-  isp?: string;
-  abuse_score?: number;
-  is_vpn_proxy?: boolean;
-}
-
 interface SecurityIntelPanelProps {
-  results: ResultItem[];
+  results: any[];
 }
-
-type IpqsData = {
-  fraud_score?: number;
-  vpn?: boolean;
-  proxy?: boolean;
-  tor?: boolean;
-  country_code?: string;
-  country?: string;
-  region?: string;
-  city?: string;
-  ISP?: string;
-  isp?: string;
-  organization?: string;
-};
-
-type AbuseData = {
-  data?: {
-    abuseConfidenceScore?: number;
-    totalReports?: number;
-    lastReportedAt?: string;
-  }
-};
-
-type DnsblItem = { zone: string; listed: boolean; text: string | null };
-
-type DnsblData = {
-  ip: string;
-  results: DnsblItem[];
-  listedCount: number;
-};
 
 export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps) {
-  const ips = useMemo(() => {
-    const set = new Set<string>();
-    (results || []).forEach(r => { if (r?.ip_address) set.add(r.ip_address); });
-    return Array.from(set);
-  }, [results]);
-
-  const [ipqs, setIpqs] = useState<Record<string, IpqsData | { error: string }>>({});
-  const [abuse, setAbuse] = useState<Record<string, AbuseData | { error: string }>>({});
-  const [dnsbl, setDnsbl] = useState<Record<string, DnsblData | { error: string }>>({});
+  const [intelData, setIntelData] = useState<Record<string, any>>({});
 
   useEffect(() => {
-    if (!ips.length) return;
+    const fetchMissingData = async () => {
+      const newIntelData: Record<string, any> = { ...intelData };
+      let hasUpdates = false;
 
-    // Pre-populate with existing data from results (only if data is valid)
-    const existingData: Record<string, IpqsData> = {};
-    (results || []).forEach((r: any) => {
-      if (r?.ip_address && r.ip_address !== '-') {
-        // Only pre-populate if we have actual data (not default values)
-        const hasValidData = (
-          (r.country && r.country !== '-') ||
-          (r.isp && r.isp !== '-') ||
-          (typeof r.abuse_score === 'number') || // 0 is valid (means clean)
-          r.is_vpn_proxy === true
-        );
+      for (const result of results) {
+        const ip = result.ip_address;
+        if (!ip || ip === '-') continue;
 
-        if (hasValidData) {
-          // Only add fields that have actual meaningful values
-          const dataObj: any = {};
-          if (r.country && r.country !== '-') {
-            dataObj.country_code = r.country;
-            dataObj.country = r.country;
+        // 1. Use existing data from props if available (Fastest)
+        if (result.ipqs_data || result.abuse_data) {
+          if (!newIntelData[ip]) {
+            newIntelData[ip] = {
+              ipqs: result.ipqs_data || null,
+              abuse: result.abuse_data || null,
+              dnsbl: null // Will fetch if needed, or we can assume clean if not provided
+            };
+            hasUpdates = true;
           }
-          if (r.region && r.region !== '-') dataObj.region = r.region;
-          if (r.city && r.city !== '-') dataObj.city = r.city;
-          if (r.isp && r.isp !== '-') {
-            dataObj.ISP = r.isp;
-            dataObj.isp = r.isp;
-            dataObj.organization = r.isp;
-          }
-          // Include fraud_score if it's a number (including 0 = clean)
-          // Only skip if undefined (not checked yet)
-          if (typeof r.abuse_score === 'number') {
-            dataObj.fraud_score = r.abuse_score;
-          }
-          // Only include VPN/proxy if explicitly true
-          if (r.is_vpn_proxy === true) {
-            dataObj.vpn = true;
-            dataObj.proxy = true;
-          }
-
-          existingData[r.ip_address] = dataObj;
-        }
-      }
-    });
-
-    // Set existing data first (only if we have valid data)
-    if (Object.keys(existingData).length > 0) {
-      setIpqs(prev => ({ ...prev, ...existingData }));
-      console.log('✅ Pre-populated IP data from results:', existingData);
-    }
-
-    const run = async () => {
-      for (const ip of ips) {
-        // Skip invalid IPs
-        const isValidIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(ip) || /^[a-fA-F0-9:]+$/.test(ip);
-        if (!isValidIp || ip === '-') continue;
-
-        // Log if using existing data for IPQS
-        if (existingData[ip]) {
-          console.log('⏭️ Using existing IPQS data for', ip, '- still fetching AbuseIPDB & DNSBL');
+          // If we have IPQS data, we might still want DNSBL, but let's prioritize showing what we have
+          continue;
         }
 
-        // IPQS: use Vite proxy (skip if we have existing data)
-        if (!ipqs[ip] && !existingData[ip]) {
+        // 2. If already fetched/stored in state, skip
+        if (newIntelData[ip]) continue;
+
+        // 3. Fetch missing data
+        try {
+          // IPQS
+          let ipqs = null;
           try {
             const r = await fetch(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`);
-            if (r.ok) {
-              const data = await r.json();
-              setIpqs(prev => ({ ...prev, [ip]: data }));
-            } else {
-              // Fallback: use free ip-api.com for Country/ISP/VPN/Risk score
-              console.log('🔄 IPQS failed, using free fallback for', ip);
-              const fallbackRes = await fetch(`/api/ip-api/json/${encodeURIComponent(ip)}?fields=status,country,countryCode,region,regionName,city,lat,lon,isp,org,as,proxy,hosting,mobile`);
-              if (fallbackRes.ok) {
-                const fallbackData = await fallbackRes.json();
-                if (fallbackData.status === 'success') {
-                  console.log('✅ Fallback data for', ip, fallbackData);
-                  // Estimate fraud score based on hosting/proxy indicators
-                  let estimatedFraudScore = 0;
-                  const isHosting = Boolean(fallbackData.hosting);
-                  const isProxy = Boolean(fallbackData.proxy);
-                  if (isHosting) estimatedFraudScore += 40;
-                  if (isProxy) estimatedFraudScore += 50;
+            if (r.ok) ipqs = await r.json();
+          } catch (e) { console.warn('IPQS fetch failed', e); }
 
-                  setIpqs(prev => ({
-                    ...prev, [ip]: {
-                      country_code: fallbackData.countryCode,
-                      country: fallbackData.country,
-                      region: fallbackData.regionName,
-                      city: fallbackData.city,
-                      ISP: fallbackData.isp || fallbackData.org,
-                      isp: fallbackData.isp || fallbackData.org,
-                      organization: fallbackData.org,
-                      proxy: isProxy,
-                      vpn: isProxy, // Use proxy as VPN indicator
-                      tor: false, // ip-api.com doesn't detect Tor specifically
-                      fraud_score: estimatedFraudScore,
-                    }
-                  }));
-                  console.log('📊 Estimated fraud score:', estimatedFraudScore);
-                }
-              }
-            }
-          } catch (err) {
-            console.warn('SecurityIntel IPQS failed for', ip, err);
-          }
-        }
-
-        // AbuseIPDB: use Vite proxy
-        if (!abuse[ip]) {
+          // AbuseIPDB
+          let abuse = null;
           try {
             const r = await fetch(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`);
-            if (r.ok) {
-              const data = await r.json();
-              setAbuse(prev => ({ ...prev, [ip]: data }));
-            } else {
-              // Fallback: estimate abuse score from DNSBL results
-              console.log('🔄 AbuseIPDB failed, will estimate from DNSBL for', ip);
-              // Wait for DNSBL check, then estimate
-              setTimeout(async () => {
-                const dnsblCheck = dnsbl[ip] as DnsblData | undefined;
-                if (dnsblCheck && typeof dnsblCheck.listedCount === 'number') {
-                  // Estimate abuse score: each blacklist adds ~25 points
-                  const estimatedAbuse = Math.min(100, dnsblCheck.listedCount * 25);
-                  console.log('📊 Estimated abuse score from DNSBL:', estimatedAbuse);
-                  setAbuse(prev => ({
-                    ...prev, [ip]: {
-                      data: {
-                        abuseConfidenceScore: estimatedAbuse,
-                        totalReports: dnsblCheck.listedCount,
-                        lastReportedAt: new Date().toISOString(),
-                      }
-                    }
-                  }));
-                }
-              }, 2000);
-            }
-          } catch (err) {
-            console.warn('SecurityIntel AbuseIPDB failed for', ip, err);
-          }
-        }
+            if (r.ok) abuse = await r.json();
+          } catch (e) { console.warn('AbuseIPDB fetch failed', e); }
 
-        // DNSBL
-        if (!dnsbl[ip]) {
+          // DNSBL
+          let dnsbl = null;
           try {
             const r = await fetch(`${API_BASE_URL}/api/v1/scan/dnsbl?ip=${encodeURIComponent(ip)}`);
-            if (!r.ok) throw new Error(String(r.status));
-            const data = await r.json();
-            setDnsbl(prev => ({ ...prev, [ip]: data }));
-          } catch {
-            // no public fallback for DNSBL
-            setDnsbl(prev => ({ ...prev, [ip]: { error: 'DNSBL check failed' } as any }));
-          }
+            if (r.ok) dnsbl = await r.json();
+          } catch (e) { console.warn('DNSBL fetch failed', e); }
+
+          newIntelData[ip] = { ipqs, abuse, dnsbl };
+          hasUpdates = true;
+        } catch (err) {
+          console.error("Error fetching security intel for", ip, err);
         }
       }
+
+      if (hasUpdates) {
+        setIntelData(newIntelData);
+      }
     };
-    run();
+
+    fetchMissingData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(ips)]);
+  }, [results]); // Re-run when results change
 
-  const getRiskGradient = (score?: number) => {
-    const s = typeof score === 'number' ? score : 0;
-    if (s >= 75) return 'from-red-500 to-red-600';
-    if (s >= 50) return 'from-red-400 to-orange-500';
-    if (s >= 25) return 'from-yellow-400 to-orange-400';
-    return 'from-emerald-400 to-teal-500';
-  };
-
-  // Helper functions for risk score colors (assuming these are defined elsewhere or will be added)
-  const getRiskColor = (score?: number) => {
-    const s = typeof score === 'number' ? score : 0;
-    if (s >= 75) return 'bg-red-500';
-    if (s >= 50) return 'bg-orange-500';
-    if (s >= 25) return 'bg-yellow-500';
+  const getRiskColor = (score: number) => {
+    if (score >= 75) return 'bg-red-500';
+    if (score >= 50) return 'bg-orange-500';
+    if (score >= 25) return 'bg-yellow-500';
     return 'bg-emerald-500';
   };
 
-  const getRiskTextColor = (score?: number) => {
-    const s = typeof score === 'number' ? score : 0;
-    if (s >= 75) return 'text-red-700 dark:text-red-300';
-    if (s >= 50) return 'text-orange-700 dark:text-orange-300';
-    if (s >= 25) return 'text-yellow-700 dark:text-yellow-300';
+  const getRiskTextColor = (score: number) => {
+    if (score >= 75) return 'text-red-700 dark:text-red-300';
+    if (score >= 50) return 'text-orange-700 dark:text-orange-300';
+    if (score >= 25) return 'text-yellow-700 dark:text-yellow-300';
     return 'text-emerald-700 dark:text-emerald-300';
   };
 
@@ -274,41 +119,29 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
         ) : (
           <div className="space-y-6">
             {results.map((result, index) => {
-              const ip = result.ip_address; // Assuming result has ip_address
-              const ipqsData = ipqs[ip] as IpqsData | undefined;
-              const abuseData = abuse[ip] as AbuseData | undefined;
-              const dnsblData = dnsbl[ip] as DnsblData | undefined;
+              const ip = result.ip_address;
+              const data = intelData[ip] || {};
+              const ipqs = data.ipqs || result.ipqs_data || {};
+              const abuse = data.abuse || result.abuse_data || {};
+              const dnsbl = data.dnsbl || {};
 
-              // Check if data has been loaded with actual values (not just empty objects)
-              const risk = (ipqsData as any)?.fraud_score as number | undefined;
-              const isVpn = (ipqsData as any)?.vpn;
-              const isProxy = (ipqsData as any)?.proxy;
-              const isTor = (ipqsData as any)?.tor;
+              // Calculate Risk Score
+              const fraudScore = ipqs.fraud_score || 0;
+              const abuseScore = abuse.data?.abuseConfidenceScore || 0;
+              const riskScore = Math.max(fraudScore, abuseScore);
 
-              // Data is considered "loaded" only if it has actual values
-              const hasIpqsData = ipqsData !== undefined && (
-                risk !== undefined ||
-                isVpn !== undefined ||
-                isProxy !== undefined ||
-                (ipqsData as any)?.country_code !== undefined ||
-                (ipqsData as any)?.ISP !== undefined
-              );
-              const hasAbuseData = abuseData !== undefined && abuseData.data !== undefined;
-              const country = (ipqsData as any)?.country_code || (ipqsData as any)?.country || '-';
-              const isp = (ipqsData as any)?.ISP || (ipqsData as any)?.isp || (ipqsData as any)?.organization || '-';
-              const listedCount = (dnsblData as any)?.listedCount as number | undefined;
-              const listedZones = ((dnsblData as any)?.results || [])
-                .filter((z: DnsblItem | null) => z && z.listed)
-                .map((z: DnsblItem) => z.zone);
+              // Threat Indicators
+              const isVpn = ipqs.vpn || ipqs.proxy || result.is_vpn_proxy || false;
+              const isTor = ipqs.tor || false;
+              const isBot = ipqs.bot_status || (riskScore > 75); // Fallback logic if bot_status missing
 
-              const hasVpnProxy = isVpn || isProxy || isTor;
-              const abuseScore = abuseData?.data?.abuseConfidenceScore;
-              const abuseReports = abuseData?.data?.totalReports;
+              // Location & ISP
+              const country = ipqs.country_code || ipqs.country || result.country || '-';
+              const isp = ipqs.ISP || ipqs.isp || ipqs.organization || result.isp || '-';
 
-              // Debug logging
-              if (!hasIpqsData && ipqsData !== undefined) {
-                console.log(`⚠️ IP ${ip} has empty IPQS data object:`, ipqsData);
-              }
+              // Blacklists
+              const listedCount = dnsbl.listedCount || 0;
+              const listedZones = dnsbl.results?.filter((z: any) => z.listed).map((z: any) => z.zone) || [];
 
               return (
                 <div
@@ -329,7 +162,7 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                           {result.domain || result.ip_address}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
-                          {result.is_vpn_proxy ? (
+                          {isVpn ? (
                             <Badge className="bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800 text-xs shadow-sm animate-pulse">
                               <WifiOff className="h-3 w-3 mr-1" /> VPN/Proxy Detected
                             </Badge>
@@ -345,9 +178,9 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                       <div className="flex flex-col items-end">
                         <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Risk Score</span>
                         <div className="flex items-center space-x-2 bg-slate-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-full border border-slate-100 dark:border-zinc-700">
-                          <div className={`w-2.5 h-2.5 rounded-full ${getRiskColor(result.abuse_score)} shadow-[0_0_8px_currentColor]`} />
-                          <span className={`text-lg font-bold ${getRiskTextColor(result.abuse_score)}`}>
-                            {result.abuse_score}/100
+                          <div className={`w-2.5 h-2.5 rounded-full ${getRiskColor(riskScore)} shadow-[0_0_8px_currentColor]`} />
+                          <span className={`text-lg font-bold ${getRiskTextColor(riskScore)}`}>
+                            {riskScore}/100
                           </span>
                         </div>
                       </div>
@@ -365,24 +198,24 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                       <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-slate-500 dark:text-zinc-400">IP Address</span>
-                          <span className="font-mono font-medium text-slate-700 dark:text-zinc-200">{result.ip_address || '-'}</span>
+                          <span className="font-mono font-medium text-slate-700 dark:text-zinc-200">{ip || '-'}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-slate-500 dark:text-zinc-400">ISP</span>
-                          <span className="font-medium text-slate-700 dark:text-zinc-200 truncate max-w-[120px]" title={result.isp}>{result.isp || '-'}</span>
+                          <span className="font-medium text-slate-700 dark:text-zinc-200 truncate max-w-[120px]" title={isp}>{isp}</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-slate-500 dark:text-zinc-400">Location</span>
                           <span className="font-medium text-slate-700 dark:text-zinc-200 flex items-center gap-1.5">
-                            {result.country !== '-' && (
+                            {country !== '-' && (
                               <img
-                                src={`https://flagcdn.com/w20/${result.country?.toLowerCase()}.png`}
-                                alt={result.country}
+                                src={`https://flagcdn.com/w20/${country?.toLowerCase()}.png`}
+                                alt={country}
                                 className="w-4 h-auto rounded-sm"
                                 onError={(e) => (e.currentTarget.style.display = 'none')}
                               />
                             )}
-                            {result.country}
+                            {country}
                           </span>
                         </div>
                       </div>
@@ -397,20 +230,20 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                       <div className="space-y-3">
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-slate-500 dark:text-zinc-400">VPN Detected</span>
-                          <Badge variant={result.is_vpn_proxy ? "destructive" : "outline"} className="text-xs">
-                            {result.is_vpn_proxy ? "Yes" : "No"}
+                          <Badge variant={isVpn ? "destructive" : "outline"} className="text-xs">
+                            {isVpn ? "Yes" : "No"}
                           </Badge>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-slate-500 dark:text-zinc-400">Tor Node</span>
-                          <Badge variant="outline" className="text-xs text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700">
-                            No
+                          <Badge variant={isTor ? "destructive" : "outline"} className="text-xs">
+                            {isTor ? "Yes" : "No"}
                           </Badge>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-slate-500 dark:text-zinc-400">Bot Traffic</span>
-                          <Badge variant="outline" className="text-xs text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700">
-                            Low Probability
+                          <Badge variant={isBot ? "destructive" : "outline"} className="text-xs">
+                            {isBot ? "High Probability" : "Low Probability"}
                           </Badge>
                         </div>
                       </div>
@@ -425,11 +258,11 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm p-2 rounded-lg bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800">
                           <span className="text-slate-600 dark:text-zinc-400">DNSBL Status</span>
-                          <Badge className={`${typeof listedCount === 'number' && listedCount > 0 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'} text-xs`}>
-                            {typeof listedCount === 'number' ? (listedCount === 0 ? 'Clean' : `${listedCount} Listed`) : 'Checking...'}
+                          <Badge className={`${listedCount > 0 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'} text-xs`}>
+                            {listedCount > 0 ? `${listedCount} Listed` : 'Clean'}
                           </Badge>
                         </div>
-                        {listedZones && listedZones.length > 0 && (
+                        {listedZones.length > 0 && (
                           <div className="mt-2 text-xs text-red-600 dark:text-red-400">
                             Listed in: {listedZones.slice(0, 3).join(', ')}{listedZones.length > 3 ? '...' : ''}
                           </div>

@@ -35,74 +35,84 @@ export async function checkVirusTotal(domain: string) {
         console.warn('[VT] Redis cache error:', err);
     }
 
-    const apiKey = getNextKey();
-
-    if (!apiKey) {
+    if (VT_API_KEYS.length === 0) {
         console.warn('No VT_API_KEYs set');
         return null;
     }
 
-    try {
-        const [reportRes, resolutionsRes] = await Promise.allSettled([
-            fetch(`${VT_API_URL}/${domain}`, {
-                headers: { 'x-apikey': apiKey }
-            }),
-            fetch(`${VT_API_URL}/${domain}/resolutions?limit=10`, {
-                headers: { 'x-apikey': apiKey }
-            })
-        ]);
+    // Try up to the number of keys we have
+    for (let i = 0; i < VT_API_KEYS.length; i++) {
+        const apiKey = getNextKey();
+        if (!apiKey) continue;
 
-        let data: any = {};
+        try {
+            const [reportRes, resolutionsRes] = await Promise.allSettled([
+                fetch(`${VT_API_URL}/${domain}`, {
+                    headers: { 'x-apikey': apiKey }
+                }),
+                fetch(`${VT_API_URL}/${domain}/resolutions?limit=10`, {
+                    headers: { 'x-apikey': apiKey }
+                })
+            ]);
 
-        if (reportRes.status === 'fulfilled' && reportRes.value.ok) {
-            data = await reportRes.value.json();
-        } else if (reportRes.status === 'fulfilled' && reportRes.value.status === 404) {
-            // Domain not found in VT
-        } else if (reportRes.status === 'fulfilled' && !reportRes.value.ok) {
-            const errorText = await reportRes.value.text();
-            console.warn(`[VT] API Error: ${reportRes.value.status} ${reportRes.value.statusText} - ${errorText}`);
-            return { error: `VirusTotal API Error: ${reportRes.value.status} ${reportRes.value.statusText}` };
-        } else {
+            // Check for Quota Exceeded (429) or Rate Limit (204) on Report
             if (reportRes.status === 'fulfilled') {
-                console.warn(`VT Report Error: ${reportRes.value.statusText}`);
+                if (reportRes.value.status === 429 || reportRes.value.status === 204) {
+                    console.warn(`[VT] Key ${i + 1} quota exceeded (Status: ${reportRes.value.status}), trying next key...`);
+                    continue; // Try next key
+                }
             }
-        }
 
+            let data: any = {};
 
+            if (reportRes.status === 'fulfilled' && reportRes.value.ok) {
+                data = await reportRes.value.json();
+            } else if (reportRes.status === 'fulfilled' && reportRes.value.status === 404) {
+                // Domain not found in VT
+            } else if (reportRes.status === 'fulfilled' && !reportRes.value.ok) {
+                const errorText = await reportRes.value.text();
+                // If it's a 401, it might be an invalid key, but we'll treat it as a failure for this key
+                console.warn(`[VT] API Error: ${reportRes.value.status} ${reportRes.value.statusText} - ${errorText}`);
+                if (reportRes.value.status === 401) continue; // Try next key if unauthorized
+                return { error: `VirusTotal API Error: ${reportRes.value.status} ${reportRes.value.statusText}` };
+            }
 
+            let resolutions: any[] = [];
+            if (resolutionsRes.status === 'fulfilled') {
+                if (resolutionsRes.value.ok) {
+                    const resData = await resolutionsRes.value.json();
+                    resolutions = resData.data || [];
+                    console.log(`[VT] Resolutions fetched: ${resolutions.length} items`);
+                } else if (resolutionsRes.value.status === 429 || resolutionsRes.value.status === 204) {
+                    console.warn(`[VT] Resolutions quota exceeded (Status: ${resolutionsRes.value.status}), but report might be ok.`);
+                    // If report was OK but resolutions failed due to quota, we might want to retry the whole thing with a new key?
+                    // For now, let's accept partial data if report succeeded, or retry if report also failed.
+                    // But since we check reportRes first, we likely won't reach here if report failed.
+                } else {
+                    const errText = await resolutionsRes.value.text();
+                    console.warn(`[VT] Resolutions API failed: ${resolutionsRes.value.status} ${resolutionsRes.value.statusText} - ${errText}`);
+                }
+            }
 
-        let resolutions: any[] = [];
-        if (resolutionsRes.status === 'fulfilled') {
-            if (resolutionsRes.value.ok) {
-                const resData = await resolutionsRes.value.json();
-                resolutions = resData.data || [];
-                console.log(`[VT] Resolutions fetched: ${resolutions.length} items`);
+            // Return combined data
+            if (data.data) {
+                data.resolutions = resolutions;
             } else {
-                const errText = await resolutionsRes.value.text();
-                console.warn(`[VT] Resolutions API failed: ${resolutionsRes.value.status} ${resolutionsRes.value.statusText} - ${errText}`);
+                data = { data: {}, resolutions };
             }
-        } else {
-            console.warn(`[VT] Resolutions fetch rejected:`, resolutionsRes.reason);
+
+            // Cache the result for 1 hour (3600 seconds)
+            if (!data.error) {
+                await redis.setex(cacheKey, 3600, JSON.stringify(data));
+            }
+
+            return data; // Success!
+
+        } catch (error: any) {
+            console.error(`[VT] Error fetching data for ${domain} with key ${i + 1}:`, error.message);
         }
-
-        // Return combined data
-        // We attach resolutions to the main data object for convenience
-        if (data.data) {
-            data.resolutions = resolutions;
-        } else {
-            // If main report failed but resolutions worked (unlikely but possible)
-            data = { data: {}, resolutions };
-        }
-
-        // Cache the result for 1 hour (3600 seconds)
-        if (!data.error) {
-            await redis.setex(cacheKey, 3600, JSON.stringify(data));
-        }
-
-        return data;
-
-    } catch (error: any) {
-        console.error(`[VT] Error fetching data for ${domain}:`, error.message);
-        return { error: error.message };
     }
+
+    console.error('[VT] All keys failed or exhausted');
+    return { error: 'All VirusTotal API keys exhausted or failed.' };
 };

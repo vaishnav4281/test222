@@ -48,11 +48,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Dashboard = () => {
     const { token, logout, user } = useAuth();
     const [activeTab, setActiveTab] = useState<'single' | 'bulk' | 'history'>('single');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     // Data States
@@ -186,10 +188,57 @@ const Dashboard = () => {
                     <div className="flex h-16 items-center justify-between">
                         {/* Logo */}
                         <div className="flex items-center gap-2">
-                            <div className="bg-gradient-to-br from-red-600 to-blue-600 p-2 rounded-lg shadow-lg shadow-red-500/20">
+                            {/* Mobile Menu Trigger */}
+                            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                                <SheetTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="md:hidden mr-2">
+                                        <Menu className="h-5 w-5" />
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800">
+                                    <div className="flex flex-col gap-6 mt-6">
+                                        <div className="flex items-center gap-2 px-2">
+                                            <div className="bg-gradient-to-br from-red-600 to-blue-600 p-2 rounded-lg shadow-lg shadow-red-500/20">
+                                                <Shield className="h-5 w-5 text-white" />
+                                            </div>
+                                            <span className="text-lg font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                                                DomainScope
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => { setActiveTab('single'); setIsMobileMenuOpen(false); }}
+                                                className={`justify-start text-base font-medium h-12 ${activeTab === 'single' ? 'bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-400'}`}
+                                            >
+                                                <Search className="mr-3 h-5 w-5" />
+                                                Single Scan
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => { setActiveTab('bulk'); setIsMobileMenuOpen(false); }}
+                                                className={`justify-start text-base font-medium h-12 ${activeTab === 'bulk' ? 'bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'}`}
+                                            >
+                                                <Database className="mr-3 h-5 w-5" />
+                                                Bulk Scanner
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => { setActiveTab('history'); setIsMobileMenuOpen(false); }}
+                                                className={`justify-start text-base font-medium h-12 ${activeTab === 'history' ? 'bg-purple-50 dark:bg-purple-900/10 text-purple-600 dark:text-purple-400' : 'text-slate-600 dark:text-slate-400'}`}
+                                            >
+                                                <HistoryIcon className="mr-3 h-5 w-5" />
+                                                History
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </SheetContent>
+                            </Sheet>
+
+                            <div className="bg-gradient-to-br from-red-600 to-blue-600 p-2 rounded-lg shadow-lg shadow-red-500/20 hidden md:block">
                                 <Shield className="h-5 w-5 text-white" />
                             </div>
-                            <span className="text-lg font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
+                            <span className="text-lg font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent hidden md:block">
                                 DomainScope
                             </span>
                         </div>
@@ -265,7 +314,7 @@ const Dashboard = () => {
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
                 <div className="space-y-8 pb-20">
 
                     {/* Page Title & Description */}
@@ -380,10 +429,8 @@ const Dashboard = () => {
                                                         <div>
                                                             <p className="font-semibold text-slate-900 dark:text-white text-lg">{item.target}</p>
                                                             <div className="flex items-center gap-3 mt-1">
-                                                                <Badge variant="outline" className="text-xs font-normal text-slate-500 border-slate-200 dark:border-slate-700">
-                                                                    {item.type === 'bulk' ? 'Bulk Scan' : 'Single Scan'}
-                                                                </Badge>
-                                                                <span className="text-xs text-slate-400">•</span>
+
+
                                                                 <span className="text-xs font-medium text-green-600 dark:text-green-400">
                                                                     {new Date(item.createdAt).toLocaleString(undefined, {
                                                                         dateStyle: 'medium',

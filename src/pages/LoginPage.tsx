@@ -97,7 +97,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col relative overflow-hidden text-slate-900 dark:text-white transition-colors duration-300">
-            <div className="flex-grow flex items-center justify-center p-4 relative z-10">
+            <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
                 {/* Three.js particle background */}
                 <ThreeBackground />
                 {/* Background Grid & Glows */}

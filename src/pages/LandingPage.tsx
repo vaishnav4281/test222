@@ -1,14 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Shield, Globe, Database, Activity, ArrowRight, CheckCircle2, Lock, Zap, Sun, Moon, LayoutDashboard } from 'lucide-react';
+import { Shield, Globe, Database, Activity, ArrowRight, CheckCircle2, Lock, Zap, Sun, Moon, LayoutDashboard, Menu, LogIn, UserPlus } from 'lucide-react';
 import ThreeBackground from '@/components/ThreeBackground';
 import { useAuth } from '@/context/AuthContext';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 import Footer from '@/components/Footer';
 
 const LandingPage = () => {
     const { isAuthenticated } = useAuth();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
@@ -41,34 +43,89 @@ const LandingPage = () => {
                                     const isDark = document.documentElement.classList.toggle('dark');
                                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                                 }}
-                                className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                                className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hidden sm:flex"
                             >
                                 <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                                 <span className="sr-only">Toggle theme</span>
                             </Button>
 
-                            {isAuthenticated ? (
-                                <Link to="/dashboard">
-                                    <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                                        Dashboard
-                                    </Button>
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link to="/login">
-                                        <Button variant="ghost" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
-                                            Log in
-                                        </Button>
-                                    </Link>
-                                    <Link to="/signup">
+                            <div className="hidden md:flex items-center space-x-4">
+                                {isAuthenticated ? (
+                                    <Link to="/dashboard">
                                         <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                                            Get Started
+                                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                                            Dashboard
                                         </Button>
                                     </Link>
-                                </>
-                            )}
+                                ) : (
+                                    <>
+                                        <Link to="/login">
+                                            <Button variant="ghost" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                                                Log in
+                                            </Button>
+                                        </Link>
+                                        <Link to="/signup">
+                                            <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                                                Get Started
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Mobile Menu */}
+                            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                                <SheetTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="md:hidden">
+                                        <Menu className="h-6 w-6 text-slate-600 dark:text-slate-300" />
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="right" className="w-[300px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800">
+                                    <div className="flex flex-col gap-6 mt-6">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-lg font-bold text-slate-900 dark:text-white">Menu</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const isDark = document.documentElement.classList.toggle('dark');
+                                                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                                                }}
+                                                className="text-slate-600 dark:text-slate-300"
+                                            >
+                                                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                                                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                                            </Button>
+                                        </div>
+                                        <div className="flex flex-col gap-3">
+                                            {isAuthenticated ? (
+                                                <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                                                    <Button className="w-full justify-start bg-gradient-to-r from-red-600 to-blue-600 text-white">
+                                                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                                                        Dashboard
+                                                    </Button>
+                                                </Link>
+                                            ) : (
+                                                <>
+                                                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                                                        <Button variant="outline" className="w-full justify-start border-slate-200 dark:border-slate-800">
+                                                            <LogIn className="mr-2 h-4 w-4" />
+                                                            Log in
+                                                        </Button>
+                                                    </Link>
+                                                    <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                                                        <Button className="w-full justify-start bg-gradient-to-r from-red-600 to-blue-600 text-white">
+                                                            <UserPlus className="mr-2 h-4 w-4" />
+                                                            Get Started
+                                                        </Button>
+                                                    </Link>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                </SheetContent>
+                            </Sheet>
                         </div>
                     </div>
                 </div>

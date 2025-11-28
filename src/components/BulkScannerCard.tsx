@@ -59,7 +59,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
         (async () => {
           try {
             const vtUrl = `${API_BASE_URL}/api/v1/scan/vt?domain=${encodeURIComponent(domain)}`;
-            let vtResponse = await fetchWithTimeout(vtUrl, 5000);
+            let vtResponse = await fetchWithTimeout(vtUrl, 20000);
             if (!vtResponse.ok && vtResponse.status === 401 && import.meta.env.DEV && import.meta.env.VITE_VIRUSTOTAL_API_KEY) {
               const direct = await fetch(`https://www.virustotal.com/api/v3/domains/${encodeURIComponent(domain)}`, {
                 headers: { 'x-apikey': import.meta.env.VITE_VIRUSTOTAL_API_KEY }
@@ -138,14 +138,18 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
 
       const validIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(ip) || /^[a-fA-F0-9:]+$/.test(ip);
 
+      let fallbackIpData = null;
+      let ipqs = null;
+      let abuse = null;
+
       if (validIp && ip !== '-') {
         const [ipqsResult, abuseResult] = await Promise.allSettled([
-          fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
-          fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
+          fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`, 10000).then(r => r.ok ? r.json() : null),
+          fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`, 10000).then(r => r.ok ? r.json() : null)
         ]);
 
-        const ipqs = ipqsResult.status === 'fulfilled' ? ipqsResult.value : null;
-        const abuse = abuseResult.status === 'fulfilled' ? abuseResult.value : null;
+        ipqs = ipqsResult.status === 'fulfilled' ? ipqsResult.value : null;
+        abuse = abuseResult.status === 'fulfilled' ? abuseResult.value : null;
 
         if (ipqs) {
           const fraud = typeof ipqs.fraud_score === 'number' ? ipqs.fraud_score : 0;
@@ -161,11 +165,38 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
         if (abuse?.data?.abuseConfidenceScore) {
           abuseScore = Math.max(abuseScore, abuse.data.abuseConfidenceScore);
         }
+
+        // Fallback IP-API if needed (matches DomainAnalysisCard logic)
+        if (!ipqs?.country_code && !ipqs?.country) {
+          try {
+            const fallbackRes = await fetchThroughCorsProxy(`http://ip-api.com/json/${ip}`, { timeout: 3000 });
+            if (fallbackRes.ok) fallbackIpData = await fallbackRes.json();
+          } catch (e) { /* ignore */ }
+        }
       }
 
+      if (fallbackIpData && (locCountry === '-' || locIsp === '-')) {
+        if (fallbackIpData.status === 'success') {
+          locCountry = fallbackIpData.country || locCountry;
+          locRegion = fallbackIpData.regionName || locRegion;
+          locCity = fallbackIpData.city || locCity;
+          locIsp = fallbackIpData.isp || locIsp;
+          locLatitude = fallbackIpData.lat ? String(fallbackIpData.lat) : locLatitude;
+          locLongitude = fallbackIpData.lon ? String(fallbackIpData.lon) : locLongitude;
+        }
+      }
+
+      const baseId = Date.now() + index;
       const dnsRecordsString = lastDns.length > 0 ? lastDns.map((r: any) => `${r.type}: ${r.value}`).join('; ') : '-';
+
+      // Extract Passive DNS from VT resolutions if available
+      const resolutions = vtData?.resolutions || [];
+      const passiveDnsString = resolutions.length > 0
+        ? resolutions.map((r: any) => `${r.attributes.ip_address} (${new Date(r.attributes.date * 1000).toISOString().split('T')[0]})`).join('; ')
+        : '-';
+
       const result = {
-        id: Date.now() + index,
+        id: baseId,
         domain,
         created: whoisCreated,
         expires: whoisExpires,
@@ -173,6 +204,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
         registrar: whoisRegistrar,
         name_servers: nsRecords,
         dns_records: dnsRecordsString,
+        passive_dns: passiveDnsString,
         abuse_score: abuseScore,
         is_vpn_proxy: isVpnProxy,
         ip_address: ip !== '-' ? ip : aRecord,
@@ -184,17 +216,22 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
         isp: locIsp,
         timestamp: new Date().toLocaleString(),
         type: 'bulk',
+        ipqs_data: ipqs,
+        abuse_data: abuse,
       };
       onResults(result);
 
+
+
       // OPTIMIZED: Metascraper & VirusTotal results with parallel CORS proxy
-      Promise.allSettled([
+      // Await this to prevent flooding the network and ensure reliability
+      await Promise.allSettled([
         (onMetascraperResults && !skipMetascraper) ? (async () => {
           try {
             const targetUrl = `https://${domain}`;
-            const metascraperResponse = await fetchThroughCorsProxy(targetUrl, { timeout: 4000, parallelAttempts: 3 });
+            const metascraperResponse = await fetchThroughCorsProxy(targetUrl, { timeout: 5000, parallelAttempts: 3 });
             const html = await metascraperResponse.text();
-            const metaData: any = { id: Date.now() + index + 1, domain, timestamp: new Date().toLocaleString() };
+            const metaData: any = { id: baseId + 1, domain, timestamp: new Date().toLocaleString() };
 
             // Extract basic metadata
             const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
@@ -207,18 +244,112 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
             const twitterDescMatch = html.match(/<meta[^>]*name=["']twitter:description["'][^>]*content=["']([^"']+)["']/i);
             metaData.description = (ogDescMatch?.[1] || twitterDescMatch?.[1] || descMatch?.[1] || '').trim();
 
+            const keywordsMatch = html.match(/<meta[^>]*name=["']keywords["'][^>]*content=["']([^"']+)["']/i);
+            if (keywordsMatch) metaData.keywords = keywordsMatch[1].trim();
+            const authorMatch = html.match(/<meta[^>]*name=["']author["'][^>]*content=["']([^"']+)["']/i);
+            const articleAuthorMatch = html.match(/<meta[^>]*property=["']article:author["'][^>]*content=["']([^"']+)["']/i);
+            if (authorMatch || articleAuthorMatch) metaData.author = (articleAuthorMatch?.[1] || authorMatch?.[1] || '').trim();
+            const langMatch = html.match(/<html[^>]*lang=["']([^"']+)["']/i);
+            const ogLocaleMatch = html.match(/<meta[^>]*property=["']og:locale["'][^>]*content=["']([^"']+)["']/i);
+            if (langMatch || ogLocaleMatch) metaData.lang = (langMatch?.[1] || ogLocaleMatch?.[1] || '').trim();
+            const publisherMatch = html.match(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["']/i);
+            if (publisherMatch) metaData.publisher = publisherMatch[1].trim();
+            const ogTypeMatch = html.match(/<meta[^>]*property=["']og:type["'][^>]*content=["']([^"']+)["']/i);
+            if (ogTypeMatch) metaData.type = ogTypeMatch[1].trim();
+            const imageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i);
+            const twitterImageMatch = html.match(/<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i);
+            if (imageMatch || twitterImageMatch) metaData.image = (imageMatch?.[1] || twitterImageMatch?.[1] || '').trim();
+            const imageAltMatch = html.match(/<meta[^>]*property=["']og:image:alt["'][^>]*content=["']([^"']+)["']/i);
+            if (imageAltMatch) metaData.imageAlt = imageAltMatch[1].trim();
+            const ogUrlMatch = html.match(/<meta[^>]*property=["']og:url["'][^>]*content=["']([^"']+)["']/i);
+            const canonicalMatch = html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i);
+            metaData.url = (ogUrlMatch?.[1] || canonicalMatch?.[1] || targetUrl).trim();
+            const twitterCardMatch = html.match(/<meta[^>]*name=["']twitter:card["'][^>]*content=["']([^"']+)["']/i);
+            if (twitterCardMatch) metaData.twitterCard = twitterCardMatch[1].trim();
+            const twitterSiteMatch = html.match(/<meta[^>]*name=["']twitter:site["'][^>]*content=["']([^"']+)["']/i);
+            if (twitterSiteMatch) metaData.twitterSite = twitterSiteMatch[1].trim();
+            const twitterCreatorMatch = html.match(/<meta[^>]*name=["']twitter:creator["'][^>]*content=["']([^"']+)["']/i);
+            if (twitterCreatorMatch) metaData.twitterCreator = twitterCreatorMatch[1].trim();
+            const publishedMatch = html.match(/<meta[^>]*property=["']article:published_time["'][^>]*content=["']([^"']+)["']/i);
+            const dateMatch = html.match(/<meta[^>]*name=["']date["'][^>]*content=["']([^"']+)["']/i);
+            if (publishedMatch || dateMatch) metaData.date = (publishedMatch?.[1] || dateMatch?.[1] || '').trim();
+            const modifiedMatch = html.match(/<meta[^>]*property=["']article:modified_time["'][^>]*content=["']([^"']+)["']/i);
+            if (modifiedMatch) metaData.modifiedDate = modifiedMatch[1].trim();
+            const sectionMatch = html.match(/<meta[^>]*property=["']article:section["'][^>]*content=["']([^"']+)["']/i);
+            if (sectionMatch) metaData.category = sectionMatch[1].trim();
+            const articleTagsMatches = html.match(/<meta[^>]*property=["']article:tag["'][^>]*content=["']([^"']+)["']/gi);
+            if (articleTagsMatches) {
+              metaData.tags = articleTagsMatches.map((tag: string) => {
+                const match = tag.match(/content=["']([^"']+)["']/i);
+                return match ? match[1] : '';
+              }).filter(Boolean).join(', ');
+            }
+            const faviconMatch = html.match(/<link[^>]*rel=["'](?:icon|shortcut icon)["'][^>]*href=["']([^"']+)["']/i);
+            if (faviconMatch) {
+              const faviconUrl = faviconMatch[1].trim();
+              metaData.favicon = faviconUrl.startsWith('http') ? faviconUrl : `https://${domain}${faviconUrl.startsWith('/') ? '' : '/'}${faviconUrl}`;
+            }
+
+            const appleTouchMatch = html.match(/<link[^>]*rel=["']apple-touch-icon["'][^>]*href=["']([^"']+)["']/i);
+            if (appleTouchMatch) {
+              const appleUrl = appleTouchMatch[1].trim();
+              metaData.logo = appleUrl.startsWith('http') ? appleUrl : `https://${domain}${appleUrl.startsWith('/') ? '' : '/'}${appleUrl}`;
+            }
+            const robotsMatch = html.match(/<meta[^>]*name=["']robots["'][^>]*content=["']([^"']+)["']/i);
+            if (robotsMatch) metaData.robots = robotsMatch[1].trim();
+            const viewportMatch = html.match(/<meta[^>]*name=["']viewport["'][^>]*content=["']([^"']+)["']/i);
+            if (viewportMatch) metaData.viewport = viewportMatch[1].trim();
+            const themeColorMatch = html.match(/<meta[^>]*name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
+            if (themeColorMatch) metaData.themeColor = themeColorMatch[1].trim();
+            const charsetMatch = html.match(/<meta[^>]*charset=["']?([^"'\s>]+)["']?/i);
+            if (charsetMatch) metaData.charset = charsetMatch[1].trim();
+            const generatorMatch = html.match(/<meta[^>]*name=["']generator["'][^>]*content=["']([^"']+)["']/i);
+            if (generatorMatch) metaData.generator = generatorMatch[1].trim();
+            const rssFeedMatch = html.match(/<link[^>]*type=["']application\/rss\+xml["'][^>]*href=["']([^"']+)["']/i);
+            if (rssFeedMatch) {
+              const rssUrl = rssFeedMatch[1].trim();
+              metaData.rssFeed = rssUrl.startsWith('http') ? rssUrl : `https://${domain}${rssUrl.startsWith('/') ? '' : '/'}${rssUrl}`;
+            }
+            const atomFeedMatch = html.match(/<link[^>]*type=["']application\/atom\+xml["'][^>]*href=["']([^"']+)["']/i);
+            if (atomFeedMatch) {
+              const atomUrl = atomFeedMatch[1].trim();
+              metaData.atomFeed = atomUrl.startsWith('http') ? atomUrl : `https://${domain}${atomUrl.startsWith('/') ? '' : '/'}${atomUrl}`;
+            }
+            // JSON-LD
+            const jsonLdMatches = html.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+            if (jsonLdMatches) {
+              try {
+                const jsonLdData = jsonLdMatches.map(script => {
+                  const content = script.match(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
+                  if (content && content[1]) {
+                    try { return JSON.parse(content[1]); } catch { return null; }
+                  }
+                  return null;
+                }).filter(Boolean);
+                if (jsonLdData.length > 0) {
+                  metaData.jsonLd = jsonLdData;
+                  const firstSchema = Array.isArray(jsonLdData[0]) ? jsonLdData[0][0] : jsonLdData[0];
+                  if (firstSchema) {
+                    if (firstSchema['@type']) metaData.schemaType = firstSchema['@type'];
+                    if (firstSchema.name && !metaData.title) metaData.title = firstSchema.name;
+                    if (firstSchema.description && !metaData.description) metaData.description = firstSchema.description;
+                  }
+                }
+              } catch (e) { /* ignore */ }
+            }
+
             const totalFields = 30;
             const filledFields = Object.keys(metaData).filter(key => key !== 'id' && key !== 'domain' && key !== 'timestamp' && key !== 'jsonLd' && metaData[key]).length;
             metaData.completenessScore = Math.round((filledFields / totalFields) * 100);
             onMetascraperResults(metaData);
           } catch (e: any) {
             const errorMsg = e?.message?.includes('CORS') ? 'CORS proxy timeout' : (e?.message || 'Failed');
-            onMetascraperResults({ id: Date.now() + index + 1, domain, timestamp: new Date().toLocaleString(), error: errorMsg });
+            onMetascraperResults({ id: baseId + 1, domain, timestamp: new Date().toLocaleString(), error: errorMsg });
           }
         })() : Promise.resolve(),
         onVirusTotalResults ? (async () => {
           const virusTotalResult = {
-            id: Date.now() + index + 2,
+            id: baseId + 2,
             domain,
             timestamp: new Date().toLocaleString(),
             reputation: attrs.reputation || 0,

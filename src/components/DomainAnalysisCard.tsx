@@ -146,8 +146,8 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
 
         if (isIp) {
           const [ipqsResult, abuseResult] = await Promise.allSettled([
-            fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null),
-            fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`, 4000).then(r => r.ok ? r.json() : null)
+            fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/ipqs?ip=${encodeURIComponent(ip)}`, 10000).then(r => r.ok ? r.json() : null),
+            fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/abuseipdb?ip=${encodeURIComponent(ip)}`, 10000).then(r => r.ok ? r.json() : null)
           ]);
           ipqsData = ipqsResult.status === 'fulfilled' ? ipqsResult.value : null;
           abuseData = abuseResult.status === 'fulfilled' ? abuseResult.value : null;
@@ -224,7 +224,9 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
         latitude: locLatitude,
         isp: locIsp,
         timestamp: new Date().toLocaleString(),
-        partial: true // MARK AS PARTIAL
+        partial: true, // MARK AS PARTIAL
+        ipqs_data: ipqsData,
+        abuse_data: abuseData,
       } as any;
 
       // EMIT STAGE 1 (DNS + IP)
