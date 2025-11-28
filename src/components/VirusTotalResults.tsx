@@ -54,7 +54,7 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
       case 'High': return 'bg-red-500';
       case 'Medium': return 'bg-orange-500';
       case 'Low': return 'bg-yellow-500';
-      case 'Clean': return 'bg-green-500';
+      case 'Clean': return 'bg-emerald-500';
       default: return 'bg-gray-500';
     }
   };
@@ -64,59 +64,61 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
       case 'High': return 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300';
       case 'Medium': return 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300';
       case 'Low': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300';
-      case 'Clean': return 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300';
+      case 'Clean': return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300';
     }
   };
 
   return (
-    <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg">
-      <CardHeader className="bg-gradient-to-r from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-indigo-100 dark:border-slate-800 p-2 sm:p-3">
+    <Card className="h-fit border-0 shadow-2xl bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl hover:shadow-3xl transition-all duration-500">
+      <CardHeader className="bg-gradient-to-r from-pink-600/10 via-purple-600/10 to-emerald-600/10 border-b border-slate-200/50 dark:border-zinc-800 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
-          <CardTitle className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-md shadow-indigo-500/20">
-              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <CardTitle className="flex items-center space-x-3">
+            <div className="p-2.5 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl shadow-lg shadow-pink-500/20 ring-1 ring-white/20">
+              <Shield className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent">
               VirusTotal Security Analysis
             </span>
-            <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            <Badge className="bg-white/50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 backdrop-blur-sm shadow-sm">
               {results.length}
             </Badge>
           </CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="p-2 sm:p-3">
+      <CardContent className="p-4 sm:p-6 bg-gradient-to-b from-transparent to-slate-50/50 dark:to-zinc-900/50">
         {results.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
-            <div className="bg-indigo-50 dark:bg-slate-800 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
-              <Shield className="h-8 w-8 sm:h-12 sm:w-12 text-indigo-300 dark:text-slate-600" />
+          <div className="text-center py-12 sm:py-16">
+            <div className="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-zinc-800 dark:to-zinc-800/50 rounded-full w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 flex items-center justify-center shadow-inner">
+              <Shield className="h-10 w-10 sm:h-12 sm:w-12 text-pink-300 dark:text-zinc-600" />
             </div>
-            <p className="text-base sm:text-lg font-medium mb-2">No VirusTotal data yet</p>
-            <p className="text-sm">Security analysis will appear here after domain scan</p>
+            <p className="text-lg font-semibold text-slate-700 dark:text-zinc-300 mb-2">No VirusTotal data yet</p>
+            <p className="text-slate-500 dark:text-zinc-400">Security analysis will appear here after domain scan</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {results.map((result, index) => (
               <div
                 key={result.id}
-                className="border border-indigo-100 dark:border-slate-800 rounded-xl p-4 sm:p-6 space-y-4 bg-white dark:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:scale-[1.01] animate-fade-in group"
+                className="group relative overflow-hidden border border-slate-200 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-900 shadow-lg hover:shadow-2xl hover:shadow-pink-500/10 transition-all duration-500 hover:scale-[1.01] animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
                 {/* Header with Risk Level */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 border-b border-indigo-50 dark:border-slate-800">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
-                      <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="relative p-5 sm:p-6 border-b border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-xl group-hover:bg-pink-100 dark:group-hover:bg-pink-900/30 transition-colors ring-1 ring-pink-100 dark:ring-pink-800">
+                      <Shield className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white break-all">
+                      <h3 className="font-bold text-lg sm:text-xl text-slate-900 dark:text-white break-all tracking-tight">
                         {result.domain}
                       </h3>
                       {result.tags && result.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
+                        <div className="flex flex-wrap gap-1.5 mt-2">
                           {result.tags.slice(0, 3).map((tag, idx) => (
-                            <Badge key={idx} className="bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300 border-0 text-xs">
+                            <Badge key={idx} className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs shadow-sm">
                               {tag}
                             </Badge>
                           ))}
@@ -126,15 +128,15 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                   </div>
                   <div className="flex items-center space-x-3">
                     {result.risk_level && (
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full ${getRiskColor(result.risk_level)}`}></div>
+                      <div className="flex items-center space-x-2 bg-slate-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-full border border-slate-100 dark:border-zinc-700">
+                        <div className={`w-2.5 h-2.5 rounded-full ${getRiskColor(result.risk_level)} shadow-[0_0_8px_currentColor]`} />
                         <Badge className={`text-xs font-medium border-0 ${getRiskBadge(result.risk_level)}`}>
                           Risk: {result.risk_level}
                         </Badge>
                       </div>
                     )}
                     {result.reputation !== undefined && (
-                      <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-0 text-xs">
+                      <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs shadow-sm">
                         Rep: {result.reputation}
                       </Badge>
                     )}
@@ -143,7 +145,8 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
 
                 {/* Error Message */}
                 {result.error && (
-                  <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg">
+                  <div className="m-5 sm:m-6 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-600 dark:text-red-400">
                       <strong>Error:</strong> {result.error}
                     </p>
@@ -151,261 +154,323 @@ const VirusTotalResults = ({ results }: VirusTotalResultsProps) => {
                 )}
 
                 {!result.error && (
-                  <Tabs defaultValue="security" className="w-full">
-                    <TabsList className="grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-start bg-slate-100 dark:bg-slate-800 h-auto gap-1 p-1">
-                      <TabsTrigger value="security" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Security</TabsTrigger>
-                      <TabsTrigger value="detection" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Detection</TabsTrigger>
-                      <TabsTrigger value="reputation" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Reputation</TabsTrigger>
-                      <TabsTrigger value="categories" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Categories</TabsTrigger>
-                      <TabsTrigger value="dns" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">DNS/SSL</TabsTrigger>
-                      <TabsTrigger value="passive-dns" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Passive DNS</TabsTrigger>
-                      <TabsTrigger value="info" className="text-xs sm:text-sm px-2 sm:px-3 py-1.5">Info</TabsTrigger>
-                    </TabsList>
+                  <div className="p-5 sm:p-6">
+                    <Tabs defaultValue="security" className="w-full">
+                      <TabsList className="w-full h-auto flex flex-wrap justify-start bg-slate-100/50 dark:bg-zinc-800/50 p-1.5 rounded-xl gap-1">
+                        <TabsTrigger value="security" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">Security</TabsTrigger>
+                        <TabsTrigger value="detection" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">Detection</TabsTrigger>
+                        <TabsTrigger value="reputation" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">Reputation</TabsTrigger>
+                        <TabsTrigger value="categories" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">Categories</TabsTrigger>
+                        <TabsTrigger value="dns" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">DNS/SSL</TabsTrigger>
+                        <TabsTrigger value="passive-dns" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">Passive DNS</TabsTrigger>
+                        <TabsTrigger value="info" className="text-xs sm:text-sm px-3 py-2 rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm transition-all">Info</TabsTrigger>
+                      </TabsList>
 
-                    {/* SECURITY TAB */}
-                    <TabsContent value="security" className="space-y-3 mt-4">
-                      {/* Analysis Stats Grid */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-100 dark:border-red-800 text-center hover:scale-105 transition-transform duration-300">
-                          <div className="text-2xl font-bold text-red-600 dark:text-red-400">{result.malicious_score}</div>
-                          <div className="text-xs text-red-600/80 dark:text-red-400/80 font-medium uppercase tracking-wider">Malicious</div>
-                        </div>
-                        <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg border border-orange-100 dark:border-orange-800 text-center hover:scale-105 transition-transform duration-300">
-                          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{result.suspicious_score}</div>
-                          <div className="text-xs text-orange-600/80 dark:text-orange-400/80 font-medium uppercase tracking-wider">Suspicious</div>
-                        </div>
-                        <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-100 dark:border-green-800 text-center hover:scale-105 transition-transform duration-300">
-                          <div className="text-2xl font-bold text-green-600 dark:text-green-400">{result.harmless_score}</div>
-                          <div className="text-xs text-green-600/80 dark:text-green-400/80 font-medium uppercase tracking-wider">Harmless</div>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700 text-center hover:scale-105 transition-transform duration-300">
-                          <div className="text-2xl font-bold text-slate-600 dark:text-slate-400">{result.undetected_score}</div>
-                          <div className="text-xs text-slate-500 dark:text-slate-500 font-medium uppercase tracking-wider">Undetected</div>
-                        </div>
-                      </div>
-
-                      {result.total_votes && (
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-2">Community Votes</p>
-                          <div className="grid grid-cols-2 gap-3 text-sm">
-                            <div>
-                              <span className="font-medium">Harmless:</span> <span className="text-green-600 dark:text-green-400">{result.total_votes.harmless || 0}</span>
-                            </div>
-                            <div>
-                              <span className="font-medium">Malicious:</span> <span className="text-red-600 dark:text-red-400">{result.total_votes.malicious || 0}</span>
+                      {/* SECURITY TAB */}
+                      <TabsContent value="security" className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {/* Analysis Stats Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                          <div className="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-800/50 text-center hover:scale-105 transition-transform duration-300 shadow-sm hover:shadow-md hover:shadow-red-500/10">
+                            <div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-1">{result.malicious_score}</div>
+                            <div className="text-xs text-red-600/80 dark:text-red-400/80 font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+                              <XCircle className="h-3 w-3" /> Malicious
                             </div>
                           </div>
+                          <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-100 dark:border-orange-800/50 text-center hover:scale-105 transition-transform duration-300 shadow-sm hover:shadow-md hover:shadow-orange-500/10">
+                            <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">{result.suspicious_score}</div>
+                            <div className="text-xs text-orange-600/80 dark:text-orange-400/80 font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+                              <AlertTriangle className="h-3 w-3" /> Suspicious
+                            </div>
+                          </div>
+                          <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/50 text-center hover:scale-105 transition-transform duration-300 shadow-sm hover:shadow-md hover:shadow-emerald-500/10">
+                            <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{result.harmless_score}</div>
+                            <div className="text-xs text-emerald-600/80 dark:text-emerald-400/80 font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+                              <CheckCircle className="h-3 w-3" /> Harmless
+                            </div>
+                          </div>
+                          <div className="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-slate-100 dark:border-zinc-700 text-center hover:scale-105 transition-transform duration-300 shadow-sm hover:shadow-md">
+                            <div className="text-3xl font-bold text-slate-600 dark:text-zinc-400 mb-1">{result.undetected_score}</div>
+                            <div className="text-xs text-slate-500 dark:text-zinc-500 font-bold uppercase tracking-wider">Undetected</div>
+                          </div>
                         </div>
-                      )}
-                    </TabsContent>
 
-                    {/* DETECTION TAB */}
-                    <TabsContent value="detection" className="space-y-3 mt-4">
-                      {result.last_analysis_results && Object.keys(result.last_analysis_results).length > 0 ? (
-                        <div className="space-y-2">
-                          {Object.entries(result.last_analysis_results).map(([vendor, data]: [string, any]) => (
-                            <div key={vendor} className="p-2 bg-slate-50 dark:bg-slate-950/50 rounded border border-slate-200 dark:border-slate-700">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">{vendor}</span>
-                                <Badge className={`text-xs ${data.category === 'malicious' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' :
-                                  data.category === 'suspicious' ? 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' :
-                                    data.category === 'harmless' ? 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' :
-                                      'bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300'
-                                  }`}>
-                                  {data.category}
-                                </Badge>
+                        {result.total_votes && (
+                          <div className="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wider">Community Votes</p>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded-lg border border-blue-100 dark:border-zinc-700 shadow-sm">
+                                <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">Harmless</span>
+                                <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-0">{result.total_votes.harmless || 0}</Badge>
                               </div>
-                              {data.result && data.result !== 'clean' && (
-                                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{data.result}</p>
+                              <div className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded-lg border border-blue-100 dark:border-zinc-700 shadow-sm">
+                                <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">Malicious</span>
+                                <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-0">{result.total_votes.malicious || 0}</Badge>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* DETECTION TAB */}
+                      <TabsContent value="detection" className="space-y-3 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {result.last_analysis_results && Object.keys(result.last_analysis_results).length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {Object.entries(result.last_analysis_results).map(([vendor, data]: [string, any]) => (
+                              <div key={vendor} className="p-3 bg-slate-50/50 dark:bg-zinc-900/50 rounded-lg border border-slate-100 dark:border-zinc-800 hover:border-pink-200 dark:hover:border-pink-800 transition-colors">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm font-semibold text-slate-700 dark:text-zinc-300 truncate pr-2">{vendor}</span>
+                                  <Badge className={`text-[10px] px-1.5 py-0.5 border-0 ${data.category === 'malicious' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                                    data.category === 'suspicious' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                                      data.category === 'harmless' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' :
+                                        'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400'
+                                    }`}>
+                                    {data.category}
+                                  </Badge>
+                                </div>
+                                {data.result && data.result !== 'clean' && (
+                                  <p className="text-xs text-slate-500 dark:text-zinc-400 truncate" title={data.result}>{data.result}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800">
+                            <p className="text-slate-500 dark:text-zinc-400">No detection results available</p>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* REPUTATION TAB */}
+                      <TabsContent value="reputation" className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {result.popularity_ranks && Object.keys(result.popularity_ranks).length > 0 && (
+                          <div className="space-y-3">
+                            <p className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-2 uppercase tracking-wider">
+                              <TrendingUp className="h-4 w-4" />
+                              Popularity Rankings
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {Object.entries(result.popularity_ranks).map(([source, data]: [string, any]) => (
+                                <div key={source} className="p-4 bg-red-50/50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-800/50 flex items-center justify-between">
+                                  <span className="text-sm font-medium capitalize text-slate-700 dark:text-zinc-300">{source}</span>
+                                  <Badge className="bg-white dark:bg-zinc-800 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900 shadow-sm">
+                                    #{data.rank ? data.rank.toLocaleString() : 'N/A'}
+                                  </Badge>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.last_analysis_date && (
+                          <div className="p-4 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-slate-100 dark:border-zinc-800 flex items-center gap-4">
+                            <div className="p-2 bg-white dark:bg-zinc-800 rounded-lg shadow-sm">
+                              <Calendar className="h-5 w-5 text-slate-500 dark:text-zinc-400" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Last Analysis Date</p>
+                              <p className="text-sm font-semibold text-slate-900 dark:text-white">{result.last_analysis_date}</p>
+                            </div>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* CATEGORIES TAB */}
+                      <TabsContent value="categories" className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {result.categories && Object.keys(result.categories).length > 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {Object.entries(result.categories).map(([source, category]) => (
+                              <div key={source} className="p-4 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-800/50 hover:bg-blue-100/50 dark:hover:bg-blue-900/20 transition-colors">
+                                <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 mb-1 uppercase tracking-wider">{source}</p>
+                                <div className="flex items-center gap-2">
+                                  <Tag className="h-3.5 w-3.5 text-blue-500" />
+                                  <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">{category}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800">
+                            <p className="text-slate-500 dark:text-zinc-400">No categories available</p>
+                          </div>
+                        )}
+
+                        {result.registrar && (
+                          <div className="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-800/50 flex items-center gap-4">
+                            <div className="p-2 bg-white dark:bg-zinc-800 rounded-lg shadow-sm">
+                              <Building2 className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Registrar</p>
+                              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">{result.registrar}</p>
+                            </div>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* DNS/SSL TAB */}
+                      <TabsContent value="dns" className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {result.last_dns_records && result.last_dns_records.length > 0 && (
+                          <div className="space-y-3">
+                            <p className="text-xs font-bold text-slate-600 dark:text-zinc-400 flex items-center gap-2 uppercase tracking-wider">
+                              <Server className="h-4 w-4" />
+                              DNS Records ({result.last_dns_records.length})
+                            </p>
+                            <div className="grid grid-cols-1 gap-2">
+                              {result.last_dns_records.slice(0, 10).map((record, idx) => (
+                                <div key={idx} className="p-3 bg-slate-50/50 dark:bg-zinc-900/50 rounded-lg border border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors">
+                                  <div className="flex items-center gap-3">
+                                    <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-0 w-12 justify-center">
+                                      {record.type}
+                                    </Badge>
+                                    <span className="text-xs sm:text-sm font-mono text-slate-600 dark:text-zinc-300 break-all">{record.value}</span>
+                                  </div>
+                                  {record.ttl && <span className="text-xs text-slate-400 font-mono whitespace-nowrap">TTL: {record.ttl}</span>}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.last_https_certificate && (
+                          <div className="p-4 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl border border-emerald-100 dark:border-emerald-800/50 space-y-3">
+                            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-semibold">
+                              <Lock className="h-4 w-4" />
+                              <span>SSL Certificate</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                              {result.last_https_certificate.subject && (
+                                <div className="space-y-1">
+                                  <span className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium uppercase tracking-wider">Subject</span>
+                                  <p className="font-medium text-slate-700 dark:text-zinc-300 break-all">{result.last_https_certificate.subject.CN}</p>
+                                </div>
+                              )}
+                              {result.last_https_certificate.issuer && (
+                                <div className="space-y-1">
+                                  <span className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium uppercase tracking-wider">Issuer</span>
+                                  <p className="font-medium text-slate-700 dark:text-zinc-300 break-all">{result.last_https_certificate.issuer.O}</p>
+                                </div>
+                              )}
+                              {result.last_https_certificate_date && (
+                                <div className="space-y-1 sm:col-span-2">
+                                  <span className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium uppercase tracking-wider">Last Seen</span>
+                                  <p className="font-medium text-slate-700 dark:text-zinc-300">{result.last_https_certificate_date}</p>
+                                </div>
                               )}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">No detection results available</p>
-                      )}
-                    </TabsContent>
+                          </div>
+                        )}
 
-                    {/* REPUTATION TAB */}
-                    <TabsContent value="reputation" className="space-y-3 mt-4">
-                      {result.popularity_ranks && Object.keys(result.popularity_ranks).length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center space-x-2">
-                            <TrendingUp className="h-4 w-4" />
-                            <span>Popularity Rankings</span>
-                          </p>
-                          {Object.entries(result.popularity_ranks).map(([source, data]: [string, any]) => (
-                            <div key={source} className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium capitalize">{source}</span>
-                                <Badge className="bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 text-xs">
-                                  Rank: {data.rank ? data.rank.toLocaleString() : 'N/A'}
-                                </Badge>
-                              </div>
+                        {result.jarm && (
+                          <div className="p-4 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-slate-100 dark:border-zinc-800">
+                            <p className="text-xs font-bold text-slate-500 dark:text-zinc-400 mb-2 uppercase tracking-wider">JARM Fingerprint</p>
+                            <p className="text-xs font-mono text-slate-600 dark:text-zinc-300 break-all bg-white dark:bg-zinc-800 p-2 rounded border border-slate-200 dark:border-zinc-700">{result.jarm}</p>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* PASSIVE DNS TAB */}
+                      <TabsContent value="passive-dns" className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        {result.resolutions && result.resolutions.length > 0 ? (
+                          <div className="space-y-3">
+                            <p className="text-xs font-bold text-purple-600 dark:text-purple-400 flex items-center gap-2 uppercase tracking-wider">
+                              <Activity className="h-4 w-4" />
+                              Passive DNS Resolutions ({result.resolutions.length})
+                            </p>
+                            <div className="space-y-2">
+                              {result.resolutions.map((res: any, idx) => (
+                                <div key={idx} className="p-3 bg-purple-50/30 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                                  <div className="flex items-center gap-3">
+                                    <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-0">
+                                      {res.attributes?.host_name || result.domain}
+                                    </Badge>
+                                    <span className="text-xs sm:text-sm font-mono text-slate-600 dark:text-zinc-300 break-all">
+                                      {res.attributes?.ip_address}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    {res.attributes?.date ? new Date(res.attributes.date * 1000).toLocaleDateString() : 'Unknown'}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      )}
+                          </div>
+                        ) : (
+                          <div className="text-center py-12 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800">
+                            <p className="text-slate-500 dark:text-zinc-400">No passive DNS data available</p>
+                          </div>
+                        )}
+                      </TabsContent>
 
-                      {result.last_analysis_date && (
-                        <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg">
-                          <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400 mb-1" />
-                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Last Analysis</p>
-                          <p className="text-sm text-slate-700 dark:text-slate-300">{result.last_analysis_date}</p>
-                        </div>
-                      )}
-                    </TabsContent>
-
-                    {/* CATEGORIES TAB */}
-                    <TabsContent value="categories" className="space-y-3 mt-4">
-                      {result.categories && Object.keys(result.categories).length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {Object.entries(result.categories).map(([source, category]) => (
-                            <div key={source} className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{source}</p>
-                              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{category}</p>
+                      {/* INFO TAB */}
+                      <TabsContent value="info" className="space-y-4 mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3.5 bg-purple-50/50 dark:bg-purple-900/10 rounded-xl border border-purple-100 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 transition-colors group/item">
+                              <span className="font-medium text-slate-600 dark:text-zinc-400 flex items-center gap-2.5">
+                                <div className="p-1.5 bg-purple-100 dark:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400 group-hover/item:scale-110 transition-transform">
+                                  <Globe className="h-3.5 w-3.5" />
+                                </div>
+                                Registrar
+                              </span>
+                              <span className="text-slate-900 dark:text-white font-semibold text-right break-all max-w-[50%] truncate">{result.registrar || 'N/A'}</span>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">No categories available</p>
-                      )}
-
-                      {result.registrar && (
-                        <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                          <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400 mb-1" />
-                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Registrar</p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400">{result.registrar}</p>
-                        </div>
-                      )}
-                    </TabsContent>
-
-                    {/* DNS/SSL TAB - Mobile Optimized */}
-                    <TabsContent value="dns" className="space-y-3 mt-4">
-                      {result.last_dns_records && result.last_dns_records.length > 0 && (
-                        <div>
-                          <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center space-x-2">
-                            <Server className="h-4 w-4 flex-shrink-0" />
-                            <span>DNS Records ({result.last_dns_records.length})</span>
-                          </p>
-                          <div className="space-y-2">
-                            {result.last_dns_records.slice(0, 10).map((record, idx) => (
-                              <div key={idx} className="p-2 sm:p-3 bg-slate-50 dark:bg-slate-950/50 rounded text-xs">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-xs w-fit">
-                                    {record.type}
-                                  </Badge>
-                                  <span className="text-slate-600 dark:text-slate-400 font-mono break-all text-xs">{record.value}</span>
+                            <div className="flex items-center justify-between p-3.5 bg-purple-50/50 dark:bg-purple-900/10 rounded-xl border border-purple-100 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 transition-colors group/item">
+                              <span className="font-medium text-slate-600 dark:text-zinc-400 flex items-center gap-2.5">
+                                <div className="p-1.5 bg-purple-100 dark:bg-purple-900/50 rounded-lg text-purple-600 dark:text-purple-400 group-hover/item:scale-110 transition-transform">
+                                  <Calendar className="h-3.5 w-3.5" />
                                 </div>
-                                {record.ttl && <p className="text-slate-500 mt-1 text-xs">TTL: {record.ttl}</p>}
-                              </div>
-                            ))}
+                                Created
+                              </span>
+                              <span className="text-slate-900 dark:text-white font-semibold">{result.creation_date || 'N/A'}</span>
+                            </div>
                           </div>
-                        </div>
-                      )}
 
-                      {result.last_https_certificate && (
-                        <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <Lock className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                            <p className="text-xs font-semibold text-green-600 dark:text-green-400">SSL Certificate</p>
-                          </div>
-                          <div className="space-y-1 text-xs">
-                            {result.last_https_certificate.subject && (
-                              <div className="break-words"><span className="font-medium">Subject:</span> {result.last_https_certificate.subject.CN}</div>
-                            )}
-                            {result.last_https_certificate.issuer && (
-                              <div className="break-words"><span className="font-medium">Issuer:</span> {result.last_https_certificate.issuer.O}</div>
-                            )}
-                            {result.last_https_certificate_date && (
-                              <div className="break-words"><span className="font-medium">Last Seen:</span> {result.last_https_certificate_date}</div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {result.jarm && (
-                        <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg">
-                          <p className="text-xs font-medium text-slate-500 dark:text-slate-400">JARM Fingerprint</p>
-                          <p className="text-xs text-slate-700 dark:text-slate-300 font-mono break-all mt-1">{result.jarm}</p>
-                        </div>
-                      )}
-                    </TabsContent>
-
-                    {/* PASSIVE DNS TAB */}
-                    <TabsContent value="passive-dns" className="space-y-3 mt-4">
-                      {result.resolutions && result.resolutions.length > 0 ? (
-                        <div>
-                          <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center space-x-2">
-                            <Activity className="h-4 w-4 flex-shrink-0" />
-                            <span>Passive DNS Resolutions ({result.resolutions.length})</span>
-                          </p>
-                          <div className="space-y-2">
-                            {result.resolutions.map((res: any, idx) => (
-                              <div key={idx} className="p-2 sm:p-3 bg-slate-50 dark:bg-slate-950/50 rounded text-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                <div className="flex items-center gap-2">
-                                  <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 text-xs w-fit">
-                                    {res.attributes?.host_name || result.domain}
-                                  </Badge>
-                                  <span className="text-slate-600 dark:text-slate-400 font-mono break-all text-xs">
-                                    {res.attributes?.ip_address}
-                                  </span>
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between p-3.5 bg-violet-50/50 dark:bg-violet-900/10 rounded-xl border border-violet-100 dark:border-violet-800/50 hover:border-violet-300 dark:hover:border-violet-700 transition-colors group/item">
+                              <span className="font-medium text-slate-600 dark:text-zinc-400 flex items-center gap-2.5">
+                                <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg text-violet-600 dark:text-violet-400 group-hover/item:scale-110 transition-transform">
+                                  <Shield className="h-3.5 w-3.5" />
                                 </div>
-                                <div className="text-slate-500 text-xs">
-                                  {res.attributes?.date ? new Date(res.attributes.date * 1000).toLocaleDateString() : 'Unknown Date'}
+                                Reputation
+                              </span>
+                              <span className={`font-bold ${result.reputation < 0 ? 'text-red-600' : 'text-emerald-600'}`}>{result.reputation}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3.5 bg-violet-50/50 dark:bg-violet-900/10 rounded-xl border border-violet-100 dark:border-violet-800/50 hover:border-violet-300 dark:hover:border-violet-700 transition-colors group/item">
+                              <span className="font-medium text-slate-600 dark:text-zinc-400 flex items-center gap-2.5">
+                                <div className="p-1.5 bg-violet-100 dark:bg-violet-900/50 rounded-lg text-violet-600 dark:text-violet-400 group-hover/item:scale-110 transition-transform">
+                                  <Clock className="h-3.5 w-3.5" />
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">No passive DNS data available</p>
-                      )}
-                    </TabsContent>
-
-                    {/* INFO TAB */}
-                    <TabsContent value="info" className="space-y-3 mt-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-purple-100 dark:border-purple-800 transition-all duration-300">
-                            <span className="font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2"><Globe className="h-4 w-4 text-purple-500" /> Registrar:</span>
-                            <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{result.registrar || 'N/A'}</span>
-                          </div>
-                          <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-purple-100 dark:border-purple-800 transition-all duration-300">
-                            <span className="font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2"><Calendar className="h-4 w-4 text-purple-500" /> Created:</span>
-                            <span className="text-slate-900 dark:text-white font-semibold">{result.creation_date || 'N/A'}</span>
+                                Last Analysis
+                              </span>
+                              <span className="text-slate-900 dark:text-white font-semibold">{result.last_analysis_date || 'N/A'}</span>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/30 border border-violet-100 dark:border-violet-800 transition-all duration-300">
-                            <span className="font-medium text-violet-700 dark:text-violet-300 flex items-center gap-2"><Shield className="h-4 w-4 text-violet-500" /> Reputation:</span>
-                            <span className={`font-bold ${result.reputation < 0 ? 'text-red-600' : 'text-green-600'}`}>{result.reputation}</span>
+                        {result.whois && (
+                          <div className="p-4 bg-slate-50 dark:bg-zinc-900/50 rounded-xl border border-slate-100 dark:border-zinc-800">
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wider">WHOIS Information</p>
+                              <Badge variant="outline" className="text-[10px]">Raw Data</Badge>
+                            </div>
+                            <pre className="text-xs bg-white dark:bg-zinc-950 p-3 rounded-lg border border-slate-200 dark:border-zinc-800 overflow-x-auto whitespace-pre-wrap font-mono text-slate-600 dark:text-zinc-400 max-h-60 overflow-y-auto custom-scrollbar">
+                              {result.whois}
+                            </pre>
                           </div>
-                          <div className="flex items-center justify-between p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-900/30 border border-violet-100 dark:border-violet-800 transition-all duration-300">
-                            <span className="font-medium text-violet-700 dark:text-violet-300 flex items-center gap-2"><Clock className="h-4 w-4 text-violet-500" /> Last Analysis:</span>
-                            <span className="text-slate-900 dark:text-white font-semibold">{result.last_analysis_date || 'N/A'}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {result.whois && (
-                        <div className="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg">
-                          <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">WHOIS Information</p>
-                          <pre className="text-xs bg-white dark:bg-slate-900 p-2 rounded overflow-x-auto whitespace-pre-wrap">
-                            {result.whois}
-                          </pre>
-                        </div>
-                      )}
-                    </TabsContent>
-                  </Tabs>
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  </div>
                 )}
 
-
                 {/* Timestamp */}
-                <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-indigo-50 dark:border-slate-800 pt-3 bg-indigo-50/30 dark:bg-slate-900/50 rounded-lg p-2 flex justify-between items-center">
-                  <span><span className="font-medium">Analyzed:</span> {result.timestamp}</span>
-                  <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">ID: {result.id}</span>
+                <div className="relative px-6 py-3 bg-slate-50 dark:bg-zinc-800/50 border-t border-slate-100 dark:border-zinc-800 flex justify-between items-center text-xs text-slate-500 dark:text-zinc-400">
+                  <span className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
+                    Analyzed: {result.timestamp}
+                  </span>
+                  <span className="font-mono opacity-50">ID: {result.id}</span>
                 </div>
               </div>
             ))}

@@ -1,8 +1,8 @@
-
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Shield, Globe, Database, AlertTriangle, Calendar, Clock, Building2, Server, MapPin, Wifi } from "lucide-react";
+import { Download, Shield, Globe, Database, AlertTriangle, Calendar, Clock, Building2, Server, MapPin, Wifi, Search, Building } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 
@@ -153,35 +153,36 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
     if (score >= 75) return "bg-gradient-to-r from-red-500 to-red-600";
     if (score >= 50) return "bg-gradient-to-r from-red-400 to-orange-500";
     if (score >= 25) return "bg-gradient-to-r from-yellow-400 to-orange-400";
-    return "bg-gradient-to-r from-green-400 to-blue-500";
+    return "bg-gradient-to-r from-emerald-400 to-teal-500";
   };
 
   const getRiskBadgeColor = (score: number) => {
-    if (score >= 75) return "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300";
-    if (score >= 50) return "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300";
-    if (score >= 25) return "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300";
-    return "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300";
+    if (score >= 75) return "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 border-red-200 dark:border-red-800";
+    if (score >= 50) return "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 border-orange-200 dark:border-orange-800";
+    if (score >= 25) return "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800";
+    return "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800";
   };
 
   return (
-    <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-      <CardHeader className="bg-gradient-to-r from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-indigo-100 dark:border-slate-800 p-2 sm:p-3">
+    <Card className="h-fit border-0 shadow-2xl bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl hover:shadow-3xl transition-all duration-500">
+      <CardHeader className="bg-gradient-to-r from-emerald-600/10 via-teal-600/10 to-cyan-600/10 border-b border-slate-200/50 dark:border-zinc-800 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
-          <CardTitle className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-md shadow-indigo-500/20">
-              <Database className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+          <CardTitle className="flex items-center space-x-3">
+            <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/20 ring-1 ring-white/20">
+              <Globe className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">Scan Results</span>
-            <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              {results.length}
+            <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+              Scan Results
+            </span>
+            <Badge className="bg-white/50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 backdrop-blur-sm shadow-sm">
+              {results.length} Found
             </Badge>
           </CardTitle>
           {results.length > 0 && (
             <Button
               onClick={exportToCsv}
               size="sm"
-              variant="outline"
-              className="border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+              className="bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 shadow-sm hover:shadow transition-all duration-300"
             >
               <Download className="mr-2 h-4 w-4" />
               Export CSV
@@ -189,85 +190,120 @@ const ResultsPanel = ({ results, vtSummaryByDomain }: ResultsPanelProps) => {
           )}
         </div>
       </CardHeader>
-      <CardContent className="p-2 sm:p-3">
+      <CardContent className="p-4 sm:p-6 bg-gradient-to-b from-transparent to-slate-50/50 dark:to-zinc-900/50">
         {results.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
-            <div className="bg-indigo-50 dark:bg-slate-800 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
-              <Database className="h-8 w-8 sm:h-12 sm:w-12 text-indigo-300 dark:text-slate-600" />
+          <div className="text-center py-12 sm:py-16">
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-zinc-800 dark:to-zinc-800/50 rounded-full w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 flex items-center justify-center shadow-inner">
+              <Search className="h-10 w-10 sm:h-12 sm:w-12 text-emerald-300 dark:text-zinc-600" />
             </div>
-            <p className="text-base sm:text-lg font-medium mb-2">No results yet</p>
-            <p className="text-sm">Start by analyzing a domain or running a bulk scan</p>
+            <p className="text-lg font-semibold text-slate-700 dark:text-zinc-300 mb-2">No results found</p>
+            <p className="text-slate-500 dark:text-zinc-400">Try scanning a different domain</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {results.map((result, index) => (
               <div
                 key={result.id}
-                className="border border-indigo-100 dark:border-slate-800 rounded-xl p-4 sm:p-6 space-y-4 bg-white dark:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:scale-[1.01] animate-fade-in group"
-                style={{ animationDelay: `${index * 100} ms` }}
+                className="group relative overflow-hidden border border-slate-200 dark:border-zinc-800 rounded-2xl bg-gradient-to-br from-white to-slate-50 dark:from-zinc-900 dark:to-zinc-900 shadow-lg hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 hover:scale-[1.01] animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* Header with Risk Level */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 pb-3 border-b border-indigo-50 dark:border-slate-800">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
-                      <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                {/* Header Section */}
+                <div className="relative p-5 sm:p-6 border-b border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 transition-colors ring-1 ring-emerald-100 dark:ring-emerald-800">
+                      <Globe className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white break-all">
-                        {result.domain}
-                      </h3>   {result.is_vpn_proxy && (
-                        <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300 border border-orange-300 dark:border-orange-700 text-xs font-semibold hover:scale-105 transition-transform duration-300 shadow-md">
-                          <Shield className="h-3 w-3 mr-1" />
-                          VPN/Proxy Detected
-                        </Badge>
-                      )}
+                      <h3 className="font-bold text-lg sm:text-xl text-slate-900 dark:text-white break-all tracking-tight">
+                        {result.domain || result.ip_address}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1 text-sm text-slate-500 dark:text-zinc-400">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>Scanned {result.timestamp}</span>
+                        <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse ml-1" />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className={`w - 4 h - 4 rounded - full ${getRiskColor(result.abuse_score)} shadow - lg`}></div>
-                    <Badge className={`text - xs font - medium border - 0 ${getRiskBadgeColor(result.abuse_score)} `}>
-                      Risk: {result.abuse_score}/100
-                    </Badge>
-                  </div>
+
+                  {/* Risk Badge */}
+                  {result.abuse_score !== undefined && (
+                    <div className={`px-4 py-2 rounded-xl border ${getRiskBadgeColor(result.abuse_score)} shadow-sm flex items-center gap-2`}>
+                      <div className={`w-2 h-2 rounded-full ${getRiskColor(result.abuse_score)} animate-pulse`} />
+                      <span className="font-bold text-slate-700 dark:text-slate-200">Score: {result.abuse_score}</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 text-sm">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
-                      <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><Calendar className="h-4 w-4 text-blue-500" /> Created:</span>
-                      <span className="text-slate-900 dark:text-white font-semibold">{result.created}</span>
+                {/* Content Grid */}
+                <div className="relative p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+                      <Server className="h-5 w-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">IP Address</p>
+                        <p className="font-mono text-sm font-semibold text-slate-700 dark:text-zinc-200 mt-0.5">{result.ip_address || '-'}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
-                      <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><Clock className="h-4 w-4 text-blue-500" /> Expires:</span>
-                      <span className="text-slate-900 dark:text-white font-semibold">{result.expires}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
-                      <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><Building2 className="h-4 w-4 text-blue-500" /> Registrar:</span>
-                      <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{result.registrar}</span>
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+                      <MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Location</p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {result.country !== '-' && (
+                            <img
+                              src={`https://flagcdn.com/w20/${result.country.toLowerCase()}.png`}
+                              alt={result.country}
+                              className="w-5 h-auto rounded-sm shadow-sm"
+                              onError={(e) => (e.currentTarget.style.display = 'none')}
+                            />
+                          )}
+                          <p className="text-sm font-semibold text-slate-700 dark:text-zinc-200">
+                            {[result.city, result.region, result.country].filter(x => x && x !== '-').join(', ') || '-'}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 border border-cyan-100 dark:border-cyan-800 transition-all duration-300">
-                      <span className="font-medium text-cyan-700 dark:text-cyan-300 flex items-center gap-2"><Server className="h-4 w-4 text-cyan-500" /> IP Address:</span>
-                      <span className="text-slate-900 dark:text-white font-semibold font-mono">{result.ip_address}</span>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+                      <Calendar className="h-5 w-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Created Date</p>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-zinc-200 mt-0.5">{result.created || '-'}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 border border-cyan-100 dark:border-cyan-800 transition-all duration-300">
-                      <span className="font-medium text-cyan-700 dark:text-cyan-300 flex items-center gap-2"><MapPin className="h-4 w-4 text-cyan-500" /> Location:</span>
-                      <span className="text-slate-900 dark:text-white font-semibold text-right">{result.city !== '-' ? `${result.city}, ` : ''}{result.country}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg hover:bg-cyan-100 dark:hover:bg-cyan-900/30 border border-cyan-100 dark:border-cyan-800 transition-all duration-300">
-                      <span className="font-medium text-cyan-700 dark:text-cyan-300 flex items-center gap-2"><Wifi className="h-4 w-4 text-cyan-500" /> ISP:</span>
-                      <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{result.isp}</span>
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+                      <Clock className="h-5 w-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Domain Age</p>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-zinc-200 mt-0.5">{result.domain_age || '-'}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Timestamp */}
-                <div className="text-xs text-slate-500 dark:text-slate-400 border-t border-indigo-50 dark:border-slate-800 pt-3 bg-indigo-50/30 dark:bg-slate-900/50 rounded-lg p-2 flex justify-between items-center">
-                  <span><span className="font-medium">Scanned:</span> {result.timestamp}</span>
-                  <span className="text-[10px] px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500">ID: {result.id}</span>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+                      <Building className="h-5 w-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Registrar</p>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-zinc-200 mt-0.5 truncate max-w-[200px]" title={result.registrar}>
+                          {result.registrar || '-'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-50 dark:hover:bg-zinc-800/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-zinc-700">
+                      <Wifi className="h-5 w-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider">ISP</p>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-zinc-200 mt-0.5 truncate max-w-[200px]" title={result.isp}>
+                          {result.isp || '-'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

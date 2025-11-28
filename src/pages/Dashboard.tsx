@@ -146,7 +146,10 @@ const Dashboard = () => {
     const handleSingleResults = (newResult: any) => {
         // For single scan, we ensure we only have one result (though handleStartScan should have cleared it)
         setResults([newResult]);
-        saveHistory(newResult.domain || newResult.ip, newResult);
+        // Only save to history if the result is complete (not a partial progressive update)
+        if (!newResult.partial) {
+            saveHistory(newResult.domain || newResult.ip, newResult);
+        }
     };
 
     const handleMetascraperResults = (newResult: any) => {
@@ -175,7 +178,7 @@ const Dashboard = () => {
     }, [virusTotalResults]);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 flex flex-col">
+        <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 flex flex-col">
 
             {/* Top Navigation Bar */}
             <nav className="sticky top-0 z-50 w-full border-b border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
@@ -319,10 +322,8 @@ const Dashboard = () => {
                                 {results.length > 0 && (
                                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
                                         <ResultsPanel results={results} vtSummaryByDomain={vtSummaryByDomain} />
-                                        <div className="grid grid-cols-1 gap-8">
-                                            <VirusTotalResults results={virusTotalResults} />
-                                            <SecurityIntelPanel results={results as any} />
-                                        </div>
+                                        <SecurityIntelPanel results={results as any} />
+                                        <VirusTotalResults results={virusTotalResults} />
                                         <MetascraperResults results={metascraperResults} />
                                     </div>
                                 )}
@@ -341,10 +342,8 @@ const Dashboard = () => {
                                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
                                         <ResultsPanel results={results} vtSummaryByDomain={vtSummaryByDomain} />
                                         {/* Show full details for Bulk Scan as well */}
-                                        <div className="grid grid-cols-1 gap-8">
-                                            <VirusTotalResults results={virusTotalResults} />
-                                            <SecurityIntelPanel results={results as any} />
-                                        </div>
+                                        <SecurityIntelPanel results={results as any} />
+                                        <VirusTotalResults results={virusTotalResults} />
                                         <MetascraperResults results={metascraperResults} />
                                     </div>
                                 )}

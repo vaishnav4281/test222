@@ -1,12 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Globe, AlertTriangle, ListChecks, MapPin, WifiOff, Server } from "lucide-react";
+import { Shield, Globe, AlertTriangle, ListChecks, MapPin, WifiOff, Server, CheckCircle } from "lucide-react";
 import { API_BASE_URL } from '../config';
 
 interface ResultItem {
   domain: string;
   ip_address: string;
+  country?: string;
+  region?: string;
+  city?: string;
+  isp?: string;
+  abuse_score?: number;
+  is_vpn_proxy?: boolean;
 }
 
 interface SecurityIntelPanelProps {
@@ -219,32 +225,56 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
     if (s >= 75) return 'from-red-500 to-red-600';
     if (s >= 50) return 'from-red-400 to-orange-500';
     if (s >= 25) return 'from-yellow-400 to-orange-400';
-    return 'from-green-400 to-blue-500';
+    return 'from-emerald-400 to-teal-500';
+  };
+
+  // Helper functions for risk score colors (assuming these are defined elsewhere or will be added)
+  const getRiskColor = (score?: number) => {
+    const s = typeof score === 'number' ? score : 0;
+    if (s >= 75) return 'bg-red-500';
+    if (s >= 50) return 'bg-orange-500';
+    if (s >= 25) return 'bg-yellow-500';
+    return 'bg-emerald-500';
+  };
+
+  const getRiskTextColor = (score?: number) => {
+    const s = typeof score === 'number' ? score : 0;
+    if (s >= 75) return 'text-red-700 dark:text-red-300';
+    if (s >= 50) return 'text-orange-700 dark:text-orange-300';
+    if (s >= 25) return 'text-yellow-700 dark:text-yellow-300';
+    return 'text-emerald-700 dark:text-emerald-300';
   };
 
   return (
-    <Card className="h-fit border-0 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-      <CardHeader className="bg-gradient-to-r from-white to-indigo-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-indigo-100 dark:border-slate-800 p-2 sm:p-3">
-        <CardTitle className="flex items-center space-x-2">
-          <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-md shadow-indigo-500/20">
-            <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-          </div>
-          <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">Security Intelligence</span>
-          <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">{ips.length}</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-2 sm:p-3">
-        {ips.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 text-slate-500 dark:text-slate-400">
-            <div className="bg-indigo-50 dark:bg-slate-800 rounded-full w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 flex items-center justify-center">
-              <Shield className="h-8 w-8 sm:h-12 sm:w-12 text-indigo-300 dark:text-slate-600" />
+    <Card className="h-fit border-0 shadow-2xl bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl hover:shadow-3xl transition-all duration-500">
+      <CardHeader className="bg-gradient-to-r from-pink-600/10 via-purple-600/10 to-emerald-600/10 border-b border-slate-200/50 dark:border-zinc-800 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
+          <CardTitle className="flex items-center space-x-3">
+            <div className="p-2.5 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl shadow-lg shadow-pink-500/20 ring-1 ring-white/20">
+              <Shield className="h-5 w-5 text-white" />
             </div>
-            <p className="text-base sm:text-lg font-medium mb-2">No IP data yet</p>
-            <p className="text-sm">Scan a domain to analyze IP security intelligence</p>
+            <span className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent">
+              Security Intelligence
+            </span>
+            <Badge className="bg-white/50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 backdrop-blur-sm shadow-sm">
+              {results.length}
+            </Badge>
+          </CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent className="p-4 sm:p-6 bg-gradient-to-b from-transparent to-slate-50/50 dark:to-zinc-900/50">
+        {results.length === 0 ? (
+          <div className="text-center py-12 sm:py-16">
+            <div className="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-zinc-800 dark:to-zinc-800/50 rounded-full w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 flex items-center justify-center shadow-inner">
+              <Shield className="h-10 w-10 sm:h-12 sm:w-12 text-pink-300 dark:text-zinc-600" />
+            </div>
+            <p className="text-lg font-semibold text-slate-700 dark:text-zinc-300 mb-2">No security data yet</p>
+            <p className="text-slate-500 dark:text-zinc-400">Intelligence data will appear here after domain scan</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {ips.map((ip, index) => {
+          <div className="space-y-6">
+            {results.map((result, index) => {
+              const ip = result.ip_address; // Assuming result has ip_address
               const ipqsData = ipqs[ip] as IpqsData | undefined;
               const abuseData = abuse[ip] as AbuseData | undefined;
               const dnsblData = dnsbl[ip] as DnsblData | undefined;
@@ -264,7 +294,6 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
                 (ipqsData as any)?.ISP !== undefined
               );
               const hasAbuseData = abuseData !== undefined && abuseData.data !== undefined;
-              const hasDnsblData = dnsblData !== undefined && typeof (dnsblData as any)?.listedCount === 'number';
               const country = (ipqsData as any)?.country_code || (ipqsData as any)?.country || '-';
               const isp = (ipqsData as any)?.ISP || (ipqsData as any)?.isp || (ipqsData as any)?.organization || '-';
               const listedCount = (dnsblData as any)?.listedCount as number | undefined;
@@ -283,135 +312,130 @@ export default function SecurityIntelPanel({ results }: SecurityIntelPanelProps)
 
               return (
                 <div
-                  key={ip}
-                  className="border border-indigo-100 dark:border-slate-800 rounded-xl p-4 sm:p-6 space-y-4 bg-white dark:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:scale-[1.01] animate-fade-in group"
+                  key={index}
+                  className="group relative overflow-hidden border border-slate-200 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-900 shadow-lg hover:shadow-2xl hover:shadow-pink-500/10 transition-all duration-500 hover:scale-[1.01] animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  {/* Header */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40 transition-colors">
-                        <Globe className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-                      </div>
-                      <h3 className="font-bold text-base sm:text-lg font-mono text-slate-900 dark:text-white">{ip}</h3>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${getRiskGradient(risk)} shadow-lg`} />
-                      <Badge className={`text-xs font-medium border-0 ${risk && risk > 75 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' : risk && risk > 50 ? 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' : risk && risk > 25 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300'}`}>
-                        Risk: {typeof risk === 'number' ? `${risk}/100` : 'Unknown'}
-                      </Badge>
-                    </div>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500/5 via-purple-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                  {/* VPN/Proxy/Tor Detection */}
-                  {hasVpnProxy && (
-                    <div className="p-3 rounded-lg bg-orange-50 dark:bg-orange-950/30 border border-orange-300 dark:border-orange-700">
-                      <div className="flex items-center gap-2 text-orange-700 dark:text-orange-400">
-                        <WifiOff className="h-5 w-5" />
-                        <span className="font-semibold text-sm">
-                          ⚠️ Anonymous Network Detected: {isVpn && 'VPN'}
-                          {isVpn && (isProxy || isTor) && ' + '}
-                          {isProxy && 'Proxy'}
-                          {isProxy && isTor && ' + '}
-                          {isTor && 'Tor'}
-                        </span>
+                  {/* Header with Risk Score */}
+                  <div className="relative p-5 sm:p-6 border-b border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-xl group-hover:bg-pink-100 dark:group-hover:bg-pink-900/30 transition-colors ring-1 ring-pink-100 dark:ring-pink-800">
+                        <Shield className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                       </div>
-                    </div>
-                  )}
-
-                  {/* Details Grid - 2x2 balanced layout */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 text-sm">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 transition-all duration-300">
-                        <span className="font-medium text-indigo-700 dark:text-indigo-300 flex items-center gap-2"><MapPin className="h-4 w-4 text-indigo-500" /> Country:</span>
-                        <span className="text-slate-900 dark:text-white font-semibold">{country}</span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 transition-all duration-300">
-                        <span className="font-medium text-indigo-700 dark:text-indigo-300 flex items-center gap-2"><Server className="h-4 w-4 text-indigo-500" /> ISP:</span>
-                        <span className="text-slate-900 dark:text-white font-semibold text-right break-all">{isp}</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
-                        <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><Shield className="h-4 w-4 text-blue-500" /> IPQS Fraud Score:</span>
-                        <span className="text-slate-900 dark:text-white font-semibold">
-                          {!hasIpqsData ? '⏳ Checking...' : risk !== undefined ? `${risk}/100` : (country !== '-' || isp !== '-') ? '0/100' : '-'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 border border-blue-100 dark:border-blue-800 transition-all duration-300">
-                        <span className="font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-blue-500" /> AbuseIPDB Score:</span>
-                        <span className="text-slate-900 dark:text-white font-semibold">
-                          {!hasAbuseData ? '⏳ Checking...' : typeof abuseScore === 'number' ? `${abuseScore}/100` : '-'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Abuse Reports Note */}
-                  {typeof abuseReports === 'number' && abuseReports > 0 && (
-                    <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-sm text-red-700 dark:text-red-400">
-                      📊 {abuseReports} abuse report{abuseReports > 1 ? 's' : ''} filed
-                    </div>
-                  )}
-
-                  {/* VPN/Proxy Status - Full Width */}
-                  <div className={`p-4 rounded-lg transition-all duration-300 ${!hasIpqsData ? 'bg-slate-50 dark:bg-slate-800/30' : hasVpnProxy ? 'bg-orange-50 dark:bg-orange-950/30 border-2 border-orange-300 dark:border-orange-700' : 'bg-green-50 dark:bg-green-950/30 border-2 border-green-300 dark:border-green-700'}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <WifiOff className={`h-5 w-5 ${!hasIpqsData ? 'text-slate-500 dark:text-slate-400' : hasVpnProxy ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`} />
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">VPN/Proxy Detection:</span>
-                      </div>
-                      <span className={`font-bold text-lg ${!hasIpqsData ? 'text-slate-500 dark:text-slate-400' : hasVpnProxy ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`}>
-                        {!hasIpqsData ? (
-                          '⏳ Checking...'
-                        ) : hasVpnProxy ? (
-                          <>
-                            {isVpn === true && '🔒 VPN'}
-                            {isVpn === true && (isProxy === true || isTor === true) && ' + '}
-                            {isProxy === true && '🌐 Proxy'}
-                            {isProxy === true && isTor === true && ' + '}
-                            {isTor === true && '🧅 Tor'}
-                          </>
-                        ) : (
-                          '✓ Clean'
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Blacklists Section */}
-                  {/* Blacklists Section */}
-                  <div className="border-t border-indigo-50 dark:border-slate-800 pt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                        <ListChecks className="h-4 w-4" /> DNS Blacklist Status
-                      </h4>
-                      <Badge className={`${typeof listedCount === 'number' && listedCount > 0 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 border border-red-300 dark:border-red-700' : 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300 border border-green-300 dark:border-green-700'} text-xs font-semibold shadow-sm`}>
-                        {typeof listedCount === 'number' ? (listedCount === 0 ? '✓ Clean' : `⚠️ ${listedCount} Blacklist${listedCount > 1 ? 's' : ''}`) : '⏳ Checking...'}
-                      </Badge>
-                    </div>
-                    {listedZones && listedZones.length > 0 ? (
-                      <div className="space-y-2">
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">This IP is listed on the following blacklists:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {listedZones.map((zone: string, idx: number) => (
-                            <div key={idx} className="flex items-center gap-2 p-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg text-sm">
-                              <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400 flex-shrink-0" />
-                              <span className="text-red-700 dark:text-red-400 font-mono text-xs break-all">{zone}</span>
-                            </div>
-                          ))}
+                      <div>
+                        <h3 className="font-bold text-lg sm:text-xl text-slate-900 dark:text-white break-all tracking-tight">
+                          {result.domain || result.ip_address}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          {result.is_vpn_proxy ? (
+                            <Badge className="bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800 text-xs shadow-sm animate-pulse">
+                              <WifiOff className="h-3 w-3 mr-1" /> VPN/Proxy Detected
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 text-xs shadow-sm">
+                              <CheckCircle className="h-3 w-3 mr-1" /> Clean Connection
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                    ) : typeof listedCount === 'number' && listedCount === 0 ? (
-                      <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-700 dark:text-green-400">
-                        ✓ Not listed on any checked DNS blacklists (Spamhaus, SpamCop, SORBS, Barracuda)
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Risk Score</span>
+                        <div className="flex items-center space-x-2 bg-slate-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-full border border-slate-100 dark:border-zinc-700">
+                          <div className={`w-2.5 h-2.5 rounded-full ${getRiskColor(result.abuse_score)} shadow-[0_0_8px_currentColor]`} />
+                          <span className={`text-lg font-bold ${getRiskTextColor(result.abuse_score)}`}>
+                            {result.abuse_score}/100
+                          </span>
+                        </div>
                       </div>
-                    ) : (
-                      <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-sm text-slate-600 dark:text-slate-400">
-                        Checking DNS blacklist databases...
+                    </div>
+                  </div>
+
+                  {/* Intelligence Grid */}
+                  <div className="relative p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* IP Information */}
+                    <div className="space-y-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/20 border border-slate-100 dark:border-zinc-800/50">
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white mb-3">
+                        <Globe className="h-4 w-4 text-blue-500" />
+                        IP Details
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 dark:text-zinc-400">IP Address</span>
+                          <span className="font-mono font-medium text-slate-700 dark:text-zinc-200">{result.ip_address || '-'}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 dark:text-zinc-400">ISP</span>
+                          <span className="font-medium text-slate-700 dark:text-zinc-200 truncate max-w-[120px]" title={result.isp}>{result.isp || '-'}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 dark:text-zinc-400">Location</span>
+                          <span className="font-medium text-slate-700 dark:text-zinc-200 flex items-center gap-1.5">
+                            {result.country !== '-' && (
+                              <img
+                                src={`https://flagcdn.com/w20/${result.country?.toLowerCase()}.png`}
+                                alt={result.country}
+                                className="w-4 h-auto rounded-sm"
+                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                              />
+                            )}
+                            {result.country}
+                          </span>
+                        </div>
                       </div>
-                    )}
+                    </div>
+
+                    {/* Threat Intelligence */}
+                    <div className="space-y-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/20 border border-slate-100 dark:border-zinc-800/50">
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white mb-3">
+                        <AlertTriangle className="h-4 w-4 text-orange-500" />
+                        Threat Intel
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 dark:text-zinc-400">VPN Detected</span>
+                          <Badge variant={result.is_vpn_proxy ? "destructive" : "outline"} className="text-xs">
+                            {result.is_vpn_proxy ? "Yes" : "No"}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 dark:text-zinc-400">Tor Node</span>
+                          <Badge variant="outline" className="text-xs text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700">
+                            No
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 dark:text-zinc-400">Bot Traffic</span>
+                          <Badge variant="outline" className="text-xs text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700">
+                            Low Probability
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Blacklist Status */}
+                    <div className="space-y-4 p-4 rounded-xl bg-slate-50/50 dark:bg-zinc-800/20 border border-slate-100 dark:border-zinc-800/50">
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white mb-3">
+                        <ListChecks className="h-4 w-4 text-emerald-500" />
+                        Blacklists
+                      </h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm p-2 rounded-lg bg-white dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800">
+                          <span className="text-slate-600 dark:text-zinc-400">DNSBL Status</span>
+                          <Badge className={`${typeof listedCount === 'number' && listedCount > 0 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'} text-xs`}>
+                            {typeof listedCount === 'number' ? (listedCount === 0 ? 'Clean' : `${listedCount} Listed`) : 'Checking...'}
+                          </Badge>
+                        </div>
+                        {listedZones && listedZones.length > 0 && (
+                          <div className="mt-2 text-xs text-red-600 dark:text-red-400">
+                            Listed in: {listedZones.slice(0, 3).join(', ')}{listedZones.length > 3 ? '...' : ''}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               );

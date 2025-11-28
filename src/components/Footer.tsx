@@ -16,8 +16,8 @@ const Footer = () => {
                     <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-sm text-slate-500 dark:text-slate-400">
                         <span>© {new Date().getFullYear()} All rights reserved.</span>
                         <span className="hidden md:inline text-slate-300 dark:text-slate-700">•</span>
-                        <span className="font-medium text-slate-600 dark:text-slate-300">
-                            In association with Kerala Police Cyberdome Kozhikode
+                        <span className="font-medium bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                            In Association With Kerala Police Cyberdome, Kozhikode
                         </span>
                     </div>
                 </div>

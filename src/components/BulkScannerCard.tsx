@@ -183,6 +183,7 @@ const BulkScannerCard = ({ onResults, onMetascraperResults, onVirusTotalResults,
         latitude: locLatitude,
         isp: locIsp,
         timestamp: new Date().toLocaleString(),
+        type: 'bulk',
       };
       onResults(result);
 

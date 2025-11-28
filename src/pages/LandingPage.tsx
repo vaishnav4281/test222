@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Shield, Globe, Database, Activity, ArrowRight, CheckCircle2, Lock, Zap, Sun, Moon } from 'lucide-react';
+import { Shield, Globe, Database, Activity, ArrowRight, CheckCircle2, Lock, Zap, Sun, Moon, LayoutDashboard } from 'lucide-react';
 import ThreeBackground from '@/components/ThreeBackground';
+import { useAuth } from '@/context/AuthContext';
 
 import Footer from '@/components/Footer';
 
 const LandingPage = () => {
+    const { isAuthenticated } = useAuth();
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
             {/* Three.js 3D Background */}
@@ -44,16 +47,28 @@ const LandingPage = () => {
                                 <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                                 <span className="sr-only">Toggle theme</span>
                             </Button>
-                            <Link to="/login">
-                                <Button variant="ghost" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
-                                    Log in
-                                </Button>
-                            </Link>
-                            <Link to="/signup">
-                                <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                                    Get Started
-                                </Button>
-                            </Link>
+
+                            {isAuthenticated ? (
+                                <Link to="/dashboard">
+                                    <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                                        Dashboard
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link to="/login">
+                                        <Button variant="ghost" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                                            Log in
+                                        </Button>
+                                    </Link>
+                                    <Link to="/signup">
+                                        <Button className="bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                                            Get Started
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -76,16 +91,26 @@ const LandingPage = () => {
                         Empowering security teams with advanced OSINT tools for comprehensive digital asset monitoring and threat detection.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up animation-delay-300">
-                        <Link to="/signup">
-                            <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
-                                Start Scanning Free <ArrowRight className="ml-2 h-5 w-5" />
-                            </Button>
-                        </Link>
-                        <Link to="/login">
-                            <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white transition-all duration-300 rounded-full w-full sm:w-auto">
-                                Login
-                            </Button>
-                        </Link>
+                        {isAuthenticated ? (
+                            <Link to="/dashboard">
+                                <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
+                                    Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                                </Button>
+                            </Link>
+                        ) : (
+                            <>
+                                <Link to="/signup">
+                                    <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
+                                        Start Scanning Free <ArrowRight className="ml-2 h-5 w-5" />
+                                    </Button>
+                                </Link>
+                                <Link to="/login">
+                                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white transition-all duration-300 rounded-full w-full sm:w-auto">
+                                        Login
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
@@ -179,11 +204,19 @@ const LandingPage = () => {
                     <p className="text-lg text-slate-600 dark:text-slate-300 mb-10">
                         Get instant access to powerful domain analysis tools and protect your digital infrastructure.
                     </p>
-                    <Link to="/signup">
-                        <Button size="lg" className="h-14 px-10 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                            Get Started for Free
-                        </Button>
-                    </Link>
+                    {isAuthenticated ? (
+                        <Link to="/dashboard">
+                            <Button size="lg" className="h-14 px-10 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                                Go to Dashboard
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link to="/signup">
+                            <Button size="lg" className="h-14 px-10 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                                Get Started for Free
+                            </Button>
+                        </Link>
+                    )}
                 </div>
             </div>
 
