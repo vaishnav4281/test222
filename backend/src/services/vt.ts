@@ -5,7 +5,10 @@ import { redis } from '../redis.js';
 
 
 const VT_API_KEYS = [
-    process.env.VT_API_KEY || process.env.VITE_VIRUSTOTAL_API_KEY,
+    process.env.VT_API_KEY,
+    process.env.VT_API_KEY_2,
+    process.env.VT_API_KEY_3,
+    process.env.VITE_VIRUSTOTAL_API_KEY,
     process.env.VITE_VIRUSTOTAL_API_KEY_2,
     process.env.VITE_VIRUSTOTAL_API_KEY_3
 ].filter(Boolean) as string[];

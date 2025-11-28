@@ -1,5 +1,7 @@
 const IPQS_KEYS = [
     process.env.IPQS_API_KEY,
+    process.env.IPQS_API_KEY_2,
+    process.env.IPQS_API_KEY_3,
     process.env.VITE_IPQS_API_KEY,
     process.env.VITE_IPQS_API_KEY_2,
     process.env.VITE_IPQS_API_KEY_3

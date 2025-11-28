@@ -174,6 +174,7 @@ const Dashboard = () => {
             map[r.domain] = {
                 reputation: r.reputation,
                 risk_level: r.risk_level,
+                malicious: r.malicious_score,
             };
         });
         return map;
