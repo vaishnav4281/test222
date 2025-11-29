@@ -1,7 +1,11 @@
 import { Resend } from 'resend';
 import crypto from 'crypto';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+if (!process.env.RESEND_API_KEY) {
+    console.warn("⚠️ RESEND_API_KEY is missing. Email services will not work.");
+}
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Generate 6-digit OTP
@@ -17,6 +21,10 @@ export function generateResetToken(): string {
 // Send signup verification email with OTP
 export async function sendVerificationEmail(email: string, otp: string) {
     try {
+        if (!resend) {
+            console.warn('Email service not configured (missing API key). Skipping verification email.');
+            return null;
+        }
         console.log('📧 Sending verification email to:', email, 'OTP:', otp);
         const { data, error } = await resend.emails.send({
             from: 'noreply@hello.satheesankoroth.in',
