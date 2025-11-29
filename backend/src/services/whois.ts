@@ -65,9 +65,17 @@ async function queryWhoisServer(domain: string, server: string | null = null) {
                 source: server || 'default'
             };
         }
+
+        console.log(`⚠️ WHOIS validation failed for ${domain} on ${server || 'default'}. Raw result keys:`, Object.keys(result || {}));
+        if (Object.keys(result || {}).length > 0) {
+            console.log('Raw result sample:', JSON.stringify(result, null, 2).slice(0, 500));
+        }
         return null;
     } catch (error: any) {
-        console.warn(`WHOIS query failed for ${domain} on ${server || 'default'}:`, error.message);
+        console.error(`❌ WHOIS query failed for ${domain} on ${server || 'default'}:`, error.message);
+        if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+            console.warn(`   -> Network error: ${error.code}`);
+        }
         return null;
     }
 }
@@ -104,6 +112,58 @@ async function resolveBestWhoisServer(domain: string) {
     }
 }
 
+async function queryRdap(domain: string) {
+    try {
+        console.log(`[RDAP] Querying RDAP for ${domain}...`);
+        const response = await fetch(`https://rdap.org/domain/${domain}`, {
+            headers: { 'Accept': 'application/rdap+json' }
+        });
+
+        if (!response.ok) {
+            console.warn(`[RDAP] Request failed: ${response.status} ${response.statusText}`);
+            return null;
+        }
+
+        const data: any = await response.json();
+
+        // Extract dates from RDAP events
+        const events = data.events || [];
+        const creationDate = events.find((e: any) => e.eventAction === 'registration')?.eventDate;
+        const expirationDate = events.find((e: any) => e.eventAction === 'expiration')?.eventDate;
+        const updatedDate = events.find((e: any) => e.eventAction === 'last changed')?.eventDate;
+
+        // Extract registrar
+        let registrar = 'Unknown';
+        if (data.entities) {
+            const registrarEntity = data.entities.find((e: any) => e.roles?.includes('registrar'));
+            if (registrarEntity && registrarEntity.vcardArray) {
+                // vcardArray is complex: ["vcard", [["version", {}, "text", "4.0"], ["fn", {}, "text", "Name"]]]
+                const fnEntry = registrarEntity.vcardArray[1]?.find((item: any) => item[0] === 'fn');
+                if (fnEntry) registrar = fnEntry[3];
+            }
+        }
+
+        if (creationDate || expirationDate || registrar !== 'Unknown') {
+            return {
+                domain_name: domain,
+                registrar: registrar,
+                creation_date: normalizeDate(creationDate),
+                expiration_date: normalizeDate(expirationDate),
+                updated_date: normalizeDate(updatedDate),
+                name_servers: data.nameservers ? data.nameservers.map((ns: any) => ns.ldhName) : [],
+                status: data.status ? data.status.join(', ') : '',
+                raw: JSON.stringify(data, null, 2),
+                source: 'RDAP (rdap.org)'
+            };
+        }
+        return null;
+
+    } catch (error: any) {
+        console.error(`[RDAP] Error for ${domain}:`, error.message);
+        return null;
+    }
+}
+
 export async function getWhois(domain: string, force = false) {
     const cacheKey = `whois:${domain.toLowerCase()}`;
 
@@ -134,10 +194,22 @@ export async function getWhois(domain: string, force = false) {
         result = await queryWhoisServer(domain, 'whois.verisign-grs.com');
     }
 
+    // If Verisign failed, try Godaddy (often works for stubborn .coms)
+    if (!result && domain.endsWith('.com')) {
+        console.log(`[WHOIS] Retrying ${domain} with Godaddy...`);
+        result = await queryWhoisServer(domain, 'whois.godaddy.com');
+    }
+
     // Final attempt with default (no server specified)
     if (!result) {
         console.log(`[WHOIS] Final retry for ${domain} with default server...`);
         result = await queryWhoisServer(domain);
+    }
+
+    // If WHOIS completely failed (likely rate limited or blocked), try RDAP
+    if (!result) {
+        console.log(`[WHOIS] All WHOIS methods failed. Attempting RDAP fallback for ${domain}...`);
+        result = await queryRdap(domain);
     }
 
     if (result) {
