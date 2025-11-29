@@ -108,7 +108,7 @@ const DomainAnalysisCard = ({ onResults, onMetascraperResults, onVirusTotalResul
 
     const whoisPromise = (async () => {
       try {
-        const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois?domain=${encodeURIComponent(sanitizedDomain)}`, 5000);
+        const whoisRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/whois?domain=${encodeURIComponent(sanitizedDomain)}`, 15000);
         if (whoisRes.ok) return await whoisRes.json();
       } catch (e) {
         console.warn('⚠️ WHOIS fetch failed:', e);

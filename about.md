@@ -6,6 +6,7 @@ DomainScope is a comprehensive domain intelligence and OSINT platform designed t
 
 ### 1. Domain Analysis (WHOIS)
 *   **Feature**: Retrieves detailed registration information for a domain, including registrar, creation/expiry dates, and name servers.
+*   **Optimization**: Implements a **3-stage progressive loading strategy** (DNS -> WHOIS -> VirusTotal) for instant feedback and is **optimized for mobile** with robust date parsing and extended network timeouts.
 *   **Provider/Library**: `whois-json` (NPM Package)
 *   **Implementation**: Backend service (`backend/src/services/whois.ts`) that parses raw WHOIS data into a structured JSON format.
 
@@ -76,7 +77,7 @@ DomainScope is a comprehensive domain intelligence and OSINT platform designed t
 ### Frontend
 *   **Framework**: **React** (v18) with **Vite**.
 *   **Language**: **TypeScript**.
-*   **Styling**: **Tailwind CSS** with **Shadcn UI** components.
+*   **Styling**: **Tailwind CSS** with **Shadcn UI** components. Features a **premium, glassmorphism-inspired UI** with animated CSS backgrounds and full mobile responsiveness.
 *   **Icons**: `lucide-react`.
 *   **Routing**: `react-router-dom`.
 

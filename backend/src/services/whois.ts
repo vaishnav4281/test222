@@ -20,18 +20,44 @@ const FALLBACK_WHOIS_SERVERS = [
     'whois.internic.net'
 ];
 
+function normalizeDate(dateStr: string | undefined | null): string {
+    if (!dateStr) return '';
+    try {
+        // Handle "DD-Mon-YYYY" format often returned by some WHOIS servers
+        // and other non-standard formats by letting Date.parse try first
+        const date = new Date(dateStr);
+
+        // Check if valid
+        if (!isNaN(date.getTime())) {
+            return date.toISOString();
+        }
+
+        // If direct parsing failed, try some manual cleanups
+        // Example: "2023-01-01 12:00:00 UTC" -> "2023-01-01T12:00:00Z"
+        const cleaned = dateStr.replace(' ', 'T').replace(' UTC', 'Z');
+        const date2 = new Date(cleaned);
+        if (!isNaN(date2.getTime())) {
+            return date2.toISOString();
+        }
+
+        return dateStr; // Return original if all else fails
+    } catch (e) {
+        return dateStr || '';
+    }
+}
+
 async function queryWhoisServer(domain: string, server: string | null = null) {
     try {
         const options = server ? { server } : {};
-        const result = await whois(domain, { ...options, timeout: 5000 });
+        const result = await whois(domain, { ...options, timeout: 10000 });
 
         if (result && (result.registrar || result.creationDate || result.registrant)) {
             return {
                 domain_name: domain,
                 registrar: result.registrar || 'Unknown',
-                creation_date: result.creationDate || result.registered || '',
-                expiration_date: result.expirationDate || result.registryExpiryDate || '',
-                updated_date: result.updatedDate || result.changed || '',
+                creation_date: normalizeDate(result.creationDate || result.registered),
+                expiration_date: normalizeDate(result.expirationDate || result.registryExpiryDate),
+                updated_date: normalizeDate(result.updatedDate || result.changed),
                 name_servers: result.nameServer ?
                     (Array.isArray(result.nameServer) ? result.nameServer : [result.nameServer]) : [],
                 status: result.domainStatus || '',
