@@ -90,6 +90,8 @@ export async function checkAlienVaultOTX(domain: string) {
                     name: p.name,
                     description: p.description,
                     created: p.created,
+                    modified: p.modified,
+                    subscriber_count: p.subscriber_count,
                     tags: p.tags,
                     references: p.references
                 })) || [],
