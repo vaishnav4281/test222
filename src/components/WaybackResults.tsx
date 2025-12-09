@@ -26,26 +26,30 @@ const WaybackResults: React.FC<WaybackResultsProps> = ({ results }) => {
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
                         <p className="text-sm text-slate-500 dark:text-slate-400">First Seen</p>
                         <p className="font-bold text-lg text-slate-900 dark:text-white">
-                            {results.first_scan ? new Date(results.first_scan).toLocaleDateString() : "Unknown"}
+                            {results.firstSnapshot?.date
+                                ? results.firstSnapshot.date.split(' ')[0]
+                                : (results.first_scan ? new Date(results.first_scan).toLocaleDateString() : "Unknown")}
                         </p>
                     </div>
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Last Seen</p>
                         <p className="font-bold text-lg text-slate-900 dark:text-white">
-                            {results.last_scan ? new Date(results.last_scan).toLocaleDateString() : "Unknown"}
+                            {results.lastSnapshot?.date
+                                ? results.lastSnapshot.date.split(' ')[0]
+                                : (results.last_scan ? new Date(results.last_scan).toLocaleDateString() : "Unknown")}
                         </p>
                     </div>
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
                         <p className="text-sm text-slate-500 dark:text-slate-400">Total Snapshots</p>
                         <p className="font-bold text-lg text-slate-900 dark:text-white">
-                            {results.total_scans?.toLocaleString() || 0}
+                            {(results.totalSnapshots ?? results.total_scans)?.toLocaleString() || 0}
                         </p>
                     </div>
                 </div>
-                {results.link && (
+                {(results.lastSnapshot?.url || results.link || results.domain) && (
                     <div className="mt-6 text-center">
                         <a
-                            href={results.link}
+                            href={results.lastSnapshot?.url || results.link || `https://web.archive.org/web/${results.domain}`}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium hover:underline"

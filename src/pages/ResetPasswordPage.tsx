@@ -81,12 +81,12 @@ export default function ResetPasswordPage() {
     const passwordStrength = getPasswordStrength(newPassword);
 
     return (
-        <div className="min-h-screen w-full flex flex-col">
+        <div className="w-full flex flex-col">
             <SEO
                 title="Reset Password"
                 description="Securely reset your password."
             />
-            <div className="flex-grow flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0B0F19] dark:to-[#0f1419] p-4">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#0B0F19] dark:to-[#0f1419] p-4">
                 {/* Background Effects */}
                 <div className="absolute inset-0 z-0 pointer-events-none">
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1f293720_1px,transparent_1px),linear-gradient(to_bottom,#1f293720_1px,transparent_1px)] bg-[size:4rem_4rem]" />
