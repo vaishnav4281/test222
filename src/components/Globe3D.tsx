@@ -16,7 +16,7 @@ export default function Globe3D() {
             0.1,
             1000
         );
-        camera.position.z = 10; // Adjusted for larger globe
+        camera.position.z = 12; // Adjusted for much larger globe
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -32,7 +32,7 @@ export default function Globe3D() {
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        const globeRadius = 4.0; // Increased from 2.5 for better visibility
+        const globeRadius = 5.5; // Increased to fill hero section
 
         // ===== MAIN GLOBE - Wireframe Style (Modern & Clean) =====
         const segments = 40;
