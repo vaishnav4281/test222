@@ -155,7 +155,7 @@ const LandingPage = () => {
                                 </span>
                             </h1>
 
-                            <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-300 mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
+                            <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
                                 Advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
                             </p>
 
