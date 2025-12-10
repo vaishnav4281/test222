@@ -15,7 +15,7 @@ const LandingPage = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#111b21] text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
             <SEO
                 title="DomainScope"
                 description="Advanced domain intelligence platform built by an expert Software Engineer. Features WHOIS, DNS, Threat Intel, and more."
