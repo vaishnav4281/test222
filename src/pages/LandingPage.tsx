@@ -137,71 +137,56 @@ const LandingPage = () => {
             </nav>
 
             {/* Hero Section */}
-            <div className="relative pt-24 pb-20 sm:pt-32 sm:pb-32 overflow-hidden flex-grow flex items-center min-h-[90vh]">
+            <div className="relative pt-20 pb-16 sm:pt-28 sm:pb-28 overflow-hidden flex-grow flex items-center min-h-[85vh]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                        {/* Left Column: Text Content (Span 7 cols) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
-                            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50/80 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 mb-8 animate-fade-in-up backdrop-blur-sm shadow-sm">
-                                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-600 mr-2.5 animate-pulse"></span>
-                                Intelligence Built for Speed, Reliability & Security
+                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 mb-6 animate-fade-in-up backdrop-blur-sm">
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-slate-500 dark:bg-slate-400 mr-2 animate-pulse"></span>
+                                Next-Gen Intelligence
                             </div>
 
-                            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-8 animate-fade-in-up animation-delay-100 leading-[1.1]">
-                                <span className="block mb-2">Master Your</span>
-                                <span className="bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 bg-clip-text text-transparent drop-shadow-sm">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 animate-fade-in-up animation-delay-100 leading-tight">
+                                <span className="block">Master Your</span>
+                                <span className="bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
                                     Domain Intelligence
                                 </span>
                             </h1>
 
-                            <div className="relative">
-                                <div className="absolute -inset-4 bg-white/30 dark:bg-slate-900/30 rounded-2xl blur-xl -z-10"></div>
-                                <p className="text-xl sm:text-2xl md:text-3xl text-slate-600 dark:text-slate-300 mb-10 leading-relaxed animate-fade-in-up animation-delay-200 font-medium max-w-2xl mx-auto lg:mx-0">
-                                    Empowering security teams with advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
-                                </p>
-                            </div>
+                            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
+                                Advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
+                            </p>
 
-                            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5 animate-fade-in-up animation-delay-300">
+                            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-300">
                                 {isAuthenticated ? (
                                     <Link to="/dashboard">
-                                        <Button size="lg" className="h-16 px-10 text-xl bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl w-full sm:w-auto font-bold">
-                                            Go to Dashboard <ArrowRight className="ml-2 h-6 w-6" />
+                                        <Button size="lg" className="h-12 px-8 text-base bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium">
+                                            Go to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
                                         </Button>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link to="/signup">
-                                            <Button size="lg" className="h-16 px-10 text-xl bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-2xl w-full sm:w-auto font-bold">
-                                                Start Scanning Free <ArrowRight className="ml-2 h-6 w-6" />
+                                            <Button size="lg" className="h-12 px-8 text-base bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium">
+                                                Start Scanning <ArrowRight className="ml-2 h-4 w-4" />
                                             </Button>
                                         </Link>
                                         <Link to="/login">
-                                            <Button size="lg" variant="outline" className="h-16 px-10 text-xl border-2 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white transition-all duration-300 rounded-2xl w-full sm:w-auto font-semibold backdrop-blur-sm bg-white/50 dark:bg-slate-900/50">
+                                            <Button size="lg" variant="ghost" className="h-12 px-8 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 rounded-lg font-medium">
                                                 Login
                                             </Button>
                                         </Link>
                                     </>
                                 )}
                             </div>
-
-                            {/* Trust badges or small stats */}
-                            <div className="mt-12 flex items-center justify-center lg:justify-start gap-8 text-slate-500 dark:text-slate-400 animate-fade-in-up animation-delay-500">
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                                    <span className="font-medium">Enterprise Ready</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                                    <span className="font-medium">Real-time Data</span>
-                                </div>
-                            </div>
                         </div>
 
-                        {/* Right Column: 3D Globe (Span 5 cols) - Positioned to interact */}
-                        <div className="lg:col-span-5 relative h-[500px] sm:h-[600px] lg:h-[800px] w-full flex items-center justify-center lg:-mr-20 animate-fade-in-up animation-delay-500 perspective-1000">
-                            {/* Decorative glows */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-br from-blue-500/20 to-red-500/20 rounded-full blur-[100px] opacity-40 animate-pulse-slow"></div>
-                            <div className="w-full h-full scale-110 lg:scale-125">
+                        {/* Right Column: 3D Globe - Optimized Size */}
+                        <div className="lg:col-span-5 relative h-[400px] sm:h-[500px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
+                            {/* Subtle dark glow for dark mode */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-slate-200/50 dark:bg-slate-800/20 rounded-full blur-[80px] opacity-50"></div>
+                            <div className="w-full h-full scale-100">
                                 <Globe3D />
                             </div>
                         </div>
