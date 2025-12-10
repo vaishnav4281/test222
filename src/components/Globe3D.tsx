@@ -100,13 +100,27 @@ export default function Globe3D() {
                     float fresnel = pow(1.0 - dot(normalize(cameraPosition - vec3(0.0)), vNormal), 2.5);
                     vec3 glowColor = mix(glowColorBlue, glowColorRed, sin(time * 0.5 + vUv.x * 3.14) * 0.5 + 0.5);
                     
+                    // Hexagon pattern for visibility
+                    float hexScale = 25.0;
+                    vec2 hexUv = vUv * hexScale;
+                    float hexPattern = abs(sin(hexUv.x * 3.14) * sin(hexUv.y * 3.14));
+                    hexPattern = step(0.85, hexPattern);
+                    
+                    // Animated scan lines
+                    float scanLines = abs(sin((vUv.y * 30.0) - time * 2.0));
+                    scanLines = step(0.9, scanLines);
+                    
                     // Adaptive glow based on theme
-                    float glowStrength = isDark > 0.5 ? 0.6 : 0.8;
+                    float glowStrength = isDark > 0.5 ? 0.7 : 0.9;
                     vec3 finalColor = mix(baseColor, glowColor, fresnel * glowStrength);
-                    finalColor += glowColor * fresnel * (isDark > 0.5 ? 0.3 : 0.5);
+                    finalColor += glowColor * fresnel * (isDark > 0.5 ? 0.4 : 0.6);
+                    
+                    // Add patterns
+                    finalColor += glowColor * hexPattern * 0.3;
+                    finalColor += glowColor * scanLines * 0.4;
                     
                     // Better opacity for light mode
-                    float alpha = isDark > 0.5 ? 0.98 : 0.95;
+                    float alpha = isDark > 0.5 ? 1.0 : 0.98;
                     gl_FragColor = vec4(finalColor, alpha);
                 }
             `,
@@ -208,18 +222,72 @@ export default function Globe3D() {
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         globeGroup.add(particlesMesh);
 
-        // Ring
-        const ring1 = new THREE.Mesh(
-            new THREE.TorusGeometry(GLOBE_RADIUS + 1.6, 0.006, 16, 100),
-            new THREE.MeshBasicMaterial({
-                color: 0x60a5fa,
-                transparent: true,
-                opacity: 0.75,
-                blending: THREE.AdditiveBlending
-            })
-        );
-        ring1.rotation.x = Math.PI / 2;
-        globeGroup.add(ring1);
+        // Dual Orbital Rings with glow effects
+        const ringBlueGeometry = new THREE.TorusGeometry(GLOBE_RADIUS + 1.6, 0.008, 16, 100);
+        const ringBlueMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                color: { value: new THREE.Color(0x60a5fa) }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                uniform vec3 color;
+                varying vec2 vUv;
+                
+                void main() {
+                    float glow = sin(vUv.x * 6.28 - time * 2.0) * 0.3 + 0.7;
+                    float pulse = sin(time * 3.0) * 0.15 + 0.85;
+                    gl_FragColor = vec4(color * glow, pulse * 0.8);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide
+        });
+        const ringBlue = new THREE.Mesh(ringBlueGeometry, ringBlueMaterial);
+        ringBlue.rotation.x = Math.PI / 2;
+        ringBlue.rotation.y = Math.PI / 6;
+        globeGroup.add(ringBlue);
+
+        const ringRedGeometry = new THREE.TorusGeometry(GLOBE_RADIUS + 1.8, 0.008, 16, 100);
+        const ringRedMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                color: { value: new THREE.Color(0xef4444) }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                uniform vec3 color;
+                varying vec2 vUv;
+                
+                void main() {
+                    float glow = sin(vUv.x * 6.28 + time * 2.0) * 0.3 + 0.7;
+                    float pulse = sin(time * 3.0 + 1.57) * 0.15 + 0.85;
+                    gl_FragColor = vec4(color * glow, pulse * 0.8);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide
+        });
+        const ringRed = new THREE.Mesh(ringRedGeometry, ringRedMaterial);
+        ringRed.rotation.x = Math.PI / 2;
+        ringRed.rotation.y = -Math.PI / 6;
+        globeGroup.add(ringRed);
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -281,7 +349,13 @@ export default function Globe3D() {
             }
             particlesGeometry.attributes.position.needsUpdate = true;
 
-            ring1.rotation.z += 0.002;
+            // Update ring shaders
+            ringBlueMaterial.uniforms.time.value = time;
+            ringRedMaterial.uniforms.time.value = time;
+
+            // Counter-rotating rings
+            ringBlue.rotation.z += 0.003;
+            ringRed.rotation.z -= 0.0025;
 
             renderer.render(scene, camera);
         };
