@@ -138,44 +138,44 @@ const LandingPage = () => {
             </nav>
 
             {/* Hero Section */}
-            <div className="relative pt-20 pb-16 sm:pt-28 sm:pb-28 overflow-hidden flex-grow flex items-center min-h-[85vh]">
+            <div className="relative pt-20 pb-16 sm:pt-32 sm:pb-32 overflow-hidden flex-grow flex items-center min-h-[85vh]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
                         {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
-                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold text-black dark:text-[#e9edef] bg-gray-100 dark:bg-[#202c33] border border-gray-200 dark:border-[#2a3942] mb-6 animate-fade-in-up group hover:border-blue-500/50 transition-colors duration-300">
-                                <span className="flex h-1.5 w-1.5 rounded-full bg-blue-600 mr-2 animate-pulse"></span>
+                            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold text-black dark:text-white bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/20 mb-8 animate-fade-in-up group hover:border-blue-500/50 transition-colors duration-300">
+                                <span className="flex h-2 w-2 rounded-full bg-blue-600 mr-2 animate-pulse"></span>
                                 Next-Gen Intelligence
-                                <span className="flex h-1.5 w-1.5 rounded-full bg-red-600 ml-2 animate-pulse delay-75"></span>
+                                <span className="flex h-2 w-2 rounded-full bg-red-600 ml-2 animate-pulse delay-75"></span>
                             </div>
 
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-black dark:text-[#e9edef] mb-6 animate-fade-in-up animation-delay-100 leading-tight">
+                            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-black dark:text-white mb-8 animate-fade-in-up animation-delay-100 leading-[1.1]">
                                 <span className="block">Master Your</span>
                                 <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm">
                                     Domain Intelligence
                                 </span>
                             </h1>
 
-                            <p className="text-lg sm:text-xl text-gray-800 dark:text-[#8696a0] mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-medium">
+                            <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-medium">
                                 Advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-300">
+                            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5 animate-fade-in-up animation-delay-300">
                                 {isAuthenticated ? (
                                     <Link to="/dashboard">
-                                        <Button size="lg" className="h-12 px-8 text-base bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 border-0 shadow-lg transition-all duration-300 rounded-lg font-bold group">
-                                            Go to Dashboard <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                        <Button size="lg" className="h-14 px-10 text-lg bg-black dark:bg-white text-white dark:text-black hover:bg-gray-900 dark:hover:bg-gray-200 border-0 shadow-xl transition-all duration-300 rounded-xl font-bold group">
+                                            Go to Dashboard <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link to="/signup">
-                                            <Button size="lg" className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 rounded-lg font-bold group">
-                                                Start Scanning <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                            <Button size="lg" className="h-14 px-10 text-lg bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white border-0 shadow-xl hover:shadow-blue-500/25 transition-all duration-300 rounded-xl font-bold group">
+                                                Start Scanning <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                                             </Button>
                                         </Link>
                                         <Link to="/login">
-                                            <Button size="lg" variant="ghost" className="h-12 px-8 text-base text-black dark:text-[#e9edef] hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300 rounded-lg font-bold">
+                                            <Button size="lg" variant="ghost" className="h-14 px-10 text-lg text-black dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300 rounded-xl font-bold border-2 border-transparent hover:border-gray-200 dark:hover:border-white/20">
                                                 Login
                                             </Button>
                                         </Link>
@@ -185,10 +185,10 @@ const LandingPage = () => {
                         </div>
 
                         {/* Right Column: 3D Globe - Optimized Size */}
-                        <div className="lg:col-span-5 relative h-[400px] sm:h-[500px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
-                            {/* Subtle dark glow for dark mode */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-[80px] opacity-50"></div>
-                            <div className="w-full h-full scale-100">
+                        <div className="lg:col-span-5 relative h-[450px] sm:h-[550px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
+                            {/* Pure Black/White Glow */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-gray-200/50 dark:bg-white/5 rounded-full blur-[100px] opacity-30"></div>
+                            <div className="w-full h-full scale-110">
                                 <Globe3D />
                             </div>
                         </div>
