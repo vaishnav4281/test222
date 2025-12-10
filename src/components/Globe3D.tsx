@@ -274,7 +274,7 @@ export default function Globe3D() {
             }
             particlesGeometry.attributes.position.needsUpdate = true;
 
-            // Update ring shaders
+            // Update uniforms
             ringBlueMaterial.uniforms.time.value = time;
             ringRedMaterial.uniforms.time.value = time;
 
@@ -326,7 +326,7 @@ export default function Globe3D() {
                 // Grid lines - more opaque and darker in light mode
                 gridMaterials.forEach((mat, index) => {
                     const isBlue = index % 2 === 0;
-                    mat.color = isBlue ? glowColorBlue : glowColorRed;
+                    mat.color = isBlue ? new THREE.Color(0x1d4ed8) : new THREE.Color(0xb91c1c);
                     mat.opacity = 0.7;
                     mat.needsUpdate = true;
                 });
