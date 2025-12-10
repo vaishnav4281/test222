@@ -32,102 +32,28 @@ export default function Globe3D() {
 
         const GLOBE_RADIUS = 2.2;
 
-        // Atmospheric glow
-        const atmosphereGeometry = new THREE.SphereGeometry(GLOBE_RADIUS * 1.15, 64, 64);
-        const atmosphereMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                time: { value: 0 },
-                colorBlue: { value: new THREE.Color(0x60a5fa) },
-                colorRed: { value: new THREE.Color(0xef4444) }
-            },
-            vertexShader: `
-                varying vec3 vNormal;
-                void main() {
-                    vNormal = normalize(normalMatrix * normal);
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                uniform float time;
-                uniform vec3 colorBlue;
-                uniform vec3 colorRed;
-                varying vec3 vNormal;
-                
-                void main() {
-                    float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-                    vec3 glow = mix(colorBlue, colorRed, sin(time * 0.3) * 0.5 + 0.5);
-                    float pulse = sin(time * 0.5) * 0.2 + 0.8;
-                    gl_FragColor = vec4(glow * pulse, intensity * 0.7);
-                }
-            `,
-            side: THREE.BackSide,
-            blending: THREE.AdditiveBlending,
-            transparent: true
-        });
-        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-        globeGroup.add(atmosphere);
-
-        // Main globe
-        const globeGeometry = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
-        const globeMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                time: { value: 0 },
-                baseColor: { value: new THREE.Color(0x0f172a) },
-                glowColorBlue: { value: new THREE.Color(0x3b82f6) },
-                glowColorRed: { value: new THREE.Color(0xef4444) },
-                isDark: { value: 1.0 }
-            },
-            vertexShader: `
-                varying vec3 vNormal;
-                varying vec2 vUv;
-                
-                void main() {
-                    vNormal = normalize(normalMatrix * normal);
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                uniform float time;
-                uniform vec3 baseColor;
-                uniform vec3 glowColorBlue;
-                uniform vec3 glowColorRed;
-                uniform float isDark;
-                varying vec3 vNormal;
-                varying vec2 vUv;
-                
-                void main() {
-                    float fresnel = pow(1.0 - dot(normalize(cameraPosition - vec3(0.0)), vNormal), 2.5);
-                    vec3 glowColor = mix(glowColorBlue, glowColorRed, sin(time * 0.5 + vUv.x * 3.14) * 0.5 + 0.5);
-                    
-                    // Hexagon pattern for visibility
-                    float hexScale = 25.0;
-                    vec2 hexUv = vUv * hexScale;
-                    float hexPattern = abs(sin(hexUv.x * 3.14) * sin(hexUv.y * 3.14));
-                    hexPattern = step(0.85, hexPattern);
-                    
-                    // Animated scan lines
-                    float scanLines = abs(sin((vUv.y * 30.0) - time * 2.0));
-                    scanLines = step(0.9, scanLines);
-                    
-                    // Adaptive glow based on theme
-                    float glowStrength = isDark > 0.5 ? 0.7 : 0.9;
-                    vec3 finalColor = mix(baseColor, glowColor, fresnel * glowStrength);
-                    finalColor += glowColor * fresnel * (isDark > 0.5 ? 0.4 : 0.6);
-                    
-                    // Add patterns
-                    finalColor += glowColor * hexPattern * 0.3;
-                    finalColor += glowColor * scanLines * 0.4;
-                    
-                    // Better opacity for light mode
-                    float alpha = isDark > 0.5 ? 1.0 : 0.98;
-                    gl_FragColor = vec4(finalColor, alpha);
-                }
-            `,
-            transparent: true
+        // Main solid globe with wireframe
+        const globeGeometry = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
+        const globeMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            metalness: 0.1,
+            roughness: 0.4,
+            transparent: true,
+            opacity: 0.95
         });
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
         globeGroup.add(globe);
+
+        // Wireframe overlay
+        const wireframeGeometry = new THREE.SphereGeometry(GLOBE_RADIUS + 0.01, 64, 64);
+        const wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x60a5fa,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+        });
+        const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+        globeGroup.add(wireframe);
 
         // Grid lines - store materials for theme updates
         const gridMaterials: THREE.LineBasicMaterial[] = [];
@@ -325,7 +251,6 @@ export default function Globe3D() {
             const delta = clock.getDelta();
             time += delta;
 
-            atmosphereMaterial.uniforms.time.value = time;
             globeMaterial.uniforms.time.value = time;
 
             const isHovering = containerRef.current?.matches(':hover');
@@ -377,20 +302,10 @@ export default function Globe3D() {
             const isDark = document.documentElement.classList.contains('dark');
 
             if (isDark) {
-                // Dark mode - vibrant colors on dark background
-                const baseColor = new THREE.Color(0x0f172a);
-                const glowColorBlue = new THREE.Color(0x3b82f6);
-                const glowColorRed = new THREE.Color(0xef4444);
-                const atmosphereBlue = new THREE.Color(0x60a5fa);
-                const atmosphereRed = new THREE.Color(0xf87171);
-
-                globeMaterial.uniforms.baseColor.value = baseColor;
-                globeMaterial.uniforms.glowColorBlue.value = glowColorBlue;
-                globeMaterial.uniforms.glowColorRed.value = glowColorRed;
-                globeMaterial.uniforms.isDark.value = 1.0;
-
-                atmosphereMaterial.uniforms.colorBlue.value = atmosphereBlue;
-                atmosphereMaterial.uniforms.colorRed.value = atmosphereRed;
+                // Dark mode - white/light globe
+                globeMaterial.color.set(0xf8fafc);
+                wireframeMaterial.color.set(0x60a5fa);
+                wireframeMaterial.opacity = 0.25;
 
                 // Grid lines - brighter in dark mode
                 gridMaterials.forEach((mat, index) => {
@@ -403,20 +318,10 @@ export default function Globe3D() {
                 pointLight1.intensity = 3;
                 pointLight2.intensity = 2;
             } else {
-                // Light mode - deeper colors on light background for contrast
-                const baseColor = new THREE.Color(0xdbeafe);
-                const glowColorBlue = new THREE.Color(0x1d4ed8);
-                const glowColorRed = new THREE.Color(0xb91c1c);
-                const atmosphereBlue = new THREE.Color(0x3b82f6);
-                const atmosphereRed = new THREE.Color(0xdc2626);
-
-                globeMaterial.uniforms.baseColor.value = baseColor;
-                globeMaterial.uniforms.glowColorBlue.value = glowColorBlue;
-                globeMaterial.uniforms.glowColorRed.value = glowColorRed;
-                globeMaterial.uniforms.isDark.value = 0.0;
-
-                atmosphereMaterial.uniforms.colorBlue.value = atmosphereBlue;
-                atmosphereMaterial.uniforms.colorRed.value = atmosphereRed;
+                // Light mode - dark globe
+                globeMaterial.color.set(0x1e293b);
+                wireframeMaterial.color.set(0x1d4ed8);
+                wireframeMaterial.opacity = 0.3;
 
                 // Grid lines - more opaque and darker in light mode
                 gridMaterials.forEach((mat, index) => {
