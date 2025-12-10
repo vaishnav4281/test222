@@ -16,7 +16,7 @@ export default function Globe3D() {
             0.1,
             1000
         );
-        camera.position.z = 8;
+        camera.position.z = 10; // Adjusted for larger globe
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -32,18 +32,18 @@ export default function Globe3D() {
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        const globeRadius = 2.5;
+        const globeRadius = 4.0; // Increased from 2.5 for better visibility
 
         // ===== MAIN GLOBE - Wireframe Style (Modern & Clean) =====
         const segments = 40;
         const globeGeometry = new THREE.SphereGeometry(globeRadius, segments, segments);
 
-        // Wireframe globe
+        // Wireframe globe - More visible
         const wireframeMaterial = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             wireframe: true,
             transparent: true,
-            opacity: 0.2
+            opacity: 0.4 // Increased for better visibility
         });
         const wireframeGlobe = new THREE.Mesh(globeGeometry, wireframeMaterial);
         globeGroup.add(wireframeGlobe);
@@ -62,9 +62,9 @@ export default function Globe3D() {
 
         const dotMaterial = new THREE.PointsMaterial({
             color: 0xffffff,
-            size: 0.04,
+            size: 0.08, // Increased from 0.04
             transparent: true,
-            opacity: 0.8,
+            opacity: 1.0,
             blending: THREE.AdditiveBlending
         });
         const dots = new THREE.Points(dotGeometry, dotMaterial);
@@ -241,14 +241,14 @@ export default function Globe3D() {
 
             if (isDark) {
                 wireframeMaterial.color.setHex(0xffffff);
-                wireframeMaterial.opacity = 0.25;
+                wireframeMaterial.opacity = 0.4; // Increased visibility
                 dotMaterial.color.setHex(0xffffff);
-                dotMaterial.opacity = 0.8;
+                dotMaterial.opacity = 1.0; // Full opacity
             } else {
                 wireframeMaterial.color.setHex(0x1f2937);
-                wireframeMaterial.opacity = 0.3;
+                wireframeMaterial.opacity = 0.5; // Increased visibility
                 dotMaterial.color.setHex(0x1f2937);
-                dotMaterial.opacity = 0.7;
+                dotMaterial.opacity = 0.9; // Increased visibility
             }
         };
 
