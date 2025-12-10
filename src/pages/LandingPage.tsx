@@ -184,11 +184,9 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-                        {/* Right Column: 3D Globe - Optimized Size */}
-                        <div className="lg:col-span-5 relative h-[450px] sm:h-[550px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
-                            {/* Pure Black/White Glow */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-gray-200/50 dark:bg-white/5 rounded-full blur-[100px] opacity-30"></div>
-                            <div className="w-full h-full scale-110">
+                        {/* Right Column: 3D Globe - Unbounded */}
+                        <div className="lg:col-span-5 w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
+                            <div className="w-full h-[500px] scale-110">
                                 <Globe3D />
                             </div>
                         </div>
