@@ -15,7 +15,7 @@ const LandingPage = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#111b21] text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
+        <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
             <SEO
                 title="DomainScope"
                 description="Advanced domain intelligence platform built by an expert Software Engineer. Features WHOIS, DNS, Threat Intel, and more."
@@ -23,9 +23,10 @@ const LandingPage = () => {
 
 
             {/* Animated gradient background */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.03] via-purple-500/[0.02] to-blue-500/[0.03] dark:from-red-500/[0.05] dark:via-purple-500/[0.03] dark:to-blue-500/[0.05] animate-gradient" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/[0.02] via-transparent to-red-500/[0.02] dark:from-blue-500/[0.04] dark:via-transparent dark:to-red-500/[0.04] animate-gradient" style={{ animationDelay: '1s', animationDuration: '4s' }} />
+            {/* Animated gradient background - Light mode only, hidden in dark mode for pure black */}
+            <div className="absolute inset-0 pointer-events-none dark:hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-red-500/[0.03] via-purple-500/[0.02] to-blue-500/[0.03] animate-gradient" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/[0.02] via-transparent to-red-500/[0.02] animate-gradient" style={{ animationDelay: '1s', animationDuration: '4s' }} />
             </div>
 
             {/* Navigation */}
