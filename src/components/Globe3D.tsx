@@ -72,9 +72,10 @@ export default function Globe3D() {
         const globeMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 },
-                baseColor: { value: new THREE.Color(0x0a0e27) },
-                glowColorBlue: { value: new THREE.Color(0x60a5fa) },
-                glowColorRed: { value: new THREE.Color(0xef4444) }
+                baseColor: { value: new THREE.Color(0x0f172a) },
+                glowColorBlue: { value: new THREE.Color(0x3b82f6) },
+                glowColorRed: { value: new THREE.Color(0xef4444) },
+                isDark: { value: 1.0 }
             },
             vertexShader: `
                 varying vec3 vNormal;
@@ -91,6 +92,7 @@ export default function Globe3D() {
                 uniform vec3 baseColor;
                 uniform vec3 glowColorBlue;
                 uniform vec3 glowColorRed;
+                uniform float isDark;
                 varying vec3 vNormal;
                 varying vec2 vUv;
                 
@@ -98,11 +100,14 @@ export default function Globe3D() {
                     float fresnel = pow(1.0 - dot(normalize(cameraPosition - vec3(0.0)), vNormal), 2.5);
                     vec3 glowColor = mix(glowColorBlue, glowColorRed, sin(time * 0.5 + vUv.x * 3.14) * 0.5 + 0.5);
                     
-                    // Stronger glow and edge lighting
-                    vec3 finalColor = mix(baseColor, glowColor, fresnel * 0.7);
-                    finalColor += glowColor * fresnel * 0.4;
+                    // Adaptive glow based on theme
+                    float glowStrength = isDark > 0.5 ? 0.6 : 0.8;
+                    vec3 finalColor = mix(baseColor, glowColor, fresnel * glowStrength);
+                    finalColor += glowColor * fresnel * (isDark > 0.5 ? 0.3 : 0.5);
                     
-                    gl_FragColor = vec4(finalColor, 1.0);
+                    // Better opacity for light mode
+                    float alpha = isDark > 0.5 ? 0.98 : 0.95;
+                    gl_FragColor = vec4(finalColor, alpha);
                 }
             `,
             transparent: true
@@ -110,7 +115,8 @@ export default function Globe3D() {
         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
         globeGroup.add(globe);
 
-        // Grid lines
+        // Grid lines - store materials for theme updates
+        const gridMaterials: THREE.LineBasicMaterial[] = [];
         const gridColorBlue = new THREE.Color(0x60a5fa);
         const gridColorRed = new THREE.Color(0xef4444);
 
@@ -130,10 +136,11 @@ export default function Globe3D() {
             const material = new THREE.LineBasicMaterial({
                 color: index % 2 === 0 ? gridColorBlue : gridColorRed,
                 transparent: true,
-                opacity: 0.65,
+                opacity: 0.55,
                 blending: THREE.AdditiveBlending,
                 linewidth: 2
             });
+            gridMaterials.push(material);
             globeGroup.add(new THREE.Line(geometry, material));
         });
 
@@ -152,10 +159,11 @@ export default function Globe3D() {
             const material = new THREE.LineBasicMaterial({
                 color: (lon / 20) % 2 === 0 ? gridColorBlue : gridColorRed,
                 transparent: true,
-                opacity: 0.65,
+                opacity: 0.55,
                 blending: THREE.AdditiveBlending,
                 linewidth: 2
             });
+            gridMaterials.push(material);
             globeGroup.add(new THREE.Line(geometry, material));
         }
 
@@ -295,25 +303,59 @@ export default function Globe3D() {
             const isDark = document.documentElement.classList.contains('dark');
 
             if (isDark) {
-                const baseColor = new THREE.Color(0x0a0e27);
-                const glowColorBlue = new THREE.Color(0x60a5fa);
-                const glowColorRed = new THREE.Color(0xef4444);
-
-                globeMaterial.uniforms.baseColor.value = baseColor;
-                globeMaterial.uniforms.glowColorBlue.value = glowColorBlue;
-                globeMaterial.uniforms.glowColorRed.value = glowColorRed;
-                atmosphereMaterial.uniforms.colorBlue.value = glowColorBlue;
-                atmosphereMaterial.uniforms.colorRed.value = glowColorRed;
-            } else {
-                const baseColor = new THREE.Color(0xe8eef5);
+                // Dark mode - vibrant colors on dark background
+                const baseColor = new THREE.Color(0x0f172a);
                 const glowColorBlue = new THREE.Color(0x3b82f6);
-                const glowColorRed = new THREE.Color(0xdc2626);
+                const glowColorRed = new THREE.Color(0xef4444);
+                const atmosphereBlue = new THREE.Color(0x60a5fa);
+                const atmosphereRed = new THREE.Color(0xf87171);
 
                 globeMaterial.uniforms.baseColor.value = baseColor;
                 globeMaterial.uniforms.glowColorBlue.value = glowColorBlue;
                 globeMaterial.uniforms.glowColorRed.value = glowColorRed;
-                atmosphereMaterial.uniforms.colorBlue.value = glowColorBlue;
-                atmosphereMaterial.uniforms.colorRed.value = glowColorRed;
+                globeMaterial.uniforms.isDark.value = 1.0;
+
+                atmosphereMaterial.uniforms.colorBlue.value = atmosphereBlue;
+                atmosphereMaterial.uniforms.colorRed.value = atmosphereRed;
+
+                // Grid lines - brighter in dark mode
+                gridMaterials.forEach((mat, index) => {
+                    mat.opacity = 0.55;
+                    mat.needsUpdate = true;
+                });
+
+                // Lights
+                ambientLight.intensity = 0.8;
+                pointLight1.intensity = 3;
+                pointLight2.intensity = 2;
+            } else {
+                // Light mode - deeper colors on light background for contrast
+                const baseColor = new THREE.Color(0xdbeafe);
+                const glowColorBlue = new THREE.Color(0x1d4ed8);
+                const glowColorRed = new THREE.Color(0xb91c1c);
+                const atmosphereBlue = new THREE.Color(0x3b82f6);
+                const atmosphereRed = new THREE.Color(0xdc2626);
+
+                globeMaterial.uniforms.baseColor.value = baseColor;
+                globeMaterial.uniforms.glowColorBlue.value = glowColorBlue;
+                globeMaterial.uniforms.glowColorRed.value = glowColorRed;
+                globeMaterial.uniforms.isDark.value = 0.0;
+
+                atmosphereMaterial.uniforms.colorBlue.value = atmosphereBlue;
+                atmosphereMaterial.uniforms.colorRed.value = atmosphereRed;
+
+                // Grid lines - more opaque and darker in light mode
+                gridMaterials.forEach((mat, index) => {
+                    const isBlue = index % 2 === 0;
+                    mat.color = isBlue ? glowColorBlue : glowColorRed;
+                    mat.opacity = 0.7;
+                    mat.needsUpdate = true;
+                });
+
+                // Lights - softer in light mode
+                ambientLight.intensity = 1.0;
+                pointLight1.intensity = 2;
+                pointLight2.intensity = 1.5;
             }
         };
 
