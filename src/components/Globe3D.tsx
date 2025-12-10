@@ -309,9 +309,9 @@ export default function Globe3D() {
     const ring1 = new THREE.Mesh(
         new THREE.TorusGeometry(GLOBE_RADIUS + 1.8, 0.004, 16, 100),
         new THREE.MeshBasicMaterial({
-            color: 0x4080ff,
+            color: 0x60a5fa,
             transparent: true,
-            opacity: 0.4,
+            opacity: 0.5,
             blending: THREE.AdditiveBlending
         })
     );
@@ -322,7 +322,7 @@ export default function Globe3D() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0x4080ff, 2, 50);
+    const pointLight = new THREE.PointLight(0x60a5fa, 2, 50);
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
 
