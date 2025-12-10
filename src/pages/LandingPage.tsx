@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Shield, Globe, Database, Activity, ArrowRight, CheckCircle2, Lock, Zap, Sun, Moon, LayoutDashboard, Menu, LogIn, UserPlus, Network, FileSearch, RefreshCw, Smartphone, Server, TrendingUp, MapPin, Clock, AlertOctagon, Layers } from 'lucide-react';
-import ThreeBackground from '@/components/ThreeBackground';
+import Globe3D from '@/components/Globe3D';
 import { useAuth } from '@/context/AuthContext';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -20,8 +20,7 @@ const LandingPage = () => {
                 title="DomainScope"
                 description="Advanced domain intelligence platform built by an expert Software Engineer. Features WHOIS, DNS, Threat Intel, and more."
             />
-            {/* Three.js 3D Background */}
-            <ThreeBackground />
+
 
             {/* Animated gradient background */}
             <div className="absolute inset-0 pointer-events-none">
@@ -139,41 +138,52 @@ const LandingPage = () => {
 
             {/* Hero Section */}
             <div className="relative pt-20 pb-16 sm:pt-32 sm:pb-24 overflow-hidden flex-grow flex items-center">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                    <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 mb-8 animate-fade-in-up">
-                        <span className="flex h-2 w-2 rounded-full bg-emerald-600 mr-2 animate-pulse"></span>
-                        Intelligence Built for Speed, Reliability & Security
-                    </div>
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-8 animate-fade-in-up animation-delay-100">
-                        <span className="block mb-2">Master Your</span>
-                        <span className="bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                            Domain Intelligence
-                        </span>
-                    </h1>
-                    <p className="mt-6 max-w-3xl mx-auto text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-12 leading-relaxed animate-fade-in-up animation-delay-200">
-                        Empowering security teams with advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
-                    </p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up animation-delay-300">
-                        {isAuthenticated ? (
-                            <Link to="/dashboard">
-                                <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
-                                    Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
-                                </Button>
-                            </Link>
-                        ) : (
-                            <>
-                                <Link to="/signup">
-                                    <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
-                                        Start Scanning Free <ArrowRight className="ml-2 h-5 w-5" />
-                                    </Button>
-                                </Link>
-                                <Link to="/login">
-                                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white transition-all duration-300 rounded-full w-full sm:w-auto">
-                                        Login
-                                    </Button>
-                                </Link>
-                            </>
-                        )}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        {/* Left Column: Text Content */}
+                        <div className="text-center lg:text-left">
+                            <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 mb-8 animate-fade-in-up">
+                                <span className="flex h-2 w-2 rounded-full bg-emerald-600 mr-2 animate-pulse"></span>
+                                Intelligence Built for Speed, Reliability & Security
+                            </div>
+                            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-8 animate-fade-in-up animation-delay-100">
+                                <span className="block mb-2">Master Your</span>
+                                <span className="bg-gradient-to-r from-red-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                                    Domain Intelligence
+                                </span>
+                            </h1>
+                            <p className="mt-6 text-xl sm:text-2xl text-slate-600 dark:text-slate-300 mb-12 leading-relaxed animate-fade-in-up animation-delay-200">
+                                Empowering security teams with advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
+                            </p>
+                            <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-300">
+                                {isAuthenticated ? (
+                                    <Link to="/dashboard">
+                                        <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
+                                            Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <Link to="/signup">
+                                            <Button size="lg" className="h-14 px-8 text-lg bg-gradient-to-r from-red-600 to-blue-600 hover:from-red-700 hover:to-blue-700 text-white border-0 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 rounded-full w-full sm:w-auto">
+                                                Start Scanning Free <ArrowRight className="ml-2 h-5 w-5" />
+                                            </Button>
+                                        </Link>
+                                        <Link to="/login">
+                                            <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white transition-all duration-300 rounded-full w-full sm:w-auto">
+                                                Login
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right Column: 3D Globe */}
+                        <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-red-500/10 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+                            <Globe3D />
+                        </div>
                     </div>
                 </div>
             </div>

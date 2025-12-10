@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Search, Database, FileText, Globe, Activity, Moon, Sun, LogOut, History as HistoryIcon, Download, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import ThreeBackground from '@/components/ThreeBackground';
+
 import DomainAnalysisCard from "@/components/DomainAnalysisCard";
 import BulkScannerCard from "@/components/BulkScannerCard";
 import ResultsPanel from "@/components/ResultsPanel";
@@ -211,8 +211,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden">
-      {/* Three.js 3D Background */}
-      <ThreeBackground />
+
 
       {/* Animated gradient background */}
       <div className="absolute inset-0 pointer-events-none">

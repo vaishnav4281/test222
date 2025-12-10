@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { Shield, Globe, Activity, Share2, Mail, Lock, Sun, Moon, Loader2, FileText } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import OTPVerificationModal from '@/components/OTPVerificationModal';
-import ThreeBackground from '@/components/ThreeBackground';
+
 
 import Footer from '@/components/Footer';
 
@@ -109,8 +109,7 @@ export default function LoginPage() {
                 description="Secure login for DomainScope. Access your advanced domain intelligence dashboard."
             />
             <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
-                {/* Three.js particle background */}
-                <ThreeBackground />
+
                 {/* Background Grid & Glows */}
                 <div className="absolute inset-0 z-0 pointer-events-none">
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1f293720_1px,transparent_1px),linear-gradient(to_bottom,#1f293720_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />

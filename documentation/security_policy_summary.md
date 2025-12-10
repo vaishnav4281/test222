@@ -124,7 +124,3 @@ crypto.randomBytes(32).toString('hex')
 | Database Encryption | AES-256 at rest | ✅ KSDC Managed |
 
 ---
-
-**Last Updated:** 2025-12-05  
-**Security Contact:** security@domainscope.kerala.gov.in
-
