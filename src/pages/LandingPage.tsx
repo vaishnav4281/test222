@@ -137,10 +137,10 @@ const LandingPage = () => {
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <div className="relative pt-20 pb-16 sm:pt-32 sm:pb-32 overflow-hidden flex-grow flex items-center min-h-[85vh]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Hero Section - Overflow Visible for Globe */}
+            <div className="relative pt-20 pb-16 sm:pt-32 sm:pb-32 overflow-visible flex-grow flex items-center min-h-[85vh]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full overflow-visible">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center overflow-visible">
                         {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
                             <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold text-black dark:text-white bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/20 mb-8 animate-fade-in-up group hover:border-blue-500/50 transition-colors duration-300">
@@ -184,9 +184,9 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-                        {/* Right Column: 3D Globe - Free Floating */}
-                        <div className="lg:col-span-5 relative">
-                            <div className="absolute inset-0 -inset-x-20 -inset-y-20">
+                        {/* Right Column: 3D Globe - Completely Unbounded */}
+                        <div className="lg:col-span-5 relative min-h-[600px] overflow-visible">
+                            <div className="absolute inset-0 -inset-x-32 -inset-y-32 overflow-visible">
                                 <Globe3D />
                             </div>
                         </div>
