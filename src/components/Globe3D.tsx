@@ -26,24 +26,24 @@ export default function Globe3D() {
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        // 1. Main Wireframe Sphere
+        // 1. Main Wireframe Sphere - High Visibility
         const geometry = new THREE.IcosahedronGeometry(5.5, 3);
         const material = new THREE.MeshBasicMaterial({
-            color: 0x333333,
+            color: 0xffffff, // Default to white for dark mode
             wireframe: true,
             transparent: true,
-            opacity: 0.15,
+            opacity: 0.4, // Increased opacity for better visibility
         });
         const sphere = new THREE.Mesh(geometry, material);
         globeGroup.add(sphere);
 
-        // 2. Inner Core
+        // 2. Inner Core - Solid & Visible
         const coreGeometry = new THREE.SphereGeometry(5.2, 64, 64);
         const coreMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 glowColor: { value: new THREE.Color(0x3b82f6) },
                 viewVector: { value: camera.position },
-                opacity: { value: 0.5 },
+                opacity: { value: 0.6 },
                 time: { value: 0 }
             },
             vertexShader: `
@@ -75,7 +75,7 @@ export default function Globe3D() {
         const core = new THREE.Mesh(coreGeometry, coreMaterial);
         globeGroup.add(core);
 
-        // 3. Particles
+        // 3. Particles - Bright & Distinct
         const particlesGeometry = new THREE.BufferGeometry();
         const particleCount = 200;
         const posArray = new Float32Array(particleCount * 3);
@@ -101,7 +101,7 @@ export default function Globe3D() {
             colorArray[i3 + 1] = color.g;
             colorArray[i3 + 2] = color.b;
 
-            sizeArray[i] = 0.5 + Math.random() * 0.5;
+            sizeArray[i] = 0.8 + Math.random() * 0.5; // Larger particles
             speedArray[i] = 0.001 + Math.random() * 0.003;
         }
 
@@ -110,25 +110,25 @@ export default function Globe3D() {
         particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.1,
+            size: 0.12,
             vertexColors: true,
             transparent: true,
-            opacity: 0.9,
+            opacity: 1.0, // Full opacity
             blending: THREE.AdditiveBlending
         });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         globeGroup.add(particlesMesh);
 
-        // 4. Rings
-        const ringGeo = new THREE.TorusGeometry(8.5, 0.008, 16, 100);
+        // 4. Rings - Visible
+        const ringGeo = new THREE.TorusGeometry(8.5, 0.01, 16, 100);
 
-        const ringMatBlue = new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+        const ringMatBlue = new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
         const ringBlue = new THREE.Mesh(ringGeo, ringMatBlue);
         ringBlue.rotation.x = Math.PI / 2;
         ringBlue.rotation.y = Math.PI / 10;
         globeGroup.add(ringBlue);
 
-        const ringMatRed = new THREE.MeshBasicMaterial({ color: 0xf87171, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+        const ringMatRed = new THREE.MeshBasicMaterial({ color: 0xf87171, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
         const ringRed = new THREE.Mesh(ringGeo, ringMatRed);
         ringRed.rotation.x = Math.PI / 2;
         ringRed.rotation.y = -Math.PI / 10;
@@ -206,18 +206,18 @@ export default function Globe3D() {
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
             if (isDark) {
-                // Dark Mode: Silver/White wireframe for contrast against black
+                // Dark Mode: PURE WHITE wireframe for maximum contrast against black bg
                 material.color.setHex(0xffffff);
-                material.opacity = 0.1;
+                material.opacity = 0.3; // Much higher opacity for visibility
 
-                coreMaterial.uniforms.opacity.value = 0.5;
-                particlesMaterial.opacity = 0.9;
-                ringMatBlue.opacity = 0.4;
-                ringMatRed.opacity = 0.4;
+                coreMaterial.uniforms.opacity.value = 0.6;
+                particlesMaterial.opacity = 1.0;
+                ringMatBlue.opacity = 0.5;
+                ringMatRed.opacity = 0.5;
             } else {
-                // Light Mode: Pure Black wireframe for sharp contrast against white
+                // Light Mode: PURE BLACK wireframe
                 material.color.setHex(0x000000);
-                material.opacity = 0.1;
+                material.opacity = 0.2;
 
                 coreMaterial.uniforms.opacity.value = 0.7;
                 particlesMaterial.opacity = 1.0;

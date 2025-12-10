@@ -142,39 +142,39 @@ const LandingPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
-                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-black dark:text-white bg-neutral-100 dark:bg-white/10 border border-neutral-200 dark:border-white/10 mb-6 animate-fade-in-up backdrop-blur-sm group hover:border-blue-500/50 transition-colors duration-300">
+                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold text-black dark:text-[#e9edef] bg-gray-100 dark:bg-[#202c33] border border-gray-200 dark:border-[#2a3942] mb-6 animate-fade-in-up group hover:border-blue-500/50 transition-colors duration-300">
                                 <span className="flex h-1.5 w-1.5 rounded-full bg-blue-600 mr-2 animate-pulse"></span>
                                 Next-Gen Intelligence
                                 <span className="flex h-1.5 w-1.5 rounded-full bg-red-600 ml-2 animate-pulse delay-75"></span>
                             </div>
 
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 animate-fade-in-up animation-delay-100 leading-tight">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-black dark:text-[#e9edef] mb-6 animate-fade-in-up animation-delay-100 leading-tight">
                                 <span className="block">Master Your</span>
                                 <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm">
                                     Domain Intelligence
                                 </span>
                             </h1>
 
-                            <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
+                            <p className="text-lg sm:text-xl text-gray-800 dark:text-[#8696a0] mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-medium">
                                 Advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
                             </p>
 
                             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-300">
                                 {isAuthenticated ? (
                                     <Link to="/dashboard">
-                                        <Button size="lg" className="h-12 px-8 text-base bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium group">
+                                        <Button size="lg" className="h-12 px-8 text-base bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 border-0 shadow-lg transition-all duration-300 rounded-lg font-bold group">
                                             Go to Dashboard <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link to="/signup">
-                                            <Button size="lg" className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 rounded-lg font-medium group">
+                                            <Button size="lg" className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 rounded-lg font-bold group">
                                                 Start Scanning <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                             </Button>
                                         </Link>
                                         <Link to="/login">
-                                            <Button size="lg" variant="ghost" className="h-12 px-8 text-base text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/10 transition-all duration-300 rounded-lg font-medium">
+                                            <Button size="lg" variant="ghost" className="h-12 px-8 text-base text-black dark:text-[#e9edef] hover:bg-gray-100 dark:hover:bg-white/10 transition-all duration-300 rounded-lg font-bold">
                                                 Login
                                             </Button>
                                         </Link>
