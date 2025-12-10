@@ -32,6 +32,20 @@ const Index = () => {
   const [results, setResults] = useState([]);
   const [metascraperResults, setMetascraperResults] = useState([]);
   const [virusTotalResults, setVirusTotalResults] = useState([]);
+  const [subdomainResults, setSubdomainResults] = useState<any>(null);
+  const [enabledModules, setEnabledModules] = useState({
+    core: true,
+    security: true,
+    subdomains: true,
+    virustotal: true,
+    metadata: true,
+    extendedDns: true,
+    emailSecurity: true,
+    ssl: true,
+    headers: true,
+    threatIntel: true,
+    wayback: true,
+  });
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // API status check
@@ -186,6 +200,10 @@ const Index = () => {
 
   const handleVirusTotalResults = (newResult: any) => {
     setVirusTotalResults(prev => [newResult, ...prev]);
+  };
+
+  const handleSubdomainResults = (newResult: any) => {
+    setSubdomainResults(newResult);
   };
 
   const handleBulkResults = (newResult: any) => {
@@ -422,12 +440,18 @@ const Index = () => {
                 onResults={handleSingleResults}
                 onMetascraperResults={handleMetascraperResults}
                 onVirusTotalResults={handleVirusTotalResults}
+                onSubdomainResults={handleSubdomainResults}
+                enabledModules={enabledModules}
+                setEnabledModules={setEnabledModules}
               />
             ) : activeTab === 'bulk' ? (
               <BulkScannerCard
                 onResults={handleBulkResults}
                 onMetascraperResults={handleMetascraperResults}
                 onVirusTotalResults={handleVirusTotalResults}
+                onSubdomainResults={handleSubdomainResults}
+                enabledModules={enabledModules}
+                setEnabledModules={setEnabledModules}
               />
             ) : (
               <Card className="border-none shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">

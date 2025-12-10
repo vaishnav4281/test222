@@ -194,19 +194,6 @@ export default function SignupPage() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Built by section inside the glassmorphism card */}
-                        <div className="text-sm text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-6">
-                            Built by{' '}
-                            <a
-                                href="https://www.linkedin.com/in/va1shnav"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-semibold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent hover:from-blue-500 hover:to-red-500 transition-all duration-300 hover:underline"
-                            >
-                                Vaishnav K
-                            </a>
-                        </div>
                     </div>
                 </div>
 
