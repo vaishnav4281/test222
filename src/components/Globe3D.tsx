@@ -251,8 +251,6 @@ export default function Globe3D() {
             const delta = clock.getDelta();
             time += delta;
 
-            globeMaterial.uniforms.time.value = time;
-
             const isHovering = containerRef.current?.matches(':hover');
             const autoRotateSpeed = isHovering ? 0.1 : 0.05;
 
