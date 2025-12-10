@@ -15,7 +15,7 @@ const LandingPage = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#111b21] text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
+        <div className="min-h-screen bg-white dark:bg-[#111b21] text-slate-900 dark:text-slate-50 transition-colors duration-300 relative overflow-hidden font-sans flex flex-col">
             <SEO
                 title="DomainScope"
                 description="Advanced domain intelligence platform built by an expert Software Engineer. Features WHOIS, DNS, Threat Intel, and more."
@@ -142,27 +142,27 @@ const LandingPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
-                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 mb-6 animate-fade-in-up backdrop-blur-sm group hover:border-blue-500/50 transition-colors duration-300">
-                                <span className="flex h-1.5 w-1.5 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
+                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-black dark:text-white bg-neutral-100 dark:bg-white/10 border border-neutral-200 dark:border-white/10 mb-6 animate-fade-in-up backdrop-blur-sm group hover:border-blue-500/50 transition-colors duration-300">
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-blue-600 mr-2 animate-pulse"></span>
                                 Next-Gen Intelligence
-                                <span className="flex h-1.5 w-1.5 rounded-full bg-red-500 ml-2 animate-pulse delay-75"></span>
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-red-600 ml-2 animate-pulse delay-75"></span>
                             </div>
 
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 animate-fade-in-up animation-delay-100 leading-tight">
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 animate-fade-in-up animation-delay-100 leading-tight">
                                 <span className="block">Master Your</span>
                                 <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm">
                                     Domain Intelligence
                                 </span>
                             </h1>
 
-                            <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
+                            <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-300 mb-8 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-light">
                                 Advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
                             </p>
 
                             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-300">
                                 {isAuthenticated ? (
                                     <Link to="/dashboard">
-                                        <Button size="lg" className="h-12 px-8 text-base bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-50 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium group">
+                                        <Button size="lg" className="h-12 px-8 text-base bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-200 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium group">
                                             Go to Dashboard <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
@@ -174,7 +174,7 @@ const LandingPage = () => {
                                             </Button>
                                         </Link>
                                         <Link to="/login">
-                                            <Button size="lg" variant="ghost" className="h-12 px-8 text-base text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 rounded-lg font-medium">
+                                            <Button size="lg" variant="ghost" className="h-12 px-8 text-base text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-white/10 transition-all duration-300 rounded-lg font-medium">
                                                 Login
                                             </Button>
                                         </Link>
@@ -186,7 +186,7 @@ const LandingPage = () => {
                         {/* Right Column: 3D Globe - Optimized Size */}
                         <div className="lg:col-span-5 relative h-[400px] sm:h-[500px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
                             {/* Subtle dark glow for dark mode */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-500/10 dark:bg-blue-900/10 rounded-full blur-[80px] opacity-50"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-[80px] opacity-50"></div>
                             <div className="w-full h-full scale-100">
                                 <Globe3D />
                             </div>
