@@ -30,7 +30,7 @@ export default function Globe3D() {
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        const GLOBE_RADIUS = 2.6;
+        const GLOBE_RADIUS = 2.2;
 
         // Atmospheric glow
         const atmosphereGeometry = new THREE.SphereGeometry(GLOBE_RADIUS * 1.15, 64, 64);
@@ -54,9 +54,10 @@ export default function Globe3D() {
                 varying vec3 vNormal;
                 
                 void main() {
-                    float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
+                    float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
                     vec3 glow = mix(colorBlue, colorRed, sin(time * 0.3) * 0.5 + 0.5);
-                    gl_FragColor = vec4(glow, intensity * 0.5);
+                    float pulse = sin(time * 0.5) * 0.2 + 0.8;
+                    gl_FragColor = vec4(glow * pulse, intensity * 0.7);
                 }
             `,
             side: THREE.BackSide,
@@ -94,10 +95,14 @@ export default function Globe3D() {
                 varying vec2 vUv;
                 
                 void main() {
-                    float fresnel = pow(1.0 - dot(normalize(cameraPosition - vec3(0.0)), vNormal), 3.0);
+                    float fresnel = pow(1.0 - dot(normalize(cameraPosition - vec3(0.0)), vNormal), 2.5);
                     vec3 glowColor = mix(glowColorBlue, glowColorRed, sin(time * 0.5 + vUv.x * 3.14) * 0.5 + 0.5);
-                    vec3 finalColor = mix(baseColor, glowColor, fresnel * 0.5);
-                    gl_FragColor = vec4(finalColor, 0.98);
+                    
+                    // Stronger glow and edge lighting
+                    vec3 finalColor = mix(baseColor, glowColor, fresnel * 0.7);
+                    finalColor += glowColor * fresnel * 0.4;
+                    
+                    gl_FragColor = vec4(finalColor, 1.0);
                 }
             `,
             transparent: true
@@ -125,8 +130,9 @@ export default function Globe3D() {
             const material = new THREE.LineBasicMaterial({
                 color: index % 2 === 0 ? gridColorBlue : gridColorRed,
                 transparent: true,
-                opacity: 0.4,
-                blending: THREE.AdditiveBlending
+                opacity: 0.65,
+                blending: THREE.AdditiveBlending,
+                linewidth: 2
             });
             globeGroup.add(new THREE.Line(geometry, material));
         });
@@ -146,8 +152,9 @@ export default function Globe3D() {
             const material = new THREE.LineBasicMaterial({
                 color: (lon / 20) % 2 === 0 ? gridColorBlue : gridColorRed,
                 transparent: true,
-                opacity: 0.4,
-                blending: THREE.AdditiveBlending
+                opacity: 0.65,
+                blending: THREE.AdditiveBlending,
+                linewidth: 2
             });
             globeGroup.add(new THREE.Line(geometry, material));
         }
@@ -183,22 +190,23 @@ export default function Globe3D() {
         particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.06,
+            size: 0.08,
             vertexColors: true,
             transparent: true,
-            opacity: 1.0,
-            blending: THREE.AdditiveBlending
+            opacity: 0.95,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true
         });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         globeGroup.add(particlesMesh);
 
         // Ring
         const ring1 = new THREE.Mesh(
-            new THREE.TorusGeometry(GLOBE_RADIUS + 1.8, 0.005, 16, 100),
+            new THREE.TorusGeometry(GLOBE_RADIUS + 1.6, 0.006, 16, 100),
             new THREE.MeshBasicMaterial({
                 color: 0x60a5fa,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.75,
                 blending: THREE.AdditiveBlending
             })
         );
@@ -206,11 +214,15 @@ export default function Globe3D() {
         globeGroup.add(ring1);
 
         // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0x60a5fa, 2, 50);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
+        const pointLight1 = new THREE.PointLight(0x60a5fa, 3, 50);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xef4444, 2, 50);
+        pointLight2.position.set(-5, -5, 5);
+        scene.add(pointLight2);
 
         // Mouse interaction
         const mouse = new THREE.Vector2();
