@@ -184,9 +184,9 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-                        {/* Right Column: 3D Globe - Unbounded */}
-                        <div className="lg:col-span-5 w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
-                            <div className="w-full h-[500px] scale-110">
+                        {/* Right Column: 3D Globe - No Boundaries */}
+                        <div className="lg:col-span-5 w-full flex items-center justify-center animate-fade-in-up animation-delay-500 overflow-visible">
+                            <div className="w-full h-[600px] overflow-visible">
                                 <Globe3D />
                             </div>
                         </div>
