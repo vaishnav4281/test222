@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://default:poEBLddyIyq4pr2DAFe6zNPGi6wNIvHB@redis-13996.c301.ap-south-1-1.ec2.cloud.redislabs.com:13996';
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
 export const redis = new Redis(REDIS_URL, {
     maxRetriesPerRequest: null, // Required for BullMQ

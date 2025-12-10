@@ -24,7 +24,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me-in-prod';
 
 const ZONES = [
   'zen.spamhaus.org',
