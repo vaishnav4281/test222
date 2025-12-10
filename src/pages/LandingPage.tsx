@@ -143,21 +143,24 @@ const LandingPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center overflow-visible">
                         {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
-                            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold text-black dark:text-white bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/20 mb-8 animate-fade-in-up group hover:border-blue-500/50 transition-colors duration-300">
-                                <span className="flex h-2 w-2 rounded-full bg-blue-600 mr-2 animate-pulse"></span>
-                                Next-Gen Intelligence
-                                <span className="flex h-2 w-2 rounded-full bg-red-600 ml-2 animate-pulse delay-75"></span>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-sm font-medium mb-6 animate-fade-in-up">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                </span>
+                                Trusted by Law Enforcement & Cyber Defense Teams
                             </div>
 
-                            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-black dark:text-white mb-8 animate-fade-in-up animation-delay-100 leading-[1.1]">
-                                <span className="block">Master Your</span>
-                                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm">
-                                    Domain Intelligence
+                            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight tracking-tight text-gray-900 dark:text-white">
+                                Domain Intelligence for <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-red-600 drop-shadow-sm">
+                                    Digital Forensics
                                 </span>
                             </h1>
 
-                            <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed animate-fade-in-up animation-delay-200 max-w-2xl mx-auto lg:mx-0 font-medium">
-                                Advanced OSINT tools for comprehensive digital asset monitoring, subdomain discovery, and real-time threat detection.
+                            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl leading-relaxed font-light">
+                                The elite OSINT platform for advanced domain reconnaissance.
+                                Used by intelligence agencies and security professionals to uncover threats, map infrastructure, and secure digital borders.
                             </p>
 
                             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5 animate-fade-in-up animation-delay-300">
