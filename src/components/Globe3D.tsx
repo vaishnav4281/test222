@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
 export default function Globe3D() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -10,7 +11,7 @@ export default function Globe3D() {
         // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
-        camera.position.z = 16; // Optimized distance
+        camera.position.z = 16;
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -25,10 +26,10 @@ export default function Globe3D() {
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        // 1. Main Wireframe Sphere - Sleeker, less dense
-        const geometry = new THREE.IcosahedronGeometry(5.5, 2); // Reduced detail for sleek look
+        // 1. Main Wireframe Sphere
+        const geometry = new THREE.IcosahedronGeometry(5.5, 2);
         const material = new THREE.MeshBasicMaterial({
-            color: 0x3b82f6,
+            color: 0x333333, // Dark base
             wireframe: true,
             transparent: true,
             opacity: 0.1,
@@ -37,11 +38,11 @@ export default function Globe3D() {
         const sphere = new THREE.Mesh(geometry, material);
         globeGroup.add(sphere);
 
-        // 2. Inner Core - Subtle
+        // 2. Inner Core - Dark with Red/Blue hint
         const coreGeometry = new THREE.SphereGeometry(5, 32, 32);
         const coreMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                glowColor: { value: new THREE.Color(0x2563eb) },
+                glowColor: { value: new THREE.Color(0x3b82f6) }, // Blue default
                 viewVector: { value: camera.position }
             },
             vertexShader: `
@@ -59,7 +60,7 @@ export default function Globe3D() {
                 varying float intensity;
                 void main() {
                     vec3 glow = glowColor * intensity;
-                    gl_FragColor = vec4(glow, 0.8);
+                    gl_FragColor = vec4(glow, 0.6);
                 }
             `,
             side: THREE.FrontSide,
@@ -69,40 +70,61 @@ export default function Globe3D() {
         const core = new THREE.Mesh(coreGeometry, coreMaterial);
         globeGroup.add(core);
 
-        // 3. Floating Data Nodes - Minimalist
+        // 3. Dual-Color Particles (Red & Blue)
         const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 80; // Reduced count
+        const particleCount = 120;
         const posArray = new Float32Array(particleCount * 3);
+        const colorArray = new Float32Array(particleCount * 3);
 
-        for (let i = 0; i < particleCount * 3; i += 3) {
-            const phi = Math.acos(-1 + (2 * i / 3) / particleCount);
+        const colorBlue = new THREE.Color(0x3b82f6);
+        const colorRed = new THREE.Color(0xef4444);
+
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            const phi = Math.acos(-1 + (2 * i) / particleCount);
             const theta = Math.sqrt(particleCount * Math.PI) * phi;
             const r = 5.8 + Math.random() * 0.4;
 
-            posArray[i] = r * Math.cos(theta) * Math.sin(phi);
-            posArray[i + 1] = r * Math.sin(theta) * Math.sin(phi);
-            posArray[i + 2] = r * Math.cos(phi);
+            posArray[i3] = r * Math.cos(theta) * Math.sin(phi);
+            posArray[i3 + 1] = r * Math.sin(theta) * Math.sin(phi);
+            posArray[i3 + 2] = r * Math.cos(phi);
+
+            // Mix of Red and Blue particles
+            const color = Math.random() > 0.5 ? colorBlue : colorRed;
+            colorArray[i3] = color.r;
+            colorArray[i3 + 1] = color.g;
+            colorArray[i3 + 2] = color.b;
         }
 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.12,
-            color: 0x60a5fa,
+            size: 0.15,
+            vertexColors: true, // Enable vertex colors
             transparent: true,
-            opacity: 0.6,
+            opacity: 0.8,
             blending: THREE.AdditiveBlending
         });
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         globeGroup.add(particlesMesh);
 
-        // 4. Orbital Rings - Thinner, elegant
-        const ringGeo = new THREE.TorusGeometry(7.5, 0.01, 16, 100); // Thinner tube
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.rotation.x = Math.PI / 2;
-        ring.rotation.y = Math.PI / 8;
-        globeGroup.add(ring);
+        // 4. Orbital Rings - One Blue, One Red
+        const ringGeo = new THREE.TorusGeometry(7.5, 0.015, 16, 100);
+
+        // Blue Ring
+        const ringMatBlue = new THREE.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+        const ringBlue = new THREE.Mesh(ringGeo, ringMatBlue);
+        ringBlue.rotation.x = Math.PI / 2;
+        ringBlue.rotation.y = Math.PI / 8;
+        globeGroup.add(ringBlue);
+
+        // Red Ring
+        const ringMatRed = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+        const ringRed = new THREE.Mesh(ringGeo, ringMatRed);
+        ringRed.rotation.x = Math.PI / 2;
+        ringRed.rotation.y = -Math.PI / 8;
+        globeGroup.add(ringRed);
 
         // Mouse Interaction
         const mouse = new THREE.Vector2();
@@ -120,17 +142,36 @@ export default function Globe3D() {
         }
 
         // Animation
+        let time = 0;
         const animate = () => {
             requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Interaction Logic
+            const isHovering = containerRef.current?.matches(':hover');
+
+            // Rotation speed increases on hover
+            const rotationSpeed = isHovering ? 0.003 : 0.001;
 
             targetRotation.x = (mouse.y * 0.0002);
             targetRotation.y = (mouse.x * 0.0002);
 
-            globeGroup.rotation.y += 0.001; // Slower auto rotate
+            globeGroup.rotation.y += rotationSpeed;
             globeGroup.rotation.x += (targetRotation.x - globeGroup.rotation.x) * 0.05;
             globeGroup.rotation.y += (targetRotation.y - globeGroup.rotation.y) * 0.05;
 
+            // Particles float
             particlesMesh.rotation.y -= 0.0005;
+
+            // Rings breathe
+            const scale = 1 + Math.sin(time) * 0.02;
+            ringBlue.scale.setScalar(scale);
+            ringRed.scale.setScalar(scale);
+
+            // Dynamic color shift for core based on time
+            const r = (Math.sin(time * 0.5) + 1) * 0.5; // 0 to 1
+            const coreColor = new THREE.Color().lerpColors(colorBlue, colorRed, r);
+            coreMaterial.uniforms.glowColor.value.copy(coreColor);
 
             renderer.render(scene, camera);
         };
@@ -154,29 +195,11 @@ export default function Globe3D() {
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
             if (isDark) {
-                // Dark Mode: Sleek Black/Silver/White - No Blue
-                material.color.setHex(0x333333); // Dark Grey wireframe
-                material.opacity = 0.15;
-
-                coreMaterial.uniforms.glowColor.value.setHex(0x1a1a1a); // Very subtle dark glow
-
-                particlesMaterial.color.setHex(0xffffff); // White nodes
-                particlesMaterial.opacity = 0.4;
-
-                ringMat.color.setHex(0x404040); // Dark grey ring
-                ringMat.opacity = 0.3;
+                material.color.setHex(0x404040);
+                material.opacity = 0.1;
             } else {
-                // Light Mode: Keep the clean Blue
-                material.color.setHex(0x2563eb);
-                material.opacity = 0.15;
-
-                coreMaterial.uniforms.glowColor.value.setHex(0x3b82f6);
-
-                particlesMaterial.color.setHex(0x60a5fa);
-                particlesMaterial.opacity = 0.6;
-
-                ringMat.color.setHex(0x93c5fd);
-                ringMat.opacity = 0.4;
+                material.color.setHex(0xcccccc);
+                material.opacity = 0.3;
             }
         };
 
@@ -197,5 +220,12 @@ export default function Globe3D() {
         };
     }, []);
 
-    return <div ref={containerRef} className="w-full h-full min-h-[400px]" />;
+    return (
+        <div
+            ref={containerRef}
+            className="w-full h-full min-h-[400px] transition-all duration-700 ease-out hover:scale-105 cursor-pointer"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        />
+    );
 }

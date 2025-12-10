@@ -142,14 +142,15 @@ const LandingPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         {/* Left Column: Text Content */}
                         <div className="lg:col-span-7 text-center lg:text-left relative z-20">
-                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 mb-6 animate-fade-in-up backdrop-blur-sm">
-                                <span className="flex h-1.5 w-1.5 rounded-full bg-slate-500 dark:bg-slate-400 mr-2 animate-pulse"></span>
+                            <div className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 mb-6 animate-fade-in-up backdrop-blur-sm group hover:border-blue-500/50 transition-colors duration-300">
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
                                 Next-Gen Intelligence
+                                <span className="flex h-1.5 w-1.5 rounded-full bg-red-500 ml-2 animate-pulse delay-75"></span>
                             </div>
 
                             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 animate-fade-in-up animation-delay-100 leading-tight">
                                 <span className="block">Master Your</span>
-                                <span className="bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+                                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 bg-clip-text text-transparent drop-shadow-sm">
                                     Domain Intelligence
                                 </span>
                             </h1>
@@ -161,15 +162,15 @@ const LandingPage = () => {
                             <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-300">
                                 {isAuthenticated ? (
                                     <Link to="/dashboard">
-                                        <Button size="lg" className="h-12 px-8 text-base bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium">
-                                            Go to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                                        <Button size="lg" className="h-12 px-8 text-base bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-50 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium group">
+                                            Go to Dashboard <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                         </Button>
                                     </Link>
                                 ) : (
                                     <>
                                         <Link to="/signup">
-                                            <Button size="lg" className="h-12 px-8 text-base bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 border-0 shadow-lg transition-all duration-300 rounded-lg font-medium">
-                                                Start Scanning <ArrowRight className="ml-2 h-4 w-4" />
+                                            <Button size="lg" className="h-12 px-8 text-base bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 rounded-lg font-medium group">
+                                                Start Scanning <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                             </Button>
                                         </Link>
                                         <Link to="/login">
@@ -185,7 +186,7 @@ const LandingPage = () => {
                         {/* Right Column: 3D Globe - Optimized Size */}
                         <div className="lg:col-span-5 relative h-[400px] sm:h-[500px] w-full flex items-center justify-center animate-fade-in-up animation-delay-500">
                             {/* Subtle dark glow for dark mode */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-slate-200/50 dark:bg-slate-800/20 rounded-full blur-[80px] opacity-50"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-500/10 dark:bg-blue-900/10 rounded-full blur-[80px] opacity-50"></div>
                             <div className="w-full h-full scale-100">
                                 <Globe3D />
                             </div>
