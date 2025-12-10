@@ -8,15 +8,14 @@ export default function Globe3D() {
     useEffect(() => {
         if (!containerRef.current) return;
 
-        // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(
-            50,
+            45,
             containerRef.current.clientWidth / containerRef.current.clientHeight,
             0.1,
             1000
         );
-        camera.position.z = 10;
+        camera.position.z = 12;
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -28,293 +27,374 @@ export default function Globe3D() {
         renderer.setClearColor(0x000000, 0);
         containerRef.current.appendChild(renderer.domElement);
 
-        // Globe Group
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        const globeRadius = 2.4;
+        const GLOBE_RADIUS = 2.6;
 
-        // ===== CLEAN WIREFRAME GLOBE =====
-        const segments = 64;
-        const globeGeometry = new THREE.SphereGeometry(globeRadius, segments, segments);
-
-        const wireframeMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15 // Very subtle
-        });
-        const wireframeGlobe = new THREE.Mesh(globeGeometry, wireframeMaterial);
-        globeGroup.add(wireframeGlobe);
-
-        // ===== CLEAN GRID LINES (GEOGRAPHIC) =====
-        const linesMaterial = new THREE.LineBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.2
-        });
-
-        // Latitude lines
-        for (let lat = -60; lat <= 60; lat += 30) {
-            const radius = Math.cos((lat * Math.PI) / 180) * globeRadius;
-            const y = Math.sin((lat * Math.PI) / 180) * globeRadius;
-
-            const points = [];
-            for (let i = 0; i <= 64; i++) {
-                const theta = (i / 64) * Math.PI * 2;
-                points.push(new THREE.Vector3(
-                    Math.cos(theta) * radius,
-                    y,
-                    Math.sin(theta) * radius
-                ));
-            }
-
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const line = new THREE.Line(geometry, linesMaterial);
-            globeGroup.add(line);
-        }
-
-        // Longitude lines
-        for (let lon = 0; lon < 180; lon += 30) {
-            const points = [];
-            for (let i = 0; i <= 64; i++) {
-                const phi = (i / 64) * Math.PI;
-                const theta = (lon * Math.PI) / 180;
-
-                points.push(new THREE.Vector3(
-                    globeRadius * Math.sin(phi) * Math.cos(theta),
-                    globeRadius * Math.cos(phi),
-                    globeRadius * Math.sin(phi) * Math.sin(theta)
-                ));
-            }
-
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const line = new THREE.Line(geometry, linesMaterial);
-            globeGroup.add(line);
-        }
-
-        // ===== SECURITY SCAN WAVE (Radar Effect) =====
-        const scanGeometry = new THREE.RingGeometry(globeRadius * 0.05, globeRadius * 1.05, 64);
-        const scanMaterial = new THREE.ShaderMaterial({
+        // ===== ATMOSPHERIC GLOW LAYERS =====
+        const atmosphereGeometry = new THREE.SphereGeometry(GLOBE_RADIUS * 1.15, 64, 64);
+        const atmosphereMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 },
-                color: { value: new THREE.Color(0x60a5fa) }
+                color: { value: new THREE.Color(0x4080ff) }
             },
             vertexShader: `
-                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
                 void main() {
-                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    vPosition = position;
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
             `,
             fragmentShader: `
                 uniform float time;
                 uniform vec3 color;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                
+                void main() {
+                    float intensity = pow(0.65 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
+                    vec3 glow = color * intensity;
+                    float pulse = sin(time * 0.5) * 0.1 + 0.9;
+                    gl_FragColor = vec4(glow * pulse, intensity * 0.25);
+                }
+            `,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        });
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        globeGroup.add(atmosphere);
+
+        // ===== MAIN GLOBE WITH SOPHISTICATED SHADER =====
+        const globeGeometry = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
+        const globeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                baseColor: { value: new THREE.Color(0x0a0e27) },
+                glowColor: { value: new THREE.Color(0x4080ff) },
+                mousePos: { value: new THREE.Vector2(0, 0) }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                varying vec3 vPosition;
                 varying vec2 vUv;
                 
                 void main() {
-                    vec2 center = vec2(0.5, 0.5);
-                    float dist = distance(vUv, center);
-                    
-                    // Scanning wave
-                    float wave = fract(time * 0.3);
-                    float scanLine = smoothstep(wave - 0.05, wave, dist) - smoothstep(wave, wave + 0.05, dist);
-                    
-                    gl_FragColor = vec4(color, scanLine * 0.8);
+                    vNormal = normalize(normalMatrix * normal);
+                    vPosition = position;
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
             `,
-            transparent: true,
-            side: THREE.DoubleSide,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
+            fragmentShader: `
+                uniform float time;
+                uniform vec3 baseColor;
+                uniform vec3 glowColor;
+                uniform vec2 mousePos;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                varying vec2 vUv;
+                
+                void main() {
+                    // Fresnel effect
+                    vec3 viewDirection = normalize(cameraPosition - vPosition);
+                    float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
+                    
+                    // Hexagonal grid pattern
+                    float scale = 15.0;
+                    vec2 st = vUv * scale;
+                    vec2 hex = vec2(st.x - 0.5 * mod(floor(st.y), 2.0), st.y);
+                    vec2 fhex = fract(hex);
+                    float d = min(min(
+                        distance(fhex, vec2(0.0, 0.5)),
+                        distance(fhex, vec2(1.0, 0.5))),
+                        min(
+                            distance(fhex, vec2(0.5, 0.0)),
+                            distance(fhex, vec2(0.5, 1.0))
+                        )
+                    );
+                    float hexGrid = smoothstep(0.05, 0.06, d);
+                    
+                    // Animated scan lines
+                    float scanLine = step(0.95, fract((vUv.y * 20.0) - time * 0.5));
+                    
+                    // Combine effects
+                    vec3 finalColor = mix(baseColor, glowColor, fresnel * 0.3);
+                    finalColor = mix(finalColor, glowColor, (1.0 - hexGrid) * 0.15);
+                    finalColor += glowColor * scanLine * 0.2;
+                    
+                    // Edge glow
+                    float edgeGlow = fresnel * 0.5;
+                    
+                    gl_FragColor = vec4(finalColor + glowColor * edgeGlow, 0.95);
+                }
+            `,
+            transparent: true
         });
+        const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+        globeGroup.add(globe);
 
-        const scanWave = new THREE.Mesh(scanGeometry, scanMaterial);
-        scanWave.rotation.x = Math.PI / 2;
-        globeGroup.add(scanWave);
-
-        // ===== DOMAIN/SERVER NODES (Data Points on Surface) =====
-        const nodeCount = 24;
-        const nodeGeometry = new THREE.SphereGeometry(0.04, 8, 8);
-        const nodeMaterialBlue = new THREE.MeshBasicMaterial({
-            color: 0x60a5fa,
-            transparent: true,
-            opacity: 0.9
-        });
-        const nodeMaterialRed = new THREE.MeshBasicMaterial({
-            color: 0xef4444,
-            transparent: true,
-            opacity: 0.9
-        });
-
-        const nodes: THREE.Mesh[] = [];
-        for (let i = 0; i < nodeCount; i++) {
-            const phi = Math.acos(-1 + (2 * i) / nodeCount);
-            const theta = Math.sqrt(nodeCount * Math.PI) * phi;
-
-            const x = globeRadius * Math.sin(phi) * Math.cos(theta);
-            const y = globeRadius * Math.sin(phi) * Math.sin(theta);
-            const z = globeRadius * Math.cos(phi);
-
-            const material = Math.random() > 0.7 ? nodeMaterialRed : nodeMaterialBlue;
-            const node = new THREE.Mesh(nodeGeometry, material);
-            node.position.set(x, y, z);
-
-            // Glowing ring around each node
-            const ringGeo = new THREE.RingGeometry(0.05, 0.06, 16);
-            const ringMat = new THREE.MeshBasicMaterial({
-                color: material.color,
+        // ===== ELEGANT LATITUDE/LONGITUDE LINES =====
+        const createGridLine = (points: THREE.Vector3[], color: THREE.Color, opacity: number) => {
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({
+                color,
                 transparent: true,
-                opacity: 0.5,
-                side: THREE.DoubleSide
+                opacity,
+                blending: THREE.AdditiveBlending
             });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.position.copy(node.position);
-            ring.lookAt(0, 0, 0);
+            return new THREE.Line(geometry, material);
+        };
 
-            globeGroup.add(node);
-            globeGroup.add(ring);
-            nodes.push(node);
+        const gridColor = new THREE.Color(0x4080ff);
+
+        // Latitude lines
+        [-60, -30, 0, 30, 60].forEach(lat => {
+            const radius = Math.cos((lat * Math.PI) / 180) * GLOBE_RADIUS;
+            const y = Math.sin((lat * Math.PI) / 180) * GLOBE_RADIUS;
+            const points = [];
+            for (let i = 0; i <= 128; i++) {
+                const theta = (i / 128) * Math.PI * 2;
+                points.push(new THREE.Vector3(
+                    Math.cos(theta) * radius,
+                    y,
+                    Math.sin(theta) * radius
+                ));
+            }
+            globeGroup.add(createGridLine(points, gridColor, 0.15));
+        });
+
+        // Longitude lines
+        for (let lon = 0; lon < 180; lon += 20) {
+            const points = [];
+            for (let i = 0; i <= 128; i++) {
+                const phi = (i / 128) * Math.PI;
+                const theta = (lon * Math.PI) / 180;
+                points.push(new THREE.Vector3(
+                    GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
+                    GLOBE_RADIUS * Math.cos(phi),
+                    GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta)
+                ));
+            }
+            globeGroup.add(createGridLine(points, gridColor, 0.15));
         }
 
-        // ===== DATA CONNECTIONS (Between Nodes) =====
-        const connectionMaterial = new THREE.LineBasicMaterial({
-            color: 0x60a5fa,
-            transparent: true,
-            opacity: 0.2
-        });
+        // ===== DATA NODES WITH ARCS =====
+        const nodes: { mesh: THREE.Mesh; ring: THREE.Mesh; position: THREE.Vector3; type: 'secure' | 'threat' }[] = [];
+        const nodePositions: THREE.Vector3[] = [];
 
-        // Create a few connections between random nodes
-        for (let i = 0; i < 8; i++) {
-            const node1 = nodes[Math.floor(Math.random() * nodes.length)];
-            const node2 = nodes[Math.floor(Math.random() * nodes.length)];
+        for (let i = 0; i < 32; i++) {
+            const phi = Math.acos(-1 + (2 * i) / 32);
+            const theta = Math.sqrt(32 * Math.PI) * phi;
 
-            if (node1 !== node2) {
-                const points = [];
-                points.push(node1.position.clone());
-                points.push(node2.position.clone());
+            const position = new THREE.Vector3(
+                GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
+                GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
+                GLOBE_RADIUS * Math.cos(phi)
+            );
 
-                const geometry = new THREE.BufferGeometry().setFromPoints(points);
-                const line = new THREE.Line(geometry, connectionMaterial);
-                globeGroup.add(line);
+            const type = Math.random() > 0.85 ? 'threat' : 'secure';
+            const color = type === 'threat' ? new THREE.Color(0xff4444) : new THREE.Color(0x44aaff);
+
+            // Node
+            const nodeGeo = new THREE.SphereGeometry(0.035, 16, 16);
+            const nodeMat = new THREE.MeshBasicMaterial({
+                color,
+                transparent: true,
+                opacity: 0.9
+            });
+            const node = new THREE.Mesh(nodeGeo, nodeMat);
+            node.position.copy(position);
+            globeGroup.add(node);
+
+            // Pulsing ring
+            const ringGeo = new THREE.RingGeometry(0.05, 0.055, 32);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color,
+                transparent: true,
+                opacity: 0.6,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.position.copy(position);
+            ring.lookAt(0, 0, 0);
+            globeGroup.add(ring);
+
+            nodes.push({ mesh: node, ring, position: position.clone(), type });
+            nodePositions.push(position);
+        }
+
+        // ===== CURVED CONNECTION ARCS =====
+        const createArc = (start: THREE.Vector3, end: THREE.Vector3, color: THREE.Color) => {
+            const distance = start.distanceTo(end);
+            const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+            mid.normalize().multiplyScalar(GLOBE_RADIUS + distance * 0.3);
+
+            const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+            const points = curve.getPoints(50);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({
+                color,
+                transparent: true,
+                opacity: 0.2,
+                blending: THREE.AdditiveBlending
+            });
+            return new THREE.Line(geometry, material);
+        };
+
+        // Create connections
+        for (let i = 0; i < 12; i++) {
+            const idx1 = Math.floor(Math.random() * nodePositions.length);
+            const idx2 = Math.floor(Math.random() * nodePositions.length);
+            if (idx1 !== idx2) {
+                const arc = createArc(nodePositions[idx1], nodePositions[idx2], new THREE.Color(0x4080ff));
+                globeGroup.add(arc);
             }
         }
 
-        // ===== SCANNING PARTICLES (Threat Detection) =====
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 60; // Reduced for cleaner look
-        const posArray = new Float32Array(particleCount * 3);
-        const colorArray = new Float32Array(particleCount * 3);
-        const speedArray = new Float32Array(particleCount);
+        // ===== TRAVELING PARTICLES =====
+        const particlesCount = 100;
+        const particlesGeo = new THREE.BufferGeometry();
+        const particlesPos = new Float32Array(particlesCount * 3);
+        const particlesColor = new Float32Array(particlesCount * 3);
+        const particlesSpeed = new Float32Array(particlesCount);
 
-        const colorBlue = new THREE.Color(0x60a5fa);
-        const colorRed = new THREE.Color(0xef4444);
+        for (let i = 0; i < particlesCount; i++) {
+            const phi = Math.acos(-1 + (2 * Math.random()));
+            const theta = Math.random() * Math.PI * 2;
+            const r = GLOBE_RADIUS + 0.2 + Math.random() * 1.2;
 
-        for (let i = 0; i < particleCount; i++) {
-            const i3 = i * 3;
-            const phi = Math.acos(-1 + (2 * i) / particleCount);
-            const theta = Math.sqrt(particleCount * Math.PI) * phi;
-            const r = globeRadius + 0.3 + Math.random() * 0.6;
+            particlesPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+            particlesPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+            particlesPos[i * 3 + 2] = r * Math.cos(phi);
 
-            posArray[i3] = r * Math.cos(theta) * Math.sin(phi);
-            posArray[i3 + 1] = r * Math.sin(theta) * Math.sin(phi);
-            posArray[i3 + 2] = r * Math.cos(phi);
+            const color = Math.random() > 0.9 ? new THREE.Color(0xff4444) : new THREE.Color(0x44aaff);
+            particlesColor[i * 3] = color.r;
+            particlesColor[i * 3 + 1] = color.g;
+            particlesColor[i * 3 + 2] = color.b;
 
-            const color = Math.random() > 0.8 ? colorRed : colorBlue; // More blue (safe), less red (threats)
-            colorArray[i3] = color.r;
-            colorArray[i3 + 1] = color.g;
-            colorArray[i3 + 2] = color.b;
-
-            speedArray[i] = 0.002 + Math.random() * 0.003;
+            particlesSpeed[i] = 0.001 + Math.random() * 0.002;
         }
 
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(particlesPos, 3));
+        particlesGeo.setAttribute('color', new THREE.BufferAttribute(particlesColor, 3));
 
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.06,
+        const particlesMat = new THREE.PointsMaterial({
+            size: 0.04,
             vertexColors: true,
             transparent: true,
-            opacity: 1.0,
-            blending: THREE.AdditiveBlending
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true
         });
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        globeGroup.add(particlesMesh);
+        const particles = new THREE.Points(particlesGeo, particlesMat);
+        globeGroup.add(particles);
 
-        // ===== SECURITY SHIELD RING =====
-        const shieldRingGeo = new THREE.TorusGeometry(globeRadius + 1.3, 0.006, 16, 100);
-        const shieldRingMat = new THREE.MeshBasicMaterial({
-            color: 0x60a5fa,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-        const shieldRing = new THREE.Mesh(shieldRingGeo, shieldRingMat);
-        shieldRing.rotation.x = Math.PI / 2;
-        globeGroup.add(shieldRing);
+        // ===== ELEGANT RING SYSTEM =====
+        const ring1 = new THREE.Mesh(
+            new THREE.TorusGeometry(GLOBE_RADIUS + 1.8, 0.004, 16, 100),
+            new THREE.MeshBasicMaterial({
+                color: 0x4080ff,
+                transparent: true,
+                opacity: 0.4,
+                blending: THREE.AdditiveBlending
+            })
+        );
+        ring1.rotation.x = Math.PI / 2;
+        globeGroup.add(ring1);
 
-        // ===== MOUSE INTERACTION =====
+        // ===== LIGHTING =====
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x4080ff, 2, 50);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        // ===== SMOOTH MOUSE INTERACTION =====
         const mouse = new THREE.Vector2();
-        const targetRotation = new THREE.Vector2();
+        const targetRotation = new THREE.Euler(0, 0, 0);
+        const currentRotation = new THREE.Euler(0, 0, 0);
 
-        const onDocumentMouseMove = (event: MouseEvent) => {
+        const onMouseMove = (event: MouseEvent) => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            targetRotation.x = mouse.y * 0.3;
+            targetRotation.y = mouse.x * 0.3;
+
+            globeMaterial.uniforms.mousePos.value.set(mouse.x, mouse.y);
         };
 
         if (window.matchMedia("(pointer: fine)").matches) {
-            document.addEventListener('mousemove', onDocumentMouseMove);
+            window.addEventListener('mousemove', onMouseMove);
         }
 
-        // ===== ANIMATION =====
+        // ===== ANIMATION LOOP =====
         let time = 0;
+        const clock = new THREE.Clock();
+
         const animate = () => {
             requestAnimationFrame(animate);
-            time += 0.01;
+            const delta = clock.getDelta();
+            time += delta;
 
-            scanMaterial.uniforms.time.value = time;
+            // Update uniforms
+            atmosphereMaterial.uniforms.time.value = time;
+            globeMaterial.uniforms.time.value = time;
 
-            // Rotate scan wave
-            scanWave.rotation.z += 0.01;
-
+            // Smooth rotation
             const isHovering = containerRef.current?.matches(':hover');
-            const rotationSpeed = isHovering ? 0.004 : 0.002;
+            const autoRotateSpeed = isHovering ? 0.1 : 0.05;
 
-            globeGroup.rotation.y += rotationSpeed;
+            currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
+            currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
 
-            targetRotation.x = mouse.y * 0.1;
-            targetRotation.y = mouse.x * 0.1;
-
-            globeGroup.rotation.x += (targetRotation.x - globeGroup.rotation.x) * 0.03;
+            globeGroup.rotation.x = currentRotation.x;
+            globeGroup.rotation.y += autoRotateSpeed * delta;
 
             // Pulse nodes
-            nodes.forEach((node, index) => {
-                const pulse = Math.sin(time * 2 + index) * 0.3 + 1.0;
-                node.scale.setScalar(pulse);
+            nodes.forEach((node, i) => {
+                const pulse = Math.sin(time * 3 + i * 0.5) * 0.15 + 1;
+                node.mesh.scale.setScalar(pulse);
+                node.ring.scale.setScalar(pulse);
+
+                if (node.type === 'threat') {
+                    const threatPulse = Math.sin(time * 5 + i) * 0.3 + 0.7;
+                    (node.mesh.material as THREE.MeshBasicMaterial).opacity = threatPulse;
+                }
             });
 
-            // Particle animation
-            const positions = particlesGeometry.attributes.position.array as Float32Array;
-            for (let i = 0; i < particleCount; i++) {
+            // Animate particles with flow field
+            const positions = particlesGeo.attributes.position.array as Float32Array;
+            for (let i = 0; i < particlesCount; i++) {
                 const i3 = i * 3;
                 const x = positions[i3];
+                const y = positions[i3 + 1];
                 const z = positions[i3 + 2];
-                const speed = speedArray[i] * (isHovering ? 1.3 : 1);
+
+                const speed = particlesSpeed[i] * (isHovering ? 1.5 : 1);
+                const angle = Math.atan2(z, x);
 
                 positions[i3] = x * Math.cos(speed) - z * Math.sin(speed);
                 positions[i3 + 2] = x * Math.sin(speed) + z * Math.cos(speed);
+                positions[i3 + 1] = y + Math.sin(time + i) * 0.002;
             }
-            particlesGeometry.attributes.position.needsUpdate = true;
+            particlesGeo.attributes.position.needsUpdate = true;
 
-            // Shield ring rotation
-            shieldRing.rotation.z += 0.001;
+            // Elegant ring rotation
+            ring1.rotation.z += 0.002;
 
             renderer.render(scene, camera);
         };
 
         animate();
 
-        // ===== RESIZE =====
+        // ===== RESIZE HANDLER =====
         const handleResize = () => {
             if (!containerRef.current) return;
             camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
@@ -324,23 +404,15 @@ export default function Globe3D() {
 
         window.addEventListener('resize', handleResize);
 
-        // ===== THEME =====
+        // ===== THEME HANDLER =====
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
+            const baseColor = isDark ? new THREE.Color(0x0a0e27) : new THREE.Color(0xf0f4f8);
+            const glowColor = isDark ? new THREE.Color(0x4080ff) : new THREE.Color(0x3b82f6);
 
-            if (isDark) {
-                wireframeMaterial.color.setHex(0xffffff);
-                wireframeMaterial.opacity = 0.15;
-                linesMaterial.color.setHex(0xffffff);
-                linesMaterial.opacity = 0.2;
-                scanMaterial.uniforms.color.value.setHex(0x60a5fa);
-            } else {
-                wireframeMaterial.color.setHex(0x1f2937);
-                wireframeMaterial.opacity = 0.2;
-                linesMaterial.color.setHex(0x374151);
-                linesMaterial.opacity = 0.25;
-                scanMaterial.uniforms.color.value.setHex(0x3b82f6);
-            }
+            globeMaterial.uniforms.baseColor.value = baseColor;
+            globeMaterial.uniforms.glowColor.value = glowColor;
+            atmosphereMaterial.uniforms.color.value = glowColor;
         };
 
         const observer = new MutationObserver(updateTheme);
@@ -353,7 +425,7 @@ export default function Globe3D() {
         // ===== CLEANUP =====
         return () => {
             window.removeEventListener('resize', handleResize);
-            document.removeEventListener('mousemove', onDocumentMouseMove);
+            window.removeEventListener('mousemove', onMouseMove);
             observer.disconnect();
 
             if (containerRef.current?.contains(renderer.domElement)) {
