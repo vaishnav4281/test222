@@ -11,7 +11,7 @@ export default function Globe3D() {
         // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, containerRef.current.clientWidth / containerRef.current.clientHeight, 0.1, 1000);
-        camera.position.z = 15;
+        camera.position.z = 14; // Slightly closer but globe will be smaller
 
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
@@ -26,19 +26,52 @@ export default function Globe3D() {
         const globeGroup = new THREE.Group();
         scene.add(globeGroup);
 
-        // 1. Main Wireframe Sphere - Optimized for Black/White Themes
-        const geometry = new THREE.IcosahedronGeometry(5.5, 3);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xffffff, // Default to white (will be updated by theme)
-            wireframe: true,
-            transparent: true,
-            opacity: 0.2,
-        });
-        const sphere = new THREE.Mesh(geometry, material);
-        globeGroup.add(sphere);
+        // 1. Modern Dot-Matrix Globe (Replacing Wireframe)
+        // Using a high-detail sphere for dot positions
+        const globeGeo = new THREE.SphereGeometry(4.0, 48, 48); // Reduced size to 4.0
 
-        // 2. Inner Core - Vibrant & Clean
-        const coreGeometry = new THREE.SphereGeometry(5.2, 64, 64);
+        // Create a custom shader material for the dots to have a "digital" pulse
+        const dotsMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                color: { value: new THREE.Color(0xffffff) },
+                time: { value: 0 }
+            },
+            vertexShader: `
+                uniform float time;
+                varying float vAlpha;
+                void main() {
+                    vec3 newPos = position;
+                    // Subtle breathing effect
+                    newPos += normal * (sin(time * 2.0 + position.y * 4.0) * 0.05);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+                    gl_PointSize = 2.5; // Fixed dot size
+                    
+                    // Fade out at edges for a softer look
+                    vec3 viewNormal = normalize(normalMatrix * normal);
+                    vAlpha = 0.6 + 0.4 * dot(viewNormal, vec3(0, 0, 1)); 
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 color;
+                varying float vAlpha;
+                void main() {
+                    // Circular dots
+                    vec2 coord = gl_PointCoord - vec2(0.5);
+                    if(length(coord) > 0.5) discard;
+                    
+                    gl_FragColor = vec4(color, vAlpha);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending // Good for dark mode, might need adjustment for light
+        });
+
+        // Convert geometry to points
+        const dots = new THREE.Points(globeGeo, dotsMaterial);
+        globeGroup.add(dots);
+
+        // 2. Inner Core - Smaller & Sharper
+        const coreGeometry = new THREE.SphereGeometry(3.6, 64, 64);
         const coreMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 glowColor: { value: new THREE.Color(0x3b82f6) },
@@ -53,8 +86,8 @@ export default function Globe3D() {
                 void main() {
                     vec3 vNormal = normalize(normalMatrix * normal);
                     vec3 vNormel = normalize(normalMatrix * viewVector);
-                    float pulse = 0.5 + 0.1 * sin(time * 2.0);
-                    intensity = pow(pulse - dot(vNormal, vNormel), 4.5);
+                    float pulse = 0.4 + 0.1 * sin(time * 3.0);
+                    intensity = pow(pulse - dot(vNormal, vNormel), 5.0);
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
                 }
             `,
@@ -64,7 +97,7 @@ export default function Globe3D() {
                 varying float intensity;
                 void main() {
                     vec3 glow = glowColor * intensity;
-                    gl_FragColor = vec4(glow, opacity * intensity * 1.5);
+                    gl_FragColor = vec4(glow, opacity * intensity);
                 }
             `,
             side: THREE.FrontSide,
@@ -75,9 +108,9 @@ export default function Globe3D() {
         const core = new THREE.Mesh(coreGeometry, coreMaterial);
         globeGroup.add(core);
 
-        // 3. Particles - Sharp & Bright
+        // 3. Floating Data Particles (Red & Blue) - User Liked This
         const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 200;
+        const particleCount = 180;
         const posArray = new Float32Array(particleCount * 3);
         const colorArray = new Float32Array(particleCount * 3);
         const sizeArray = new Float32Array(particleCount);
@@ -90,7 +123,7 @@ export default function Globe3D() {
             const i3 = i * 3;
             const phi = Math.acos(-1 + (2 * i) / particleCount);
             const theta = Math.sqrt(particleCount * Math.PI) * phi;
-            const r = 6.2 + Math.random() * 1.0;
+            const r = 4.8 + Math.random() * 1.5; // Adjusted for smaller globe
 
             posArray[i3] = r * Math.cos(theta) * Math.sin(phi);
             posArray[i3 + 1] = r * Math.sin(theta) * Math.sin(phi);
@@ -101,8 +134,8 @@ export default function Globe3D() {
             colorArray[i3 + 1] = color.g;
             colorArray[i3 + 2] = color.b;
 
-            sizeArray[i] = 0.8 + Math.random() * 0.5;
-            speedArray[i] = 0.001 + Math.random() * 0.003;
+            sizeArray[i] = 0.6 + Math.random() * 0.6;
+            speedArray[i] = 0.002 + Math.random() * 0.004;
         }
 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -110,7 +143,7 @@ export default function Globe3D() {
         particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.12,
+            size: 0.1,
             vertexColors: true,
             transparent: true,
             opacity: 1.0,
@@ -119,8 +152,8 @@ export default function Globe3D() {
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         globeGroup.add(particlesMesh);
 
-        // 4. Rings - Subtle Elegance
-        const ringGeo = new THREE.TorusGeometry(8.5, 0.01, 16, 100);
+        // 4. Rings - Thinner & Cleaner
+        const ringGeo = new THREE.TorusGeometry(6.5, 0.008, 16, 100); // Smaller radius
 
         const ringMatBlue = new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
         const ringBlue = new THREE.Mesh(ringGeo, ringMatBlue);
@@ -154,10 +187,11 @@ export default function Globe3D() {
         const animate = () => {
             requestAnimationFrame(animate);
             time += 0.01;
+            dotsMaterial.uniforms.time.value = time;
             coreMaterial.uniforms.time.value = time;
 
             const isHovering = containerRef.current?.matches(':hover');
-            const rotationSpeed = isHovering ? 0.003 : 0.001;
+            const rotationSpeed = isHovering ? 0.004 : 0.001; // Slightly faster for dots
             targetRotation.x = (mouse.y * 0.00015);
             targetRotation.y = (mouse.x * 0.00015);
 
@@ -165,6 +199,7 @@ export default function Globe3D() {
             globeGroup.rotation.x += (targetRotation.x - globeGroup.rotation.x) * 0.08;
             globeGroup.rotation.y += (targetRotation.y - globeGroup.rotation.y) * 0.08;
 
+            // Particle Orbit
             const positions = particlesGeometry.attributes.position.array as Float32Array;
             for (let i = 0; i < particleCount; i++) {
                 const i3 = i * 3;
@@ -206,25 +241,23 @@ export default function Globe3D() {
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
             if (isDark) {
-                // Dark Mode (Pure Black BG): 
-                // Use WHITE wireframe for maximum contrast
-                material.color.setHex(0xffffff);
-                material.opacity = 0.25; // Visible but not overwhelming
+                // Dark Mode: White Dots
+                dotsMaterial.uniforms.color.value.setHex(0xffffff);
+                dotsMaterial.blending = THREE.AdditiveBlending;
 
                 coreMaterial.uniforms.opacity.value = 0.6;
                 particlesMaterial.opacity = 1.0;
-                ringMatBlue.opacity = 0.4;
-                ringMatRed.opacity = 0.4;
+                ringMatBlue.opacity = 0.5;
+                ringMatRed.opacity = 0.5;
             } else {
-                // Light Mode (Pure White BG):
-                // Use BLACK wireframe for maximum contrast
-                material.color.setHex(0x000000);
-                material.opacity = 0.15; // Sharp, thin lines
+                // Light Mode: Black Dots - No Additive Blending for visibility
+                dotsMaterial.uniforms.color.value.setHex(0x000000);
+                dotsMaterial.blending = THREE.NormalBlending; // Normal blending for black dots
 
                 coreMaterial.uniforms.opacity.value = 0.7;
                 particlesMaterial.opacity = 1.0;
-                ringMatBlue.opacity = 0.5;
-                ringMatRed.opacity = 0.5;
+                ringMatBlue.opacity = 0.6;
+                ringMatRed.opacity = 0.6;
             }
         };
 
@@ -239,8 +272,10 @@ export default function Globe3D() {
             if (containerRef.current?.contains(renderer.domElement)) {
                 containerRef.current.removeChild(renderer.domElement);
             }
-            geometry.dispose();
-            material.dispose();
+            globeGeo.dispose();
+            dotsMaterial.dispose();
+            coreGeometry.dispose();
+            coreMaterial.dispose();
             renderer.dispose();
         };
     }, []);
