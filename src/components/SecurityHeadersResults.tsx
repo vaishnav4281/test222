@@ -36,9 +36,16 @@ const SecurityHeadersResults: React.FC<SecurityHeadersResultsProps> = ({ results
                     <div className="p-2 bg-orange-100 dark:bg-orange-900/50 rounded-lg">
                         <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                     </div>
-                    <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                        HTTP Security Headers
-                    </span>
+                    <div>
+                        <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent block">
+                            HTTP Security Headers
+                        </span>
+                        {results.domain && (
+                            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                for {results.domain}
+                            </span>
+                        )}
+                    </div>
                     <div className={`ml-auto px-3 py-1 rounded-full text-white font-bold ${getGradeColor(grade)}`}>
                         Grade: {grade}
                     </div>

@@ -7,9 +7,10 @@ interface ThreatIntelResultsProps {
     safeBrowsing?: any;
     urlScan?: any;
     otx?: any;
+    domain?: string;
 }
 
-const ThreatIntelResults: React.FC<ThreatIntelResultsProps> = ({ safeBrowsing, urlScan, otx }) => {
+const ThreatIntelResults: React.FC<ThreatIntelResultsProps> = ({ safeBrowsing, urlScan, otx, domain }) => {
     if (!safeBrowsing && !urlScan && !otx) return null;
 
     return (
@@ -19,9 +20,16 @@ const ThreatIntelResults: React.FC<ThreatIntelResultsProps> = ({ safeBrowsing, u
                     <div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
                         <AlertOctagon className="h-5 w-5 text-red-600 dark:text-red-400" />
                     </div>
-                    <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                        Advanced Threat Intelligence
-                    </span>
+                    <div>
+                        <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent block">
+                            Advanced Threat Intelligence
+                        </span>
+                        {domain && (
+                            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                for {domain}
+                            </span>
+                        )}
+                    </div>
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">

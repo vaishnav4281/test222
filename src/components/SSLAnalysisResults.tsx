@@ -27,18 +27,25 @@ const SSLAnalysisResults: React.FC<SSLAnalysisResultsProps> = ({ results }) => {
                     <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
                         <Lock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
-                    <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                        SSL/TLS Analysis
-                    </span>
+                    <div>
+                        <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent block">
+                            SSL/TLS Analysis
+                        </span>
+                        {results.domain && (
+                            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                for {results.domain}
+                            </span>
+                        )}
+                    </div>
                     <Badge variant={isValid ? "default" : "destructive"} className="ml-auto">
                         {isValid ? "Valid" : "Invalid"}
                     </Badge>
                     <Badge
                         variant="outline"
                         className={`${grade.startsWith('A') ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                grade === 'B' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                                    grade === 'C' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                            grade === 'B' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                grade === 'C' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                             }`}
                     >
                         Grade: {grade}

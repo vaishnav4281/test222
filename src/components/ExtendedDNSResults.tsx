@@ -53,9 +53,16 @@ const ExtendedDNSResults: React.FC<ExtendedDNSResultsProps> = ({ results }) => {
                     <div className="p-2 bg-cyan-100 dark:bg-cyan-900/50 rounded-lg">
                         <Globe className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
                     </div>
-                    <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
-                        Extended DNS Records
-                    </span>
+                    <div>
+                        <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent block">
+                            Extended DNS Records
+                        </span>
+                        {results.domain && (
+                            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                for {results.domain}
+                            </span>
+                        )}
+                    </div>
                     {summary.totalRecordTypes && (
                         <Badge variant="secondary" className="ml-auto">
                             {summary.totalRecordTypes} record types

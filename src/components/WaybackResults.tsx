@@ -16,9 +16,16 @@ const WaybackResults: React.FC<WaybackResultsProps> = ({ results }) => {
                     <div className="p-2 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg">
                         <History className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                     </div>
-                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent">
-                        Wayback Machine History
-                    </span>
+                    <div>
+                        <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent block">
+                            Wayback Machine History
+                        </span>
+                        {results.domain && (
+                            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                for {results.domain}
+                            </span>
+                        )}
+                    </div>
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-6">

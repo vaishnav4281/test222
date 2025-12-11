@@ -21,9 +21,16 @@ const EmailSecurityResults: React.FC<EmailSecurityResultsProps> = ({ results }) 
                     <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
                         <Mail className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
-                    <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-                        Email Security (DMARC/SPF)
-                    </span>
+                    <div>
+                        <span className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent block">
+                            Email Security (DMARC/SPF)
+                        </span>
+                        {results.domain && (
+                            <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                for {results.domain}
+                            </span>
+                        )}
+                    </div>
                     <Badge variant={results.score >= 80 ? "default" : results.score >= 50 ? "secondary" : "destructive"} className="ml-auto">
                         Score: {results.score}/100
                     </Badge>

@@ -74,12 +74,12 @@ const Dashboard = () => {
     const [subdomainResults, setSubdomainResults] = useState<any>(null);
 
     // New OSINT Data States
-    const [extendedDNSResults, setExtendedDNSResults] = useState<any>(null);
-    const [emailSecurityResults, setEmailSecurityResults] = useState<any>(null);
-    const [sslResults, setSSLResults] = useState<any>(null);
-    const [headersResults, setHeadersResults] = useState<any>(null);
-    const [threatIntelResults, setThreatIntelResults] = useState<any>({});
-    const [waybackResults, setWaybackResults] = useState<any>(null);
+    const [extendedDNSResults, setExtendedDNSResults] = useState<any[]>([]);
+    const [emailSecurityResults, setEmailSecurityResults] = useState<any[]>([]);
+    const [sslResults, setSSLResults] = useState<any[]>([]);
+    const [headersResults, setHeadersResults] = useState<any[]>([]);
+    const [threatIntelResults, setThreatIntelResults] = useState<any[]>([]);
+    const [waybackResults, setWaybackResults] = useState<any[]>([]);
 
     // Module Selection State
     const [enabledModules, setEnabledModules] = useState({
@@ -179,12 +179,12 @@ const Dashboard = () => {
         setVirusTotalResults([]);
         setSubdomainResults(null);
         // Reset New States
-        setExtendedDNSResults(null);
-        setEmailSecurityResults(null);
-        setSSLResults(null);
-        setHeadersResults(null);
-        setThreatIntelResults({});
-        setWaybackResults(null);
+        setExtendedDNSResults([]);
+        setEmailSecurityResults([]);
+        setSSLResults([]);
+        setHeadersResults([]);
+        setThreatIntelResults([]);
+        setWaybackResults([]);
     };
 
     // Result Handlers
@@ -217,29 +217,29 @@ const Dashboard = () => {
 
     // New Handlers
     const handleExtendedDNSResults = (res: any) => {
-        setExtendedDNSResults(res);
+        setExtendedDNSResults(prev => [res, ...prev]);
         setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, extendedDNS: res } : r));
     };
     const handleEmailSecurityResults = (res: any) => {
-        setEmailSecurityResults(res);
+        setEmailSecurityResults(prev => [res, ...prev]);
         setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, emailSecurity: res } : r));
     };
     const handleSSLResults = (res: any) => {
-        setSSLResults(res);
+        setSSLResults(prev => [res, ...prev]);
         setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, sslResults: res } : r));
     };
     const handleHeadersResults = (res: any) => {
-        setHeadersResults(res);
+        setHeadersResults(prev => [res, ...prev]);
         setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, headersResults: res } : r));
     };
     const handleThreatIntelResults = (res: any) => {
-        setThreatIntelResults((prev: any) => ({ ...prev, ...res }));
+        setThreatIntelResults(prev => [res, ...prev]);
         if (res.domain) {
             setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, threatIntel: res } : r));
         }
     };
     const handleWaybackResults = (res: any) => {
-        setWaybackResults(res);
+        setWaybackResults(prev => [res, ...prev]);
         setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, waybackResults: res } : r));
     };
 
@@ -482,28 +482,30 @@ const Dashboard = () => {
                                         {enabledModules.metadata && <MetascraperResults results={metascraperResults} />}
 
                                         {/* New OSINT Modules */}
-                                        {enabledModules.extendedDns && extendedDNSResults && (
-                                            <ExtendedDNSResults results={extendedDNSResults} />
-                                        )}
-                                        {enabledModules.emailSecurity && emailSecurityResults && (
-                                            <EmailSecurityResults results={emailSecurityResults} />
-                                        )}
-                                        {enabledModules.ssl && sslResults && (
-                                            <SSLAnalysisResults results={sslResults} />
-                                        )}
-                                        {enabledModules.headers && headersResults && (
-                                            <SecurityHeadersResults results={headersResults} />
-                                        )}
-                                        {enabledModules.threatIntel && (threatIntelResults.safeBrowsing || threatIntelResults.urlScan || threatIntelResults.otx) && (
+                                        {enabledModules.extendedDns && extendedDNSResults.map((res, i) => (
+                                            <ExtendedDNSResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.emailSecurity && emailSecurityResults.map((res, i) => (
+                                            <EmailSecurityResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.ssl && sslResults.map((res, i) => (
+                                            <SSLAnalysisResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.headers && headersResults.map((res, i) => (
+                                            <SecurityHeadersResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.threatIntel && threatIntelResults.map((res, i) => (
                                             <ThreatIntelResults
-                                                safeBrowsing={threatIntelResults.safeBrowsing}
-                                                urlScan={threatIntelResults.urlScan}
-                                                otx={threatIntelResults.otx}
+                                                key={i}
+                                                safeBrowsing={res.safeBrowsing}
+                                                urlScan={res.urlScan}
+                                                otx={res.otx}
+                                                domain={res.domain}
                                             />
-                                        )}
-                                        {enabledModules.wayback && waybackResults && (
-                                            <WaybackResults results={waybackResults} />
-                                        )}
+                                        ))}
+                                        {enabledModules.wayback && waybackResults.map((res, i) => (
+                                            <WaybackResults key={i} results={res} />
+                                        ))}
                                     </div>
                                 )}
                             </div>
@@ -550,28 +552,30 @@ const Dashboard = () => {
                                         {enabledModules.metadata && <MetascraperResults results={metascraperResults} />}
 
                                         {/* New OSINT Cards */}
-                                        {enabledModules.extendedDns && extendedDNSResults && (
-                                            <ExtendedDNSResults results={extendedDNSResults} />
-                                        )}
-                                        {enabledModules.emailSecurity && emailSecurityResults && (
-                                            <EmailSecurityResults results={emailSecurityResults} />
-                                        )}
-                                        {enabledModules.ssl && sslResults && (
-                                            <SSLAnalysisResults results={sslResults} />
-                                        )}
-                                        {enabledModules.headers && headersResults && (
-                                            <SecurityHeadersResults results={headersResults} />
-                                        )}
-                                        {enabledModules.threatIntel && (threatIntelResults.safeBrowsing || threatIntelResults.urlScan || threatIntelResults.otx) && (
+                                        {enabledModules.extendedDns && extendedDNSResults.map((res, i) => (
+                                            <ExtendedDNSResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.emailSecurity && emailSecurityResults.map((res, i) => (
+                                            <EmailSecurityResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.ssl && sslResults.map((res, i) => (
+                                            <SSLAnalysisResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.headers && headersResults.map((res, i) => (
+                                            <SecurityHeadersResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.threatIntel && threatIntelResults.map((res, i) => (
                                             <ThreatIntelResults
-                                                safeBrowsing={threatIntelResults.safeBrowsing}
-                                                urlScan={threatIntelResults.urlScan}
-                                                otx={threatIntelResults.otx}
+                                                key={i}
+                                                safeBrowsing={res.safeBrowsing}
+                                                urlScan={res.urlScan}
+                                                otx={res.otx}
+                                                domain={res.domain}
                                             />
-                                        )}
-                                        {enabledModules.wayback && waybackResults && (
-                                            <WaybackResults results={waybackResults} />
-                                        )}
+                                        ))}
+                                        {enabledModules.wayback && waybackResults.map((res, i) => (
+                                            <WaybackResults key={i} results={res} />
+                                        ))}
                                     </div>
                                 )}
                             </div>

@@ -478,25 +478,37 @@ const BulkScannerCard = ({
         onExtendedDNSResults && enabledModules.extendedDns ? (async () => {
           try {
             const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/dns-extended?domain=${encodeURIComponent(domain)}`, 15000);
-            if (res.ok) onExtendedDNSResults(await res.json());
+            if (res.ok) {
+              const data = await res.json();
+              onExtendedDNSResults({ ...data, domain });
+            }
           } catch (e) { console.warn('Extended DNS failed:', e); }
         })() : Promise.resolve(),
         onEmailSecurityResults && enabledModules.emailSecurity ? (async () => {
           try {
             const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/email-security?domain=${encodeURIComponent(domain)}`, 15000);
-            if (res.ok) onEmailSecurityResults(await res.json());
+            if (res.ok) {
+              const data = await res.json();
+              onEmailSecurityResults({ ...data, domain });
+            }
           } catch (e) { console.warn('Email Security failed:', e); }
         })() : Promise.resolve(),
         onSSLResults && enabledModules.ssl ? (async () => {
           try {
             const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/ssl-cert?domain=${encodeURIComponent(domain)}`, 20000);
-            if (res.ok) onSSLResults(await res.json());
+            if (res.ok) {
+              const data = await res.json();
+              onSSLResults({ ...data, domain });
+            }
           } catch (e) { console.warn('SSL Analysis failed:', e); }
         })() : Promise.resolve(),
         onHeadersResults && enabledModules.headers ? (async () => {
           try {
             const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/http-headers?domain=${encodeURIComponent(domain)}`, 15000);
-            if (res.ok) onHeadersResults(await res.json());
+            if (res.ok) {
+              const data = await res.json();
+              onHeadersResults({ ...data, domain });
+            }
           } catch (e) { console.warn('HTTP Headers failed:', e); }
         })() : Promise.resolve(),
         onThreatIntelResults && enabledModules.threatIntel ? (async () => {
@@ -518,7 +530,10 @@ const BulkScannerCard = ({
         onWaybackResults && enabledModules.wayback ? (async () => {
           try {
             const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/wayback?domain=${encodeURIComponent(domain)}`, 20000);
-            if (res.ok) onWaybackResults(await res.json());
+            if (res.ok) {
+              const data = await res.json();
+              onWaybackResults({ ...data, domain });
+            }
           } catch (e) { console.warn('Wayback failed:', e); }
         })() : Promise.resolve()
       ]);
