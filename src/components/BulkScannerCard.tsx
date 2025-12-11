@@ -466,12 +466,12 @@ const BulkScannerCard = ({
             const subRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/subdomain?domain=${encodeURIComponent(domain)}`, 20000);
             if (subRes.ok) {
               const subData = await subRes.json();
-              onSubdomainResults(subData);
+              onSubdomainResults({ ...subData, domain });
             } else {
-              onSubdomainResults({ error: 'Failed to fetch subdomains' });
+              onSubdomainResults({ error: 'Failed to fetch subdomains', domain });
             }
           } catch (e) {
-            onSubdomainResults({ error: 'Subdomain scan timed out or failed' });
+            onSubdomainResults({ error: 'Subdomain scan timed out or failed', domain });
           }
         })() : Promise.resolve(),
         // NEW OSINT MODULES

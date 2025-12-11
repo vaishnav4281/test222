@@ -9,6 +9,7 @@ interface SubdomainResultsProps {
         count?: number;
         error?: string;
         timestamp?: string;
+        domain?: string;
     } | null;
 }
 
@@ -25,9 +26,16 @@ const SubdomainResults: React.FC<SubdomainResultsProps> = ({ results }) => {
                         <div className="p-2.5 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl shadow-lg shadow-blue-500/20 ring-1 ring-white/20">
                             <Network className="h-5 w-5 text-white" />
                         </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent">
-                            Subdomain Discovery
-                        </span>
+                        <div>
+                            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent block">
+                                Subdomain Discovery
+                            </span>
+                            {results.domain && (
+                                <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                                    for {results.domain}
+                                </span>
+                            )}
+                        </div>
                         {results.count !== undefined && (
                             <Badge className="bg-white/50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 backdrop-blur-sm shadow-sm">
                                 {results.count} Found

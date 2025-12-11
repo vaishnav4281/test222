@@ -71,7 +71,7 @@ const Dashboard = () => {
     const [results, setResults] = useState([]);
     const [metascraperResults, setMetascraperResults] = useState([]);
     const [virusTotalResults, setVirusTotalResults] = useState([]);
-    const [subdomainResults, setSubdomainResults] = useState<any>(null);
+    const [subdomainResults, setSubdomainResults] = useState<any[]>([]);
 
     // New OSINT Data States
     const [extendedDNSResults, setExtendedDNSResults] = useState<any[]>([]);
@@ -177,7 +177,7 @@ const Dashboard = () => {
         setResults([]);
         setMetascraperResults([]);
         setVirusTotalResults([]);
-        setSubdomainResults(null);
+        setSubdomainResults([]);
         // Reset New States
         setExtendedDNSResults([]);
         setEmailSecurityResults([]);
@@ -206,7 +206,7 @@ const Dashboard = () => {
     };
 
     const handleSubdomainResults = (newResult: any) => {
-        setSubdomainResults(newResult);
+        setSubdomainResults(prev => [newResult, ...prev]);
     };
 
     const handleBulkResults = (newResult: any) => {
@@ -478,7 +478,9 @@ const Dashboard = () => {
                                         {enabledModules.virustotal && <VirusTotalResults results={virusTotalResults} />}
 
                                         {/* Secondary Cards */}
-                                        {enabledModules.subdomains && <SubdomainResults results={subdomainResults} />}
+                                        {enabledModules.subdomains && subdomainResults.map((res, i) => (
+                                            <SubdomainResults key={i} results={res} />
+                                        ))}
                                         {enabledModules.metadata && <MetascraperResults results={metascraperResults} />}
 
                                         {/* New OSINT Modules */}
@@ -548,7 +550,9 @@ const Dashboard = () => {
                                         {enabledModules.virustotal && <VirusTotalResults results={virusTotalResults} />}
 
                                         {/* Secondary Cards */}
-                                        {enabledModules.subdomains && <SubdomainResults results={subdomainResults} />}
+                                        {enabledModules.subdomains && subdomainResults.map((res, i) => (
+                                            <SubdomainResults key={i} results={res} />
+                                        ))}
                                         {enabledModules.metadata && <MetascraperResults results={metascraperResults} />}
 
                                         {/* New OSINT Cards */}
