@@ -33,6 +33,7 @@ interface BulkScannerCardProps {
   onHeadersResults?: (result: any) => void;
   onThreatIntelResults?: (result: any) => void;
   onWaybackResults?: (result: any) => void;
+  onShodanResults?: (result: any) => void;
 
   onStartScan?: () => void;
   enabledModules: {
@@ -77,6 +78,7 @@ const BulkScannerCard = ({
   onHeadersResults,
   onThreatIntelResults,
   onWaybackResults,
+  onShodanResults,
   onStartScan,
   enabledModules,
   setEnabledModules
@@ -537,6 +539,15 @@ const BulkScannerCard = ({
               onWaybackResults({ ...data, domain });
             }
           } catch (e) { console.warn('Wayback failed:', e); }
+        })() : Promise.resolve(),
+        onShodanResults && enabledModules.shodan ? (async () => {
+          try {
+            const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/shodan?domain=${encodeURIComponent(domain)}`, 25000);
+            if (res.ok) {
+              const data = await res.json();
+              onShodanResults({ ...data, domain });
+            }
+          } catch (e) { console.warn('Shodan failed:', e); }
         })() : Promise.resolve()
       ]);
     } catch (error: any) {
@@ -781,6 +792,15 @@ const BulkScannerCard = ({
                 className="w-4 h-4 rounded border-slate-300 text-orange-600 focus:ring-orange-500"
               />
               <span className="text-sm text-slate-700 dark:text-slate-300">Wayback Machine</span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={enabledModules.shodan}
+                onChange={(e) => setEnabledModules(prev => ({ ...prev, shodan: e.target.checked }))}
+                className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+              />
+              <span className="text-sm text-slate-700 dark:text-slate-300">Shodan</span>
             </label>
           </div>
         </div>

@@ -458,6 +458,7 @@ const Index = () => {
                 onMetascraperResults={handleMetascraperResults}
                 onVirusTotalResults={handleVirusTotalResults}
                 onSubdomainResults={handleSubdomainResults}
+                onShodanResults={handleShodanResults}
                 enabledModules={enabledModules}
                 setEnabledModules={setEnabledModules}
               />
