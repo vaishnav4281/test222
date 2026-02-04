@@ -48,6 +48,7 @@ interface BulkScannerCardProps {
     headers: boolean;
     threatIntel: boolean;
     wayback: boolean;
+    shodan: boolean;
   };
   setEnabledModules: React.Dispatch<React.SetStateAction<{
     core: boolean;
@@ -61,6 +62,7 @@ interface BulkScannerCardProps {
     headers: boolean;
     threatIntel: boolean;
     wayback: boolean;
+    shodan: boolean;
   }>>;
 }
 
@@ -671,6 +673,7 @@ const BulkScannerCard = ({
                   headers: newState,
                   threatIntel: newState,
                   wayback: newState,
+                  shodan: newState, // Preserve consistency
                 });
               }}
               className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
