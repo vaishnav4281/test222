@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shodan Module Fix Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        .good { color: #4ade80; font-weight: bold; }
+        .bad { color: #f87171; font-weight: bold; }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .danger {
+            background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .instructions ol {
+            margin-left: 20px;
+        }
+        .instructions li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Shodan Module Fix Verification</h1>
+        
+        <div class="instructions">
+            <h2>📋 Instructions</h2>
+            <ol>
+                <li>Click <strong>"Check Current Status"</strong> to see your localStorage state</li>
+                <li>If Shodan is <span class="bad">NOT enabled</span>, click <strong>"Apply Fix"</strong></li>
+                <li>Refresh your main application</li>
+                <li>Shodan checkbox should now be checked!</li>
+            </ol>
+        </div>
+
+        <div class="status" id="status">
+            <h3>Current Status</h3>
+            <p>Click "Check Current Status" to analyze...</p>
+        </div>
+
+        <div style="text-align: center;">
+            <button onclick="checkStatus()">🔍 Check Current Status</button>
+            <button onclick="applyFix()">✅ Apply Fix</button>
+            <button class="danger" onclick="clearAll()">🗑️ Clear All Data</button>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3>Raw localStorage Data:</h3>
+            <pre id="rawData">Click "Check Current Status" to view...</pre>
+        </div>
+    </div>
+
+    <script>
+        function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            const rawDataPre = document.getElementById('rawData');
+            
+            // Get localStorage data
+            const enabledModules = localStorage.getItem('enabledModules');
+            const migrationDone = localStorage.getItem('shodan_migration_v1');
+            
+            let html = '<h3>Current Status</h3>';
+            
+            if (!enabledModules) {
+                html += '<div class="status-item"><span>enabledModules:</span><span class="bad">NOT FOUND (will use defaults)</span></div>';
+            } else {
+                try {
+                    const parsed = JSON.parse(enabledModules);
+                    const shodanEnabled = parsed.shodan === true;
+                    
+                    html += '<div class="status-item"><span>enabledModules:</span><span class="good">FOUND</span></div>';
+                    html += `<div class="status-item"><span>Shodan enabled:</span><span class="${shodanEnabled ? 'good' : 'bad'}">${shodanEnabled ? 'YES ✅' : 'NO ❌'}</span></div>`;
+                    
+                    // Show all modules
+                    html += '<div class="status-item"><span>All modules:</span><span>';
+                    Object.keys(parsed).forEach(key => {
+                        const enabled = parsed[key];
+                        html += `${key}: ${enabled ? '✅' : '❌'} `;
+                    });
+                    html += '</span></div>';
+                } catch (e) {
+                    html += '<div class="status-item"><span>enabledModules:</span><span class="bad">INVALID JSON</span></div>';
+                }
+            }
+            
+            html += `<div class="status-item"><span>Migration done:</span><span class="${migrationDone ? 'good' : 'bad'}">${migrationDone ? 'YES' : 'NO'}</span></div>`;
+            
+            statusDiv.innerHTML = html;
+            
+            // Show raw data
+            rawDataPre.textContent = JSON.stringify({
+                enabledModules: enabledModules ? JSON.parse(enabledModules) : null,
+                shodan_migration_v1: migrationDone,
+                theme: localStorage.getItem('theme')
+            }, null, 2);
+        }
+        
+        function applyFix() {
+            // Get current modules or use defaults
+            let modules = {
+                core: true,
+                security: true,
+                subdomains: true,
+                virustotal: true,
+                metadata: true,
+                extendedDns: true,
+                emailSecurity: true,
+                ssl: true,
+                headers: true,
+                threatIntel: true,
+                wayback: true,
+                shodan: true
+            };
+            
+            // Try to preserve existing settings
+            const existing = localStorage.getItem('enabledModules');
+            if (existing) {
+                try {
+                    const parsed = JSON.parse(existing);
+                    modules = { ...modules, ...parsed, shodan: true }; // Force shodan to true
+                } catch (e) {
+                    console.error('Failed to parse existing modules:', e);
+                }
+            }
+            
+            // Save updated modules
+            localStorage.setItem('enabledModules', JSON.stringify(modules));
+            localStorage.setItem('shodan_migration_v1', 'true');
+            
+            alert('✅ Fix applied! Shodan is now enabled.\n\nPlease refresh your main application.');
+            checkStatus();
+        }
+        
+        function clearAll() {
+            if (confirm('⚠️ This will clear ALL localStorage data including your theme preferences. Continue?')) {
+                localStorage.clear();
+                alert('🗑️ All localStorage data cleared!\n\nRefresh the page to start fresh.');
+                checkStatus();
+            }
+        }
+        
+        // Auto-check on load
+        window.onload = checkStatus;
+    </script>
+</body>
+</html>
