@@ -35,19 +35,36 @@ const Index = () => {
   const [virusTotalResults, setVirusTotalResults] = useState([]);
   const [subdomainResults, setSubdomainResults] = useState<any>(null);
   const [shodanResults, setShodanResults] = useState([]);
-  const [enabledModules, setEnabledModules] = useState({
-    core: true,
-    security: true,
-    subdomains: true,
-    virustotal: true,
-    metadata: true,
-    extendedDns: true,
-    emailSecurity: true,
-    ssl: true,
-    headers: true,
-    threatIntel: true,
-    wayback: true,
-    shodan: true,
+  const [enabledModules, setEnabledModules] = useState(() => {
+    // Default values
+    const defaults = {
+      core: true,
+      security: true,
+      subdomains: true,
+      virustotal: true,
+      metadata: true,
+      extendedDns: true,
+      emailSecurity: true,
+      ssl: true,
+      headers: true,
+      threatIntel: true,
+      wayback: true,
+      shodan: true,
+    };
+
+    // Try to load from localStorage
+    try {
+      const saved = localStorage.getItem('enabledModules');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Merge with defaults to ensure new modules (like shodan) are included
+        return { ...defaults, ...parsed };
+      }
+    } catch (e) {
+      console.warn('Failed to load enabledModules from localStorage:', e);
+    }
+
+    return defaults;
   });
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -91,6 +108,15 @@ const Index = () => {
       document.documentElement.classList.add('dark');
     }
   }, []);
+
+  // Save enabledModules to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('enabledModules', JSON.stringify(enabledModules));
+    } catch (e) {
+      console.warn('Failed to save enabledModules to localStorage:', e);
+    }
+  }, [enabledModules]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
