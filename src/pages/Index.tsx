@@ -36,7 +36,7 @@ const Index = () => {
   const [subdomainResults, setSubdomainResults] = useState<any>(null);
   const [shodanResults, setShodanResults] = useState([]);
   const [enabledModules, setEnabledModules] = useState(() => {
-    // Default values
+    // Default values - all modules enabled by default
     const defaults = {
       core: true,
       security: true,
@@ -57,8 +57,22 @@ const Index = () => {
       const saved = localStorage.getItem('enabledModules');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Merge with defaults to ensure new modules (like shodan) are included
-        return { ...defaults, ...parsed };
+        // Merge: use saved value if key exists, otherwise use default
+        // This ensures new modules (like shodan) get default value if not in saved state
+        const merged: any = {};
+
+        // For each default key, check if it exists in saved state
+        Object.keys(defaults).forEach(key => {
+          // Only use saved value if the key actually exists in parsed object
+          if (parsed.hasOwnProperty(key)) {
+            merged[key] = parsed[key];
+          } else {
+            // Key doesn't exist in saved state, use default (true for new modules)
+            merged[key] = defaults[key as keyof typeof defaults];
+          }
+        });
+
+        return merged;
       }
     } catch (e) {
       console.warn('Failed to load enabledModules from localStorage:', e);
@@ -106,6 +120,26 @@ const Index = () => {
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       setIsDarkMode(true);
       document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  // One-time migration: Ensure Shodan is enabled for existing users
+  useEffect(() => {
+    const migrationKey = 'shodan_migration_v1';
+    const migrationDone = localStorage.getItem(migrationKey);
+
+    if (!migrationDone) {
+      // Force enable Shodan if it's not already enabled
+      setEnabledModules(prev => {
+        if (!prev.shodan) {
+          console.log('Migrating: Enabling Shodan module');
+          return { ...prev, shodan: true };
+        }
+        return prev;
+      });
+
+      // Mark migration as complete
+      localStorage.setItem(migrationKey, 'true');
     }
   }, []);
 
