@@ -55,8 +55,13 @@ const Index = () => {
     // Try to load from localStorage
     try {
       const saved = localStorage.getItem('enabledModules');
+      console.log('[DEBUG] Saved enabledModules from localStorage:', saved);
+
       if (saved) {
         const parsed = JSON.parse(saved);
+        console.log('[DEBUG] Parsed enabledModules:', parsed);
+        console.log('[DEBUG] Shodan in parsed?', 'shodan' in parsed, 'Value:', parsed.shodan);
+
         // Merge: use saved value if key exists, otherwise use default
         // This ensures new modules (like shodan) get default value if not in saved state
         const merged: any = {};
@@ -72,6 +77,8 @@ const Index = () => {
           }
         });
 
+        console.log('[DEBUG] Merged enabledModules:', merged);
+        console.log('[DEBUG] Shodan in merged:', merged.shodan);
         return merged;
       }
     } catch (e) {
@@ -128,18 +135,27 @@ const Index = () => {
     const migrationKey = 'shodan_migration_v1';
     const migrationDone = localStorage.getItem(migrationKey);
 
+    console.log('[DEBUG] Migration check - migrationDone:', migrationDone);
+    console.log('[DEBUG] Current enabledModules.shodan:', enabledModules.shodan);
+
     if (!migrationDone) {
+      console.log('[DEBUG] Running migration...');
       // Force enable Shodan if it's not already enabled
       setEnabledModules(prev => {
+        console.log('[DEBUG] Migration - prev.shodan:', prev.shodan);
         if (!prev.shodan) {
-          console.log('Migrating: Enabling Shodan module');
+          console.log('[DEBUG] Migrating: Enabling Shodan module');
           return { ...prev, shodan: true };
         }
+        console.log('[DEBUG] Shodan already enabled, skipping');
         return prev;
       });
 
       // Mark migration as complete
       localStorage.setItem(migrationKey, 'true');
+      console.log('[DEBUG] Migration marked as complete');
+    } else {
+      console.log('[DEBUG] Migration already done, skipping');
     }
   }, []);
 
