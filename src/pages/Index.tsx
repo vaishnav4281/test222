@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Search, Database, FileText, Globe, Activity, Moon, Sun, LogOut, History as HistoryIcon, Download, Trash2 } from "lucide-react";
+import { Shield, Search, Database, FileText, Globe, Activity, Moon, Sun, LogOut, History as HistoryIcon, Download, Trash2, RotateCcw } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 import DomainAnalysisCard from "@/components/DomainAnalysisCard";
@@ -331,6 +331,9 @@ const Index = () => {
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
                 DomainScope
               </h1>
+              <Badge variant="outline" className="text-[10px] py-0 px-1 text-slate-400 border-slate-200 dark:border-slate-800">
+                v1.2.5
+              </Badge>
             </div>
             <div className="flex items-center space-x-1.5 sm:space-x-3">
               <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -342,6 +345,22 @@ const Index = () => {
                 className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 shadow-sm"
               >
                 {isDarkMode ? <Sun className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5 text-slate-700" />}
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('Are you sure you want to reset all dashboard settings? This will clear your module preferences and reload the page.')) {
+                    localStorage.removeItem('enabledModules');
+                    localStorage.removeItem('shodan_migration_v1');
+                    window.location.reload();
+                  }
+                }}
+                title="Reset Settings"
+                className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-all duration-300 shadow-sm"
+              >
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <RotateCcw className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden sm:inline text-xs font-medium">Reset</span>
+                </div>
               </button>
               <button
                 onClick={logout}
@@ -737,7 +756,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </div >
   );
 };
 

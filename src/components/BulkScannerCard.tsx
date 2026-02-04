@@ -83,7 +83,7 @@ const BulkScannerCard = ({
   enabledModules,
   setEnabledModules
 }: BulkScannerCardProps) => {
-  const fetchWithTimeout = async (url: string, timeout = 5000) => {
+  const fetchWithTimeout = async (url: string, timeout = 15000) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {

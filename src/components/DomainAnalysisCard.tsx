@@ -78,7 +78,7 @@ const DomainAnalysisCard = ({
   const [isCoolingDown, setIsCoolingDown] = useState(false);
   const { toast } = useToast();
 
-  const fetchWithTimeout = async (url: string, timeout = 6000) => {
+  const fetchWithTimeout = async (url: string, timeout = 15000) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
@@ -174,7 +174,7 @@ const DomainAnalysisCard = ({
 
     const dnsPromise = (async () => {
       try {
-        const dnsRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/dns?domain=${encodeURIComponent(sanitizedDomain)}`, 4000);
+        const dnsRes = await fetchWithTimeout(`${API_BASE_URL}/api/v1/scan/dns?domain=${encodeURIComponent(sanitizedDomain)}`, 10000);
         if (dnsRes.ok) return await dnsRes.json();
       } catch (e) {
         console.warn('⚠️ DNS fetch failed:', e);
