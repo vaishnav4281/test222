@@ -34,6 +34,7 @@ import SSLAnalysisResults from "@/components/SSLAnalysisResults";
 import SecurityHeadersResults from "@/components/SecurityHeadersResults";
 import ThreatIntelResults from "@/components/ThreatIntelResults";
 import WaybackResults from "@/components/WaybackResults";
+import ShodanResults from "@/components/ShodanResults";
 import { API_BASE_URL } from '../config';
 import Footer from '@/components/Footer';
 import {
@@ -80,6 +81,7 @@ const Dashboard = () => {
     const [headersResults, setHeadersResults] = useState<any[]>([]);
     const [threatIntelResults, setThreatIntelResults] = useState<any[]>([]);
     const [waybackResults, setWaybackResults] = useState<any[]>([]);
+    const [shodanResults, setShodanResults] = useState<any[]>([]);
 
     // Module Selection State
     const [enabledModules, setEnabledModules] = useState({
@@ -94,7 +96,8 @@ const Dashboard = () => {
         ssl: true,
         headers: true,
         threatIntel: true,
-        wayback: true
+        wayback: true,
+        shodan: true
     });
 
 
@@ -185,6 +188,7 @@ const Dashboard = () => {
         setHeadersResults([]);
         setThreatIntelResults([]);
         setWaybackResults([]);
+        setShodanResults([]);
     };
 
     // Result Handlers
@@ -241,6 +245,10 @@ const Dashboard = () => {
     const handleWaybackResults = (res: any) => {
         setWaybackResults(prev => [res, ...prev]);
         setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, waybackResults: res } : r));
+    };
+    const handleShodanResults = (res: any) => {
+        setShodanResults(prev => [res, ...prev]);
+        setResults(prev => prev.map(r => r.domain === res.domain ? { ...r, shodanResults: res } : r));
     };
 
     const vtSummaryByDomain = useMemo(() => {
@@ -456,6 +464,7 @@ const Dashboard = () => {
                                     onHeadersResults={handleHeadersResults}
                                     onThreatIntelResults={handleThreatIntelResults}
                                     onWaybackResults={handleWaybackResults}
+                                    onShodanResults={handleShodanResults}
 
                                     enabledModules={enabledModules}
                                     setEnabledModules={setEnabledModules}
@@ -508,6 +517,9 @@ const Dashboard = () => {
                                         {enabledModules.wayback && waybackResults.map((res, i) => (
                                             <WaybackResults key={i} results={res} />
                                         ))}
+                                        {enabledModules.shodan && shodanResults.map((res, i) => (
+                                            <ShodanResults key={i} results={Array.isArray(res) ? res : [res]} />
+                                        ))}
                                     </div>
                                 )}
                             </div>
@@ -528,6 +540,7 @@ const Dashboard = () => {
                                     onHeadersResults={handleHeadersResults}
                                     onThreatIntelResults={handleThreatIntelResults}
                                     onWaybackResults={handleWaybackResults}
+                                    onShodanResults={handleShodanResults}
 
                                     enabledModules={enabledModules}
                                     setEnabledModules={setEnabledModules}
@@ -579,6 +592,9 @@ const Dashboard = () => {
                                         ))}
                                         {enabledModules.wayback && waybackResults.map((res, i) => (
                                             <WaybackResults key={i} results={res} />
+                                        ))}
+                                        {enabledModules.shodan && shodanResults.map((res, i) => (
+                                            <ShodanResults key={i} results={Array.isArray(res) ? res : [res]} />
                                         ))}
                                     </div>
                                 )}
